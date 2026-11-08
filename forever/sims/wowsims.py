@@ -35,7 +35,8 @@ SPEC_FIELDS = {
 }  # fmt: skip
 _IMPORT = re.compile(r"^import\s+(\w+)\s+from\s+'\./([^']+\.json)';", re.MULTILINE)
 _GEAR = re.compile(r"export const (\w+) = PresetUtils\.makePresetGear\(\s*'[^']*',\s*(\w+)")
-_APL = re.compile(r"export const (\w+) = PresetUtils\.makePresetAPLRotation\(\s*'([^']*)',\s*(\w+)")
+# rotation exportée directement, ou déclarée dans un objet (`export const X = { ...PresetUtils.makePresetAPLRotation(`)
+_APL = re.compile(r"export const (\w+) = (?:\{\s*\.\.\.)?PresetUtils\.makePresetAPLRotation\(\s*'([^']*)',\s*(\w+)")
 _TALENTS = re.compile(
     r"export const (\w+) = PresetUtils\.makePresetTalents\(\s*'[^']*',\s*SavedTalents\.create\(\{\s*talentsString:"
     r"\s*'([^']*)'"
@@ -319,14 +320,72 @@ def _from_builds(spec_dir: Path, rel: str) -> list[Preset]:
     return out
 
 
-def read_presets(clone: Path) -> list[Preset]:
-    """Préréglages de toutes les spés du clone épinglé, dans l'ordre des dossiers."""
+SIML_TIMEOUT_S = 60.0  # lecture d'un fichier SIML par le binaire (réglage de l'outil)
+
+
+def _from_siml(spec_dir: Path, rel: str, binary: Path | None, runner: gitops.Runner) -> list[Preset]:
+    """Builds SIML (`builds/*.siml`) lus par le binaire épinglé (`siml parse -json`), en local ; un fichier
+    illisible est écarté sans arrêter les autres."""
+    files = sorted((spec_dir / "builds").glob("*.siml"))
+    if not files or binary is None or rel not in SPEC_FIELDS:
+        return []
+    spec_field = SPEC_FIELDS[rel]
+
+    def parse(path: Path) -> dict[str, Any]:
+        try:
+            done = gitops._run(runner, [str(binary), "siml", "parse", "-json", str(path)], spec_dir,
+                               timeout=SIML_TIMEOUT_S, check=False)  # fmt: skip
+            return dict(json.loads(done.stdout)) if done.returncode == 0 else {}
+        except (gitops.GitOpsError, OSError, ValueError):
+            return {}
+
+    # un build est chargé par-dessus les valeurs par défaut de sa spé (`defaults.siml`), comme le fait wowsims
+    defaults = parse(spec_dir / "defaults.siml") if (spec_dir / "defaults.siml").is_file() else {}
+    out = []
+    for path in files:
+        doc = parse(path)
+        player = {**(defaults.get("player") or {}), **(doc.get("player") or {})}
+        rotation = player.get("rotation") or {}
+        if rotation.get("type") != "TypeAPL":  # rotation « simple » : jouée par l'interface web seulement
+            name = path.name.removesuffix(".siml")
+            for apl in (spec_dir / "apls" / f"{name}.apl.siml", spec_dir / "apls" / "default.apl.siml"):
+                parsed = parse(apl) if apl.is_file() else {}
+                if parsed.get("type") == "TypeAPL":
+                    player["rotation"] = parsed
+                    break
+        if not player.get("rotation") or not player.get("class"):
+            continue
+        out.append(
+            Preset(
+                key=f"{rel}/{path.name.removesuffix('.siml')}",
+                class_token=str(player["class"]),
+                spec_field=spec_field,
+                talents=str(player.get("talentsString") or ""),
+                rotation=dict(player["rotation"]),
+                equipment=dict(player.get("equipment") or {}),
+                spec_options=dict(player.get(spec_field) or {}),
+                race=player.get("race"),
+                individual_buffs=dict(player.get("buffs") or {}),
+                consumables=dict(player.get("consumables") or {}),
+            )
+        )
+    return out
+
+
+def read_presets(clone: Path, *, runner: gitops.Runner | None = None) -> list[Preset]:
+    """Préréglages de toutes les spés du clone épinglé, dans l'ordre des dossiers ; builds SIML lus par le binaire
+    épinglé (`pin.json` à côté du clone) s'il existe."""
     specs = clone / "ui" / "specs"
     ids = consumable_ids(clone)
+    pin_path = clone.parent / "pin.json"
+    binary = None
+    if pin_path.is_file():
+        candidate = clone.parent / str(json.loads(pin_path.read_text(encoding="utf-8")).get("binary"))
+        binary = candidate if candidate.is_file() else None
     out: list[Preset] = []
     for spec_dir in sorted(p for p in specs.glob("*/*") if p.is_dir()):
         rel = spec_dir.relative_to(specs).as_posix()
-        builds = _from_builds(spec_dir, rel)
+        builds = _from_builds(spec_dir, rel) + _from_siml(spec_dir, rel, binary, runner or gitops.subprocess_runner)
         out += builds + _from_presets_ts(spec_dir, rel, ids, fallback=not builds)
     return out
 

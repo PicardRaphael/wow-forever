@@ -348,13 +348,19 @@ def run_from_sources(
     picks_at: Callable[[int], Sequence[Mapping[str, Any]]] | None = None
     if gear == "gearquest":
         from forever.gear import gear_report
+        from forever.sims.engines import ClassTalents
+
+        if gear_spec is None:
+            conv = ClassTalents(deps, class_name)
+            gear_spec = gearquest_spec(chosen.key, conv.lead_tree(conv.wowsims.decode(chosen.talents)))
 
         def picks_at(level: int) -> Sequence[Mapping[str, Any]]:
             doc = gear_report(deps, "leveling", class_name=class_name, level=level, race=race or "Orc",
                               spec=gear_spec)  # fmt: skip
             return list(doc.get("picks") or [])
 
-        notes.append("équipement : choix de GearQuest au niveau de chaque tranche (forever_gear action=leveling)")
+        notes.append(f"équipement : choix de GearQuest ({gear_spec}) au niveau de chaque tranche "
+                     "(forever_gear action=leveling)")  # fmt: skip
     else:
         notes.append("équipement : aucun (nu)")
     from forever.sims.base_stats import logger_anchors
@@ -536,6 +542,11 @@ def optimise_from_sources(
     if candidates is None:
         from forever.gear import gear_report
 
+        if gear_spec is None:
+            from forever.sims.engines import ClassTalents
+
+            conv = ClassTalents(deps, class_name)
+            gear_spec = gearquest_spec(chosen.key, conv.lead_tree(conv.wowsims.decode(chosen.talents)))
         doc = gear_report(deps, "leveling", class_name=class_name, level=level, race=race or "Orc", spec=gear_spec)
         candidates = list(doc.get("picks") or [])
         notes.append("candidats : choix de GearQuest au niveau (forever_gear action=leveling)")
@@ -546,6 +557,16 @@ def optimise_from_sources(
     return out
 
 
+# dossier de spé de wowsims -> spécialisation de GearQuest, quand le dossier la nomme
+_GQ_FOLDERS = {"retribution": "retribution", "balance": "balance", "elemental": "elemental",
+               "enhancement": "enhancement", "feralcat": "feral", "feralbear": "bear"}  # fmt: skip
+_GQ_TREES = {"feral_combat": "feral"}  # arbre du client -> spécialisation de GearQuest, quand ils diffèrent
+
+
 def gearquest_spec(preset_key: str, lead_tree: str) -> str:
-    """Squelette (SIM2)."""
-    raise NotImplementedError
+    """Spécialisation de GearQuest Forever (`<spé>-<classe>`, forme de `forever_gear`) d'un préréglage : son dossier
+    de spé s'il la nomme, sinon l'arbre le plus pris par ses talents."""
+    class_folder, spec_folder = preset_key.split("/")[:2]
+    tree = lead_tree.strip().lower().replace(" ", "_")
+    name = _GQ_FOLDERS.get(spec_folder) or _GQ_TREES.get(tree, tree)
+    return f"{name}-{class_folder}"

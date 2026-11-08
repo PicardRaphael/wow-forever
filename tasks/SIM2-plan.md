@@ -230,3 +230,4 @@ niveau accepté) ; aucune PR publique chez wowsims.
   246 → 455, Voleur 60 25 → 360, Chaman 25 14 → 31 DPS.
 - **Bloc 7 fait** : poids des statistiques par tranche (`stats`, `reference` sur `brackets`), tirages appariés dans les conditions de chaque tranche.
 - **Bloc 8 fait** : optimisation de l'équipement par emplacement (`forever sims gear`) ; vérification réelle des 7 classes calculables après 1.60.1.70862.
+- **Bloc 9 fait** : builds SIML lus par le binaire (Chasseur, Paladin Vindicte ; rotation simple remplacée par l'APL du dépôt), rotation déclarée dans un objet (Druide félin), fiches GearQuest du Paladin, spécialisation de GearQuest déduite du préréglage.
