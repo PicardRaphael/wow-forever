@@ -1841,8 +1841,9 @@ mechanics:
       - tests/unit/test_kill_time.py::test_measured_when_enough_samples
       - tests/unit/test_objectives_kill_time.py::test_mage_measure_wins_over_the_engine_which_stays_for_comparison
       - tests/unit/test_objectives_kill_time.py::test_journal_combat_time_is_marked_as_combat_only
+      - tests/unit/test_sims_validate.py::test_fights_are_measured_by_level_with_pet_and_without_duplicates
     tolerance: null
-    note: "mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), comme le moteur du Mage, et passe avant la durée des combats des journaux, qui n'en compte pas (champ scope : total ou combat) ; même règle pour le Mage (décision 249) : la mesure passe avant le moteur, dont le temps reste rendu à côté ; écart moteur et mesure : question LVL11 ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
+    note: "SIM2 (mesuré contre simulé, forever sims validate) : chaque combat porte aussi ses dégâts (joueur et familier, dépassement retiré, suffixe _DAMAGE seul : le client écrit chaque coup au contact deux fois, SWING_DAMAGE puis SWING_DAMAGE_LANDED, relevé dans le journal réel du 2026-09-27) ; mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), comme le moteur du Mage, et passe avant la durée des combats des journaux, qui n'en compte pas (champ scope : total ou combat) ; même règle pour le Mage (décision 249) : la mesure passe avant le moteur, dont le temps reste rendu à côté ; écart moteur et mesure : question LVL11 ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
   - id: I16
     categorie: optimisation
     description: "Durée et monstres d'un passage de donjon (relevés du joueur, compte d'un addon, formule de Factoruide)"

@@ -33,6 +33,8 @@ class FightDuration(NamedTuple):
     seconds: float
     pet: bool  # le familier a frappé pendant le combat
     start: Any  # heure locale du début (datetime)
+    damage: float = 0.0  # SIM2 : dégâts du joueur et de son familier sur ce monstre (dépassement retiré)
+    pet_damage: float = 0.0  # part du familier dans `damage`
 
 
 class KillTime(NamedTuple):
@@ -107,6 +109,7 @@ def fight_durations(events: Iterable[Event], mine: str) -> list[FightDuration]:
 
     Registre : I15"""
     started: dict[str, tuple[datetime, bool, int | None]] = {}
+    dealt: dict[str, list[float]] = {}  # GUID du monstre -> [dégâts, dont familier]
     out: list[FightDuration] = []
     for e in events:
         dest = e.dest
@@ -118,13 +121,31 @@ def fight_durations(events: Iterable[Event], mine: str) -> list[FightDuration]:
                 continue
             if dest.guid not in started:
                 started[dest.guid] = (e.time, pet, dest.npc_id)
+                dealt[dest.guid] = [0.0, 0.0]
             elif pet and not started[dest.guid][1]:
                 begin, _, npc = started[dest.guid]
                 started[dest.guid] = (begin, True, npc)
+            amount = _amount(e)
+            dealt[dest.guid][0] += amount
+            if pet:
+                dealt[dest.guid][1] += amount
         elif e.name == "UNIT_DIED" and dest.guid in started:
             begin, pet, npc = started.pop(dest.guid)
-            out.append(FightDuration(dest.guid, npc, (e.time - begin).total_seconds(), pet, begin))
+            damage, pet_damage = dealt.pop(dest.guid)
+            out.append(FightDuration(dest.guid, npc, (e.time - begin).total_seconds(), pet, begin, damage, pet_damage))
     return out
+
+
+def _amount(e: Event) -> float:
+    """Dégâts d'un événement, dépassement (overkill) retiré. Le client écrit chaque coup au contact deux fois
+    (`SWING_DAMAGE`, puis `SWING_DAMAGE_LANDED` à la même heure, relevé dans le journal réel du 2026-09-27) : seul le
+    suffixe `_DAMAGE` est compté."""
+    if not e.name.endswith("_DAMAGE"):
+        return 0.0
+    amount, overkill = e.suffix.get("amount"), e.suffix.get("overkill")
+    if not isinstance(amount, int | float):
+        return 0.0
+    return float(amount) - (float(overkill) if isinstance(overkill, int | float) and overkill > 0 else 0.0)
 
 
 def kill_cadence(gains: Sequence[XpGain], *, pause_s: float) -> list[float]:
@@ -237,13 +258,11 @@ def kill_time(
     return KillTime(cls, level, "estimated", (low + high) / 2, low, high, 0, "suppose", "estimé", "combat")
 
 
-def refresh_kill_times(deps: Deps, *, logs_dir: Path | None = None, sv_dir: Path | None = None) -> dict[str, Any]:
-    """Relit journaux et ForeverLogger, écrit `<cache>/measures/kill_time.json` et rend les mesures."""
-    from forever.gamedata import MECHANICS_FILE
-    from forever.store import load_version
-
-    data = load_version(deps)
-    params = kill_params(data.read_json(MECHANICS_FILE)["values"])
+def local_sources(
+    deps: Deps, *, logs_dir: Path | None = None, sv_dir: Path | None = None
+) -> tuple[list[Path], list[LoggerDB]]:
+    """Journaux de combat (`<jeu>/Logs`, ou `logs_dir`) et SavedVariables de ForeverLogger (de chaque compte, ou
+    `sv_dir/ForeverLogger.lua`) lus sur disque."""
     wow = deps.wow_dir
     logs_dir = logs_dir or (wow / "Logs" if wow else None)
     logs = log_files(logs_dir) if logs_dir is not None and logs_dir.is_dir() else []
@@ -253,7 +272,17 @@ def refresh_kill_times(deps: Deps, *, logs_dir: Path | None = None, sv_dir: Path
         paths = sorted(wow.glob(f"WTF/Account/*/SavedVariables/{LOGGER_FILE}"))
     else:
         paths = []
-    loggers = [read_logger_db(p) for p in paths if p.is_file()]
+    return logs, [read_logger_db(p) for p in paths if p.is_file()]
+
+
+def refresh_kill_times(deps: Deps, *, logs_dir: Path | None = None, sv_dir: Path | None = None) -> dict[str, Any]:
+    """Relit journaux et ForeverLogger, écrit `<cache>/measures/kill_time.json` et rend les mesures."""
+    from forever.gamedata import MECHANICS_FILE
+    from forever.store import load_version
+
+    data = load_version(deps)
+    params = kill_params(data.read_json(MECHANICS_FILE)["values"])
+    logs, loggers = local_sources(deps, logs_dir=logs_dir, sv_dir=sv_dir)
     out = {**measure_kill_times(params, logs=logs, loggers=loggers), "logs": len(logs), "loggers": len(loggers)}
     target = deps.cache_dir / "measures" / MEASURES_FILE
     target.parent.mkdir(parents=True, exist_ok=True)

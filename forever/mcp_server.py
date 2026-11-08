@@ -475,6 +475,10 @@ def build_server(deps: Deps) -> MCPServer:
         equipped: str | None = None,
         candidates: str | None = None,
         conditions: str = "solo",
+        character: str | None = None,
+        log: str | None = None,
+        sv: str | None = None,
+        group: str = "bracket",
     ) -> dict[str, Any]:
         """Calculs de wowsims/forever (et de MythicSim, MS1) au niveau 60 seulement, toutes classes (décisions 293 et 294 : simulateur
         maintenu par d'autres, compilé tel quel, épinglé) : `action="presets"` préréglages du dépôt (`key` :
@@ -502,7 +506,11 @@ def build_server(deps: Deps) -> MCPServer:
         (« Emplacement:objet,… », emplacements de wowsims), `candidates` (même forme ; défaut : choix de GearQuest au
         niveau) ; chaque candidat essayé à sa place, gain, seuil de bruit, verdict « meilleur » ou « non départagé ».
         `conditions` (brackets) : `solo` (leveling, défaut), `group` (buffs du préréglage), `raid` (buffs,
-        consommables, boss au-dessus : comparable aux classements de MythicSim). Les
+        consommables, boss au-dessus : comparable aux classements de MythicSim). `action="validate"` (SIM2, mesure et
+        recoupement) : DPS mesuré dans les journaux de combat du personnage `character` (nom ou GUID de ForeverLogger ;
+        `log` fichier ou dossier, défaut `<jeu>/Logs` ; `sv` fichier ForeverLogger.lua) par tranche (`group` :
+        `bracket`, ou `level`), comparé au calcul de la tranche (`preset` facultatif) : écart relatif, verdict
+        « non départagé » sous le bruit, certitude `probable` pour une tranche recoupée, sinon `suppose`. Les
         hypothèses de la provenance disent ce qui reste au niveau 60 (attributs de base) : les citer."""
         from forever.sims.report import simulate
 
@@ -511,7 +519,8 @@ def build_server(deps: Deps) -> MCPServer:
                             iterations=iterations, cases=cases, consumables=consumables, talents=talents,
                             engine=engine, rotation=rotation, max_steps=max_steps, popular=popular, brackets=brackets,
                             path=path, gear=gear, spec=spec, level=level, equipped=equipped,
-                            candidates=candidates, conditions=conditions)  # fmt: skip
+                            candidates=candidates, conditions=conditions, character=character, log=log, sv=sv,
+                            group=group)  # fmt: skip
         except ForeverError as err:
             return cast(dict[str, Any], _error_result(deps, err))
 
