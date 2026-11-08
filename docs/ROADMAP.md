@@ -187,7 +187,10 @@ Dans cet ordre, chaque tranche par le flux habituel (`/tranche`, tests d'abord, 
    « ce qui change pour moi » (classe, spé, équipement, route).
 6. **AMI6, communauté en recoupement** : classements de MythicSim, Warcraft Logs, foreverlogs.gg lus et comparés,
    jamais pris pour vérité (étiquette `suppose`).
-7. **AMI7, au-delà des dégâts** : métiers rentables, hôtel des ventes, réputations, champs de bataille.
+7. **AMI7, au-delà des dégâts** : métiers rentables, hôtel des ventes, réputations, champs de bataille. AMI7b
+   (2026-11-08) : ces questions, et PNJ, vendeurs et objets, passent par les outils forever d'abord puis par le
+   serveur MCP tiers Everloot (skill `forever-economie`, certitude au mieux `suppose`) ; champs de bataille absents
+   des données du dépôt (PVP5).
 
 ### CM1 — Calcul du Chaman
 - Plus de moteur du Chaman écrit par nous (décision 293 ; l'ancien contenu « table de mêlée, soins, totems,

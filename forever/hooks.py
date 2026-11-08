@@ -43,6 +43,9 @@ _ANY_NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
 _FOREVER_TOOL = re.compile(r"^mcp__.+__forever_\w+$")
 _FOREVER_SKILL = re.compile(r"^(?:forever:)?forever-[\w-]+$")
 _SOURCE_AGENT = re.compile(r"^(?:forever:)?forever-sim-runner$")
+# Serveur MCP tiers Everloot (AMI7b) : ses résultats sont des sources de chiffres, à citer comme tiers (certitude au
+# mieux `suppose`), jamais comme un fait du projet. Nom direct (`mcp__everloot__…`) ou par un connecteur.
+_THIRD_PARTY_TOOL = re.compile(r"^mcp__(?:\w+_)?everloot__\w+$", re.IGNORECASE)
 _RESEARCH_AGENT = re.compile(r"^(?:forever:)?forever-web-researcher$")
 _ADDRESS = re.compile(r"https?://", re.IGNORECASE)
 _FOREVER_AGENT = re.compile(r"^(?:forever:)?forever-[\w-]+$")
@@ -118,7 +121,7 @@ def _is_source_use(use: Mapping[str, Any]) -> bool:
     name = str(use.get("name", ""))
     inp = use.get("input") if isinstance(use.get("input"), Mapping) else {}
     assert isinstance(inp, Mapping)
-    if _FOREVER_TOOL.match(name):
+    if _FOREVER_TOOL.match(name) or _THIRD_PARTY_TOOL.match(name):
         return True
     return name in ("Agent", "Task") and bool(_SOURCE_AGENT.match(str(inp.get("subagent_type", ""))))
 
@@ -282,7 +285,7 @@ def _matches(x: float, decimals: int, unit: str, v: float) -> bool:
 
 def unsourced_numbers(lines: Iterable[Mapping[str, Any]], last_message: str | None = None) -> list[str]:
     """Chiffres de jeu de la dernière réponse absents des résultats des outils `forever_*` (et du sous-agent de
-    simulation), des lignes sourcées (avec une adresse) du rapport du sous-agent de recherche et de la question de
+    simulation), des résultats du serveur tiers Everloot, des lignes sourcées (avec une adresse) du rapport du sous-agent de recherche et de la question de
     l'utilisateur. Égalité à l'arrondi affiché près ; fraction acceptée pour un
     pourcentage, secondes pour des minutes ou des heures ; virgule et point équivalents."""
     all_lines = list(lines)
