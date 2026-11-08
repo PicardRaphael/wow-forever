@@ -53,3 +53,11 @@ def anchor_note(anchors: Sequence[Mapping[str, Any]], level: int) -> str:
         f"attributs sans équipement interpolés entre le relevé ForeverLogger du niveau {below[-1]} et "
         f"{'le relevé du niveau ' + str(upper) if above else 'les tables du niveau 60 de wowsims'} (suppose)"
     )
+
+
+def anchors_from_logger(db: Any, class_token: str) -> list[dict[str, Any]]:
+    raise NotImplementedError
+
+
+def logger_anchors(deps: Deps, class_token: str) -> tuple[list[dict[str, Any]], list[Any]]:
+    raise NotImplementedError

@@ -227,6 +227,11 @@ end
 
 UnitName = api("UnitName", function(unit) if unit == "player" then return Stub.player.name end end)
 GetRealmName = api("GetRealmName", function() return Stub.player.realm end)
+-- UnitStat simulé : Stub.player.stats[indice] = { valeur, effectif, bonus, malus } (valeurs synthétiques).
+UnitStat = api("UnitStat", function(unit, index)
+	local s = unit == "player" and Stub.player.stats and Stub.player.stats[index]
+	if s then return s[1], s[2], s[3], s[4] end
+end)
 UnitLevel = api("UnitLevel", function(unit)
 	if unit == "player" then return Stub.player.level end
 	if unit == "target" then return Stub.player.target_level end
