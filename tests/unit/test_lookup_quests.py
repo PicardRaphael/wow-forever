@@ -1,12 +1,14 @@
 """Consultation des quêtes (T04d, bloc D) : `forever lookup quests`, `forever quests show|build|diff`,
 `forever_lookup(kind="quests")`, chaque sortie avec sa provenance. Fixture : `tests/fixtures/addons/quests/`."""
 
+import dataclasses
 import json
 
 import pytest
-from conftest import FIXTURES, isolated_deps
+from conftest import DATA_DIR, FIXTURES, isolated_deps
 
 from forever.cli import main
+from forever.config import default_deps
 from forever.provenance import validate_provenance
 from forever.quests import lookup_quests
 
@@ -42,7 +44,10 @@ def run(capsys, args, tmp_path, monkeypatch):
     monkeypatch.setenv("FOREVER_CACHE_DIR", str(tmp_path / "cache"))
     monkeypatch.setenv("FOREVER_WOW_DIR", str(WOW))
     monkeypatch.setenv("FOREVER_OFFLINE", "1")
-    code = main(args)
+    # données figées des tests (DATA_DIR), jamais la version installée : une nouvelle version du jeu donne un rapport
+    # des valeurs qui changent, pas un test rouge (décision 288)
+    deps = dataclasses.replace(default_deps(), data_dir=DATA_DIR)
+    code = main(args, deps)
     return code, capsys.readouterr().out
 
 
