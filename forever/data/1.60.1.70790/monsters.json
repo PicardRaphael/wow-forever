@@ -27,7 +27,8 @@
   "WoWCombatLog-110626_073420.txt",
   "WoWCombatLog-110626_124613.txt",
   "WoWCombatLog-110626_125830.txt",
-  "WoWCombatLog-110626_180748.txt"
+  "WoWCombatLog-110626_180748.txt",
+  "WoWCombatLog-110626_182926.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -390,9 +391,9 @@
     "2": {
      "max_hp": 55,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_180748.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_180748.txt, WoWCombatLog-110626_182926.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 55,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -404,30 +405,30 @@
     "1": {
      "max_hp": 42,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_180748.txt (bloc avancé, 20 individu(s))",
+     "source": "journal WoWCombatLog-110626_180748.txt, WoWCombatLog-110626_182926.txt (bloc avancé, 120 individu(s))",
      "questie_hp": 42,
-     "fought": null
+     "fought": true
     }
    }
   },
   "706": {
-   "name": "Frostmane Troll Whelp",
+   "name": "Jeune troll Frostmane",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "3": {
      "max_hp": 71,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 11 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 30 individu(s))",
      "questie_hp": 71,
-     "fought": null
+     "fought": true
     },
     "4": {
      "max_hp": 86,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 20 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 33 individu(s))",
      "questie_hp": 86,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -439,14 +440,14 @@
     "1": {
      "max_hp": 42,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 42,
      "fought": null
     },
     "2": {
      "max_hp": 55,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_180748.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110626_180748.txt, WoWCombatLog-110626_182926.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 55,
      "fought": null
     }
@@ -460,9 +461,9 @@
     "3": {
      "max_hp": 71,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 60 individu(s))",
      "questie_hp": 71,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -474,7 +475,7 @@
     "1": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_180748.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_180748.txt, WoWCombatLog-110626_182926.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 1,
      "fought": null
     }
@@ -488,9 +489,23 @@
     "2": {
      "max_hp": 55,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_180748.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_180748.txt, WoWCombatLog-110626_182926.txt (bloc avancé, 53 individu(s))",
      "questie_hp": 55,
-     "fought": null
+     "fought": true
+    }
+   }
+  },
+  "808": {
+   "name": "Grik'nir le Froid",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 98,
+     "fought": true
     }
    }
   },
@@ -557,6 +572,20 @@
     }
    }
   },
+  "946": {
+   "name": "Novice Frostmane",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 69,
+     "fought": false
+    }
+   }
+  },
   "1024": {
    "name": "Murloc Branchie-bleue",
    "zone_id": 11,
@@ -593,21 +622,21 @@
    }
   },
   "1115": {
-   "name": "Rockjaw Skullthumper",
+   "name": "Brise-crâne Mâcheroc",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 17 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 156,
      "fought": null
     },
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 21 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 176,
      "fought": null
     }
@@ -628,177 +657,177 @@
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 16 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 198,
      "fought": null
     }
    }
   },
   "1117": {
-   "name": "Rockjaw Bonesnapper",
+   "name": "Briseur d’os Mâcheroc",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 24 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 176,
      "fought": null
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 23 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 198,
      "fought": null
     }
    }
   },
   "1120": {
-   "name": "Frostmane Troll",
+   "name": "Troll Frostmane",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 137,
      "fought": null
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 156,
      "fought": null
     }
    }
   },
   "1121": {
-   "name": "Frostmane Snowstrider",
+   "name": "Marche-neige Frostmane",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 148,
-     "fought": null
+     "fought": true
     },
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 8 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 166,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1122": {
-   "name": "Frostmane Hideskinner",
+   "name": "Ecorcheur Frostmane",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 176,
-     "fought": null
+     "fought": true
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 198,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1123": {
-   "name": "Frostmane Headhunter",
+   "name": "Chasseur de têtes Frostmane",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 10 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 156,
-     "fought": null
+     "fought": true
     },
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 176,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1124": {
-   "name": "Frostmane Shadowcaster",
+   "name": "Exhalombre Frostmane",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 160,
-     "fought": null
+     "fought": true
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 178,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1125": {
-   "name": "Crag Boar",
+   "name": "Sanglier des rochers",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 102,
-     "fought": null
+     "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 14 individu(s))",
      "questie_hp": 120,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1126": {
-   "name": "Large Crag Boar",
+   "name": "Grand sanglier des rochers",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 14 individu(s))",
      "questie_hp": 120,
-     "fought": null
+     "fought": true
     },
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 137,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -810,79 +839,79 @@
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 137,
-     "fought": null
+     "fought": true
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 13 individu(s))",
      "questie_hp": 156,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1128": {
-   "name": "Young Black Bear",
+   "name": "Jeune ours noir",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "5": {
      "max_hp": 122,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 122,
      "fought": null
     },
     "6": {
      "max_hp": 144,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 144,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1131": {
-   "name": "Winter Wolf",
+   "name": "Loup blanc",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 137,
      "fought": null
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 156,
      "fought": null
     }
    }
   },
   "1134": {
-   "name": "Young Wendigo",
+   "name": "Jeune wendigo",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 102,
-     "fought": null
+     "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 120,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -894,16 +923,16 @@
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 14 individu(s))",
      "questie_hp": 120,
-     "fought": null
+     "fought": true
     },
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 20 individu(s))",
      "questie_hp": 137,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -915,9 +944,16 @@
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 120,
      "fought": null
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 137,
+     "fought": true
     }
    }
   },
@@ -1097,58 +1133,58 @@
     "7": {
      "max_hp": 164,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 164,
-     "fought": null
+     "fought": true
     },
     "8": {
      "max_hp": 187,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 16 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 187,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1199": {
-   "name": "Juvenile Snow Leopard",
+   "name": "Jeune Léopard des neiges",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 102,
      "fought": null
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 120,
      "fought": null
     }
    }
   },
   "1201": {
-   "name": "Snow Leopard",
+   "name": "Léopard des neiges",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 23 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 137,
-     "fought": null
+     "fought": true
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 156,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -1202,14 +1238,14 @@
    }
   },
   "1260": {
-   "name": "Great Father Arctikus",
+   "name": "Grand-père Arctikus",
    "zone_id": 1,
    "rank": 4,
    "levels": {
     "11": {
      "max_hp": 239,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 208,
      "fought": null
     }
@@ -1230,16 +1266,16 @@
    }
   },
   "1271": {
-   "name": "Old Icebeard",
+   "name": "Vieux Barbeglace",
    "zone_id": 1,
    "rank": 1,
    "levels": {
     "11": {
      "max_hp": 717,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 666,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -1265,30 +1301,30 @@
     "11": {
      "max_hp": 717,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 666,
-     "fought": null
+     "fought": true
     }
    }
   },
   "1397": {
-   "name": "Frostmane Seer",
+   "name": "Prophète Frostmane",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 148,
-     "fought": null
+     "fought": true
     },
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 14 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 18 individu(s))",
      "questie_hp": 166,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -1366,6 +1402,20 @@
      "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 198,
      "fought": null
+    }
+   }
+  },
+  "1718": {
+   "name": "Ecumeur Mâcheroc",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "4": {
+     "max_hp": 86,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 86,
+     "fought": true
     }
    }
   },
@@ -2094,6 +2144,20 @@
      "source": "journal WoWCombatLog-110626_073420.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 300,
      "fought": null
+    }
+   }
+  },
+  "2326": {
+   "name": "Thamner Pol",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
     }
    }
   },
@@ -3568,7 +3632,7 @@
     "11": {
      "max_hp": 239,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 24 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
      "fought": null
     }
@@ -3805,6 +3869,20 @@
     }
    }
   },
+  "10611": {
+   "name": "Courtebottes",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 198,
+     "fought": false
+    }
+   }
+  },
   "10803": {
    "name": "Rifleman Wheeler",
    "zone_id": 1,
@@ -3830,6 +3908,20 @@
      "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
      "fought": null
+    }
+   }
+  },
+  "10805": {
+   "name": "Eclaireur Klemmy",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 120,
+     "fought": false
     }
    }
   },
@@ -4240,14 +4332,14 @@
    }
   },
   "257446": {
-   "name": "Teo Hammerstorm",
+   "name": "Teo Martel-tempête",
    "zone_id": null,
    "rank": null,
    "levels": {
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": null,
      "fought": null
     }
@@ -4268,7 +4360,7 @@
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
      "fought": null
     }
@@ -4526,6 +4618,20 @@
     }
    }
   },
+  "269075": {
+   "name": "Léopard des neiges rôdeur",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
   "270196": {
    "name": "Jai'vhanel",
    "zone_id": null,
@@ -4541,44 +4647,65 @@
    }
   },
   "271486": {
-   "name": "Wendigo Shaman",
+   "name": "Wendigo chaman",
    "zone_id": null,
    "rank": null,
    "levels": {
+    "6": {
+     "max_hp": 96,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
     "7": {
      "max_hp": 110,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
      "questie_hp": null,
      "fought": null
     },
     "8": {
      "max_hp": 125,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 2 individu(s))",
      "questie_hp": null,
-     "fought": null
+     "fought": true
     }
    }
   },
   "271530": {
-   "name": "Elder Wendigo",
+   "name": "Sage wendigo",
    "zone_id": null,
    "rank": null,
    "levels": {
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 21 individu(s))",
      "questie_hp": null,
-     "fought": null
+     "fought": true
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 22 individu(s))",
      "questie_hp": null,
-     "fought": null
+     "fought": true
+    }
+   }
+  },
+  "271587": {
+   "name": "Hurlegivre",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "9": {
+     "max_hp": 270,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": null,
+     "fought": false
     }
    }
   },
@@ -4604,14 +4731,14 @@
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 6 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 4 individu(s))",
      "questie_hp": null,
      "fought": null
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 7 individu(s))",
+     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 5 individu(s))",
      "questie_hp": null,
      "fought": null
     }
@@ -4653,21 +4780,21 @@
   },
   "4": {
    "value": 86,
-   "certainty": "probable",
-   "source": "journaux : médiane de [86] des PNJ normaux observés",
-   "n_npcs": 1
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 2
   },
   "5": {
    "value": 102,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 2
+   "n_npcs": 3
   },
   "6": {
    "value": 120,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 5
+   "n_npcs": 6
   },
   "7": {
    "value": 137,
@@ -5277,6 +5404,12 @@
    "questie": 386
   },
   {
+   "npc_id": 808,
+   "level": 5,
+   "measured": 102,
+   "questie": 98
+  },
+  {
    "npc_id": 822,
    "level": 9,
    "measured": 225,
@@ -5305,6 +5438,12 @@
    "level": 11,
    "measured": 239,
    "questie": 222
+  },
+  {
+   "npc_id": 946,
+   "level": 3,
+   "measured": 71,
+   "questie": 69
   },
   {
    "npc_id": 1024,
@@ -6771,6 +6910,12 @@
    "questie": 300
   },
   {
+   "npc_id": 10611,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
    "npc_id": 11318,
    "level": 13,
    "measured": 921,
@@ -6968,11 +7113,11 @@
    },
    "4": {
     "ratio": 1.0,
-    "n_pairs": 1
+    "n_pairs": 2
    },
    "5": {
     "ratio": 1.0,
-    "n_pairs": 2
+    "n_pairs": 3
    },
    "6": {
     "ratio": 1.0,
@@ -7169,38 +7314,44 @@
     "ratio": 1.2739420935412027
    },
    {
+    "npc_id": 946,
+    "name": "Novice Frostmane",
+    "level": 3,
+    "ratio": 1.0289855072463767
+   },
+   {
     "npc_id": 1128,
-    "name": "Young Black Bear",
+    "name": "Jeune ours noir",
     "level": 5,
     "ratio": 1.0
    },
    {
     "npc_id": 1128,
-    "name": "Young Black Bear",
+    "name": "Jeune ours noir",
     "level": 6,
     "ratio": 1.0
    },
    {
     "npc_id": 1131,
-    "name": "Winter Wolf",
+    "name": "Loup blanc",
     "level": 7,
     "ratio": 1.0
    },
    {
     "npc_id": 1131,
-    "name": "Winter Wolf",
+    "name": "Loup blanc",
     "level": 8,
     "ratio": 1.0
    },
    {
     "npc_id": 1134,
-    "name": "Young Wendigo",
+    "name": "Jeune wendigo",
     "level": 5,
     "ratio": 1.0
    },
    {
     "npc_id": 1134,
-    "name": "Young Wendigo",
+    "name": "Jeune wendigo",
     "level": 6,
     "ratio": 1.0
    },
@@ -7220,6 +7371,12 @@
     "npc_id": 1138,
     "name": "Loup pisteur des neiges",
     "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1138,
+    "name": "Loup pisteur des neiges",
+    "level": 7,
     "ratio": 1.0
    },
    {
@@ -7763,6 +7920,18 @@
     "ratio": 1.0
    },
    {
+    "npc_id": 10611,
+    "name": "Courtebottes",
+    "level": 10,
+    "ratio": 1.0505050505050506
+   },
+   {
+    "npc_id": 10805,
+    "name": "Eclaireur Klemmy",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 12138,
     "name": "Lunegriffe",
     "level": 12,
@@ -7947,8 +8116,16 @@
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
+   "npc_id": 946,
+   "name": "Novice Frostmane",
+   "levels": [
+    3
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 1128,
-   "name": "Young Black Bear",
+   "name": "Jeune ours noir",
    "levels": [
     5,
     6
@@ -7957,7 +8134,7 @@
   },
   {
    "npc_id": 1131,
-   "name": "Winter Wolf",
+   "name": "Loup blanc",
    "levels": [
     7,
     8
@@ -7966,7 +8143,7 @@
   },
   {
    "npc_id": 1134,
-   "name": "Young Wendigo",
+   "name": "Jeune wendigo",
    "levels": [
     5,
     6
@@ -7986,7 +8163,8 @@
    "npc_id": 1138,
    "name": "Loup pisteur des neiges",
    "levels": [
-    6
+    6,
+    7
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
@@ -8065,7 +8243,7 @@
   },
   {
    "npc_id": 1260,
-   "name": "Great Father Arctikus",
+   "name": "Grand-père Arctikus",
    "levels": [
     11
    ],
@@ -8081,7 +8259,7 @@
   },
   {
    "npc_id": 1271,
-   "name": "Old Icebeard",
+   "name": "Vieux Barbeglace",
    "levels": [
     11
    ],
@@ -8214,6 +8392,14 @@
     16
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 2326,
+   "name": "Thamner Pol",
+   "levels": [
+    9
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 2336,
@@ -8592,6 +8778,14 @@
    "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
+   "npc_id": 10611,
+   "name": "Courtebottes",
+   "levels": [
+    10
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 10803,
    "name": "Rifleman Wheeler",
    "levels": [
@@ -8606,6 +8800,14 @@
     8
    ],
    "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 10805,
+   "name": "Eclaireur Klemmy",
+   "levels": [
+    6
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 11318,
@@ -8799,7 +9001,7 @@
   },
   {
    "npc_id": 257446,
-   "name": "Teo Hammerstorm",
+   "name": "Teo Martel-tempête",
    "levels": [
     5
    ],
@@ -8903,8 +9105,9 @@
   },
   {
    "npc_id": 271486,
-   "name": "Wendigo Shaman",
+   "name": "Wendigo chaman",
    "levels": [
+    6,
     7,
     8
    ],
@@ -8912,12 +9115,20 @@
   },
   {
    "npc_id": 271530,
-   "name": "Elder Wendigo",
+   "name": "Sage wendigo",
    "levels": [
     7,
     8
    ],
    "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 271587,
+   "name": "Hurlegivre",
+   "levels": [
+    9
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 274935,
