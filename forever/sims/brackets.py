@@ -392,3 +392,13 @@ def extra_items(cache_dir: Path) -> tuple[Path | None, set[int], str | None]:
         f"{revision[:12]}) : valeurs de cette révision, objet changé depuis par Blizzard non suivi (suppose)"
     )
     return path, {int(i["id"]) for i in items}, note
+
+
+def parse_equipped(text: str) -> dict[str, int]:
+    """Squelette (SIM2 bloc 8)."""
+    raise NotImplementedError
+
+
+def optimise_gear(deps: Deps, **kwargs: Any) -> dict[str, Any]:
+    """Squelette (SIM2 bloc 8)."""
+    raise NotImplementedError
