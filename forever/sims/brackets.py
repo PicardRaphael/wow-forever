@@ -525,6 +525,37 @@ def run_from_sources(
 ) -> dict[str, Any]:
     """`run_brackets` avec les sources installées : parcours `path` (plan de leveling ou aucun) et équipement `gear`
     (choix de GearQuest au niveau de chaque tranche, ou nu)."""
+    steps, picks_at, anchors, notes, candidates_at = resolve_sources(
+        deps, preset=preset, race=race, path=path, gear=gear, spec=spec, gear_spec=gear_spec
+    )
+    out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
+                       iterations=iterations, anchors=anchors, stats=stats, reference=reference,
+                       conditions=conditions, candidates_at=candidates_at, targets=targets)  # fmt: skip
+    out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
+    from forever.sims.leveling_rates import add_rates
+
+    return add_rates(deps, out)  # temps pour tuer et XP par heure, toujours (plan 3c)
+
+
+def resolve_sources(
+    deps: Deps,
+    *,
+    preset: str,
+    race: str | None,
+    path: str = "auto",
+    gear: str = "gearquest",
+    spec: str | None = None,
+    gear_spec: str | None = None,
+) -> tuple[
+    list[dict[str, Any]],
+    Callable[[int], Sequence[Mapping[str, Any]]] | None,
+    list[dict[str, Any]],
+    list[str],
+    Callable[[int], Sequence[Mapping[str, Any]]] | None,
+]:
+    """Parcours de talents, choix d'équipement par niveau, relevés d'attributs et notes de provenance tirés des sources
+    installées, et réserve où chercher une arme du type du préréglage (voir `run_from_sources`) ; `race` ne sert
+    qu'au choix de GearQuest."""
     from forever.sims.engines import class_of
 
     if path not in PATHS:
@@ -582,14 +613,7 @@ def run_from_sources(
     anchors, files = logger_anchors(deps, chosen.class_token)
     notes.append(f"relevés d'attributs de ForeverLogger : {len(anchors)} point(s) de la classe dans {len(files)} "
                  "fichier(s) de SavedVariables (connexion et montée de niveau, ForeverLogger 0.8.0)")  # fmt: skip
-    out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
-                       iterations=iterations, anchors=anchors, stats=stats, reference=reference,
-                       conditions=conditions, candidates_at=candidates_at,
-                       targets=targets)  # fmt: skip
-    out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
-    from forever.sims.leveling_rates import add_rates
-
-    return add_rates(deps, out)  # temps pour tuer et XP par heure, toujours (plan 3c)
+    return steps, picks_at, list(anchors), notes, candidates_at
 
 
 ITEMS_PATCH = "0004-items.patch"

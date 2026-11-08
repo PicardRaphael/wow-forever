@@ -506,7 +506,11 @@ def build_server(deps: Deps) -> MCPServer:
         niveau) ; chaque candidat essayé à sa place, gain, seuil de bruit, verdict « meilleur » ou « non départagé ».
         `conditions` (brackets) : `solo` (leveling, défaut), `group` (buffs du préréglage), `raid` (buffs,
         consommables, boss au-dessus : comparable aux classements de MythicSim) ; `targets` (brackets) : nombre de
-        cibles identiques (1 par défaut ; zone au-delà, ex. 3 ou 5), rendu dans `targets` et la provenance. Les
+        cibles identiques (1 par défaut ; zone au-delà, ex. 3 ou 5), rendu dans `targets` et la provenance.
+        `action="race_brackets"` : toutes
+        les races jouables de la classe de `preset` (races.json ; ou `races`) par tranche (`brackets`, `path`,
+        `gear`, `conditions` comme brackets), mêmes talents, équipement et graine ; triées par dégâts, écart à la
+        meilleure, « non départagé » sous deux erreurs types. Les
         hypothèses de la provenance disent ce qui reste au niveau 60 (attributs de base) : les citer."""
         from forever.sims.report import simulate
 

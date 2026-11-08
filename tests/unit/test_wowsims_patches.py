@@ -82,7 +82,13 @@ def test_repository_patches_name_their_reason():
     """Correctifs du dépôt : le niveau réglable, les rangs appris, puis les statistiques de base (bloc 4), chacun marqué « forever (SIM2) » dans le code
     qu'il ajoute ; mention de licence de wowsims gardée par le fichier d'origine (correctifs, pas de copie)."""
     names = sorted(p.name for p in PATCHES_DIR.glob("*.patch"))
-    assert names == ["0001-level.patch", "0002-ranks.patch", "0003-base-stats.patch", "0004-items.patch", "0005-shaman-ranks.patch"]
+    assert names == [
+        "0001-level.patch",
+        "0002-ranks.patch",
+        "0003-base-stats.patch",
+        "0004-items.patch",
+        "0005-shaman-ranks.patch",
+    ]
     level = (PATCHES_DIR / "0001-level.patch").read_text(encoding="utf-8")
     ranks = (PATCHES_DIR / "0002-ranks.patch").read_text(encoding="utf-8")
     assert "sim/core/constants.go" in level and "--forever-level=" in level and "forever (SIM2)" in level
