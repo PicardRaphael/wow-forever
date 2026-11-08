@@ -12,7 +12,6 @@ au niveau) : aucun chiffre de jeu écrit ici."""
 import dataclasses
 
 import pytest
-from forever.sims.leveling_rates import add_rates
 from test_sims_brackets import FROST_STEPS, LevelSim, _setup
 
 from forever.engine.dungeon import SECONDS_PER_HOUR
@@ -20,6 +19,7 @@ from forever.engine.monsters import grind_xp_per_hour, mob_hp, time_to_kill
 from forever.engine.xp import mob_kill_xp
 from forever.gamedata import build_game_data
 from forever.sims.brackets import run_brackets
+from forever.sims.leveling_rates import add_rates
 from forever.store import load_version
 
 

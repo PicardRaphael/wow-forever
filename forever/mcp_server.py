@@ -497,7 +497,9 @@ def build_server(deps: Deps) -> MCPServer:
         10-19, 20-29, 30-39, 40-49, 50-59 et 60, un niveau représentatif chacune), des tranches ou des niveaux séparés
         par des virgules ; `path` : `auto` (défaut : plan, sinon build populaire), `plan` (plan de leveling de `spec`), `popular` (build populaire de Talents Forever de l'arbre du préréglage, ordre légal généré) ou `none` ; `gear` :
         `gearquest` (choix au niveau de chaque tranche) ou `none` (nu) ; solo (aucun buff ni consommable) ; `stats`
-        (séparées par des virgules) et `reference` : poids des statistiques de chaque tranche (tirages appariés).
+        (séparées par des virgules) et `reference` : poids des statistiques de chaque tranche (tirages appariés) ;
+        chaque ligne porte aussi `ttk_s` (temps pour tuer un monstre normal du niveau) et `xp_per_hour` (sans repos :
+        plafond), leurs entrées dans `rates`, ou `rates_missing` (raison).
         `action="gear"` : optimisation de l'équipement au niveau `level` sur `preset` pour `race` : `equipped`
         (« Emplacement:objet,… », emplacements de wowsims), `candidates` (même forme ; défaut : choix de GearQuest au
         niveau) ; chaque candidat essayé à sa place, gain, seuil de bruit, verdict « meilleur » ou « non départagé ».
