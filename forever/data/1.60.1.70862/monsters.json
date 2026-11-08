@@ -34,7 +34,8 @@
   "WoWCombatLog-110826_102624.txt",
   "WoWCombatLog-110826_102944.txt",
   "WoWCombatLog-110826_103236.txt",
-  "WoWCombatLog-110826_153517.txt"
+  "WoWCombatLog-110826_153517.txt",
+  "WoWCombatLog-110826_172854.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -82,9 +83,16 @@
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 19 individu(s))",
      "questie_hp": 176,
-     "fought": false
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 198,
+     "fought": true
     }
    }
   },
@@ -187,16 +195,23 @@
    }
   },
   "118": {
-   "name": "Rôdeur",
+   "name": "Prowler",
    "zone_id": 12,
    "rank": 0,
    "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 198,
-     "fought": false
+     "fought": true
     }
    }
   },
@@ -362,8 +377,15 @@
     "19": {
      "max_hp": 572,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 449,
+     "fought": false
+    },
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 484,
      "fought": false
     }
    }
@@ -768,8 +790,15 @@
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110826_153517.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 137,
+     "fought": true
+    },
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 156,
      "fought": true
     }
    }
@@ -1355,6 +1384,27 @@
     }
    }
   },
+  "732": {
+   "name": "Murloc Lurker",
+   "zone_id": 12,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    }
+   }
+  },
   "808": {
    "name": "Grik'nir le Froid",
    "zone_id": 1,
@@ -1377,16 +1427,16 @@
     "8": {
      "max_hp": 195,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110826_153517.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 195,
-     "fought": null
+     "fought": true
     },
     "9": {
      "max_hp": 225,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_153517.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 220,
-     "fought": null
+     "fought": true
     }
    }
   },
@@ -2552,6 +2602,41 @@
     }
    }
   },
+  "1922": {
+   "name": "Gray Forest Wolf",
+   "zone_id": 12,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 137,
+     "fought": true
+    },
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 156,
+     "fought": false
+    }
+   }
+  },
+  "1933": {
+   "name": "Sheep",
+   "zone_id": 12,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 14,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 14,
+     "fought": false
+    }
+   }
+  },
   "1956": {
    "name": "Ancien Rampant lacustre",
    "zone_id": 130,
@@ -2588,10 +2673,17 @@
    }
   },
   "2044": {
-   "name": "Esprit mélancolique",
+   "name": "Forlorn Spirit",
    "zone_id": 0,
    "rank": 0,
    "levels": {
+    "25": {
+     "max_hp": 954,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 590,
+     "fought": false
+    },
     "26": {
      "max_hp": 1024,
      "certainty": "certain",
@@ -3704,6 +3796,20 @@
      "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 617,
      "fought": null
+    }
+   }
+  },
+  "2442": {
+   "name": "Cow",
+   "zone_id": 12,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 1,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
     }
    }
   },
@@ -6206,6 +6312,20 @@
     }
    }
   },
+  "248278": {
+   "name": "Croaky",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "11": {
+     "max_hp": 717,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
   "250624": {
    "name": "Mage squelette",
    "zone_id": null,
@@ -6653,6 +6773,20 @@
      "fought": null
     }
    }
+  },
+  "276189": {
+   "name": "Matriarch Bristlefur",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "10": {
+     "max_hp": 260,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
+    }
+   }
   }
  },
  "hp_by_level": {
@@ -6696,25 +6830,25 @@
    "value": 137,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 7
+   "n_npcs": 8
   },
   "8": {
    "value": 156,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 9
+   "n_npcs": 11
   },
   "9": {
    "value": 180,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 14
+   "n_npcs": 15
   },
   "10": {
    "value": 208,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 24
+   "n_npcs": 25
   },
   "11": {
    "value": 239,
@@ -7132,6 +7266,12 @@
    "questie": 176
   },
   {
+   "npc_id": 46,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
    "npc_id": 95,
    "level": 11,
    "measured": 239,
@@ -7166,6 +7306,12 @@
    "level": 12,
    "measured": 272,
    "questie": 247
+  },
+  {
+   "npc_id": 118,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
   },
   {
    "npc_id": 118,
@@ -7262,6 +7408,12 @@
    "level": 19,
    "measured": 572,
    "questie": 449
+  },
+  {
+   "npc_id": 213,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
   },
   {
    "npc_id": 391,
@@ -7676,6 +7828,18 @@
    "level": 15,
    "measured": 385,
    "questie": 328
+  },
+  {
+   "npc_id": 732,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 732,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
   },
   {
    "npc_id": 808,
@@ -8126,6 +8290,12 @@
    "level": 11,
    "measured": 239,
    "questie": 222
+  },
+  {
+   "npc_id": 2044,
+   "level": 25,
+   "measured": 954,
+   "questie": 590
   },
   {
    "npc_id": 2044,
@@ -9945,19 +10115,19 @@
    },
    "7": {
     "ratio": 1.0,
-    "n_pairs": 6
+    "n_pairs": 7
    },
    "8": {
     "ratio": 1.0,
-    "n_pairs": 8
+    "n_pairs": 10
    },
    "9": {
     "ratio": 1.0227272727272727,
-    "n_pairs": 14
+    "n_pairs": 15
    },
    "10": {
     "ratio": 1.0505050505050506,
-    "n_pairs": 23
+    "n_pairs": 24
    },
    "11": {
     "ratio": 1.0765765765765767,
@@ -10056,6 +10226,12 @@
     "ratio": 1.0227272727272727
    },
    {
+    "npc_id": 46,
+    "name": "Fourrageur murloc",
+    "level": 10,
+    "ratio": 1.0505050505050506
+   },
+   {
     "npc_id": 94,
     "name": "Vide-gousset défias",
     "level": 5,
@@ -10087,7 +10263,13 @@
    },
    {
     "npc_id": 118,
-    "name": "Rôdeur",
+    "name": "Prowler",
+    "level": 9,
+    "ratio": 1.0227272727272727
+   },
+   {
+    "npc_id": 118,
+    "name": "Prowler",
     "level": 10,
     "ratio": 1.0505050505050506
    },
@@ -10132,6 +10314,12 @@
     "name": "Loup redoutable affamé",
     "level": 19,
     "ratio": 1.2739420935412027
+   },
+   {
+    "npc_id": 213,
+    "name": "Loup redoutable affamé",
+    "level": 20,
+    "ratio": 1.2995867768595042
    },
    {
     "npc_id": 299,
@@ -10560,6 +10748,12 @@
     "ratio": 1.0
    },
    {
+    "npc_id": 1933,
+    "name": "Sheep",
+    "level": 3,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 1956,
     "name": "Ancien Rampant lacustre",
     "level": 18,
@@ -10579,7 +10773,13 @@
    },
    {
     "npc_id": 2044,
-    "name": "Esprit mélancolique",
+    "name": "Forlorn Spirit",
+    "level": 25,
+    "ratio": 1.616949152542373
+   },
+   {
+    "npc_id": 2044,
+    "name": "Forlorn Spirit",
     "level": 26,
     "ratio": 1.6331738437001595
    },
@@ -11227,7 +11427,8 @@
    "npc_id": 46,
    "name": "Fourrageur murloc",
    "levels": [
-    9
+    9,
+    10
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
@@ -11259,8 +11460,9 @@
   },
   {
    "npc_id": 118,
-   "name": "Rôdeur",
+   "name": "Prowler",
    "levels": [
+    9,
     10
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
@@ -11303,7 +11505,8 @@
    "npc_id": 213,
    "name": "Loup redoutable affamé",
    "levels": [
-    19
+    19,
+    20
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
@@ -11941,6 +12144,14 @@
    "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
   },
   {
+   "npc_id": 1933,
+   "name": "Sheep",
+   "levels": [
+    3
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 1956,
    "name": "Ancien Rampant lacustre",
    "levels": [
@@ -11959,8 +12170,9 @@
   },
   {
    "npc_id": 2044,
-   "name": "Esprit mélancolique",
+   "name": "Forlorn Spirit",
    "levels": [
+    25,
     26
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
@@ -12094,6 +12306,14 @@
    "name": "Lion des montagnes affamé",
    "levels": [
     23
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 2442,
+   "name": "Cow",
+   "levels": [
+    5
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
@@ -12797,6 +13017,14 @@
    "reason": "hors norme : 8 PV au niveau 1, -81,0 % de la médiane des autres PNJ du niveau (42) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
+   "npc_id": 248278,
+   "name": "Croaky",
+   "levels": [
+    11
+   ],
+   "reason": "hors norme : 717 PV au niveau 11, +200,0 % de la médiane des autres PNJ du niveau (239) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
    "npc_id": 250624,
    "name": "Mage squelette",
    "levels": [
@@ -12983,6 +13211,14 @@
     8
    ],
    "reason": "hors norme : 234 PV au niveau 8, +50,0 % de la médiane des autres PNJ du niveau (156) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 276189,
+   "name": "Matriarch Bristlefur",
+   "levels": [
+    10
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   }
  ],
  "notes": [
