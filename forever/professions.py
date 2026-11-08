@@ -87,20 +87,27 @@ def _ah(prices: Mapping[int, ItemPrice], item: int) -> ItemPrice | None:
 # --- recettes ---------------------------------------------------------------------------------------------------------
 
 
-def _reagent(item: int, qty: int, prices: Mapping[int, ItemPrice], craft: Mapping[str, Any], names: Mapping[int, str]):
-    offers = []
+Prices = Mapping[int, ItemPrice]
+Names = Mapping[int, str]
+Craft = Mapping[str, Any]
+
+
+def _reagent(item: int, qty: int, prices: Prices, craft: Craft, names: Names) -> dict[str, Any]:
+    offers: list[tuple[int, str, str | None]] = []
     vendor = craft["vendor_prices"].get(item)
     if vendor is not None:
         offers.append((vendor, "marchand", None))
     ah = _ah(prices, item)
     if ah is not None:
         offers.append((ah.min, "auctionator", ah.date))
-    best = min(offers, key=lambda o: o[0]) if offers else (None, None, None)
+    best: tuple[int | None, str | None, str | None] = min(offers, key=lambda o: o[0]) if offers else (None, None, None)
     return {"item_id": item, "name": names.get(item), "quantity": qty, "unit_price": best[0], "source": best[1],
             "date": best[2]}  # fmt: skip
 
 
-def _recipe_row(spell: int, base: Mapping[str, Any], made: Mapping[str, Any], skill: int, prices, craft, names):
+def _recipe_row(
+    spell: int, base: Mapping[str, Any], made: Mapping[str, Any], skill: int, prices: Prices, craft: Craft, names: Names
+) -> dict[str, Any]:
     reagents = [_reagent(i, q, prices, craft, names) for i, q in made["reagents"]]
     out_item, out_qty = made["output"]
     ah = _ah(prices, out_item)
@@ -128,7 +135,7 @@ def _recipe_row(spell: int, base: Mapping[str, Any], made: Mapping[str, Any], sk
             "unit_price": ah.min if ah else None,
             "date": ah.date if ah else None,
             "vendor_sell": craft["sell_prices"].get(out_item),
-        },  # fmt: skip
+        },
         "cost": cost,
         "sale": sale,
         "profit": sale - cost if sale is not None and cost is not None else None,
@@ -136,8 +143,11 @@ def _recipe_row(spell: int, base: Mapping[str, Any], made: Mapping[str, Any], sk
     }
 
 
-def _one_profession(name: str, line: int, skill: int, skillup, craft, prices, names, limit: int) -> dict[str, Any]:
-    rows, too_high, without_output, no_data = [], 0, 0, 0
+def _one_profession(
+    name: str, line: int, skill: int, skillup: Mapping[str, Any], craft: Craft, prices: Prices, names: Names, limit: int
+) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    too_high, without_output, no_data = 0, 0, 0
     for spell, base in skillup["recipes"].items():
         if base["skill_line"] != line:
             continue
@@ -187,7 +197,7 @@ def _wanted(deps: Deps, profession: str | None, skill: int | None) -> dict[str, 
 def _inventories(deps: Deps) -> dict[str, dict[str, Any]] | None:
     from forever.pipeline.lua_table import parse_lua_assignments
 
-    found = None
+    found: dict[str, dict[str, Any]] | None = None
     for d in _account_svs(deps):
         path = d / COMPANION_FILE
         if not path.is_file():
@@ -207,7 +217,9 @@ def _inventories(deps: Deps) -> dict[str, dict[str, Any]] | None:
     return found
 
 
-def _to_sell(deps: Deps, realm: str | None, character: str | None, prices, craft, names, limit: int):
+def _to_sell(
+    deps: Deps, realm: str | None, character: str | None, prices: Prices, craft: Craft, names: Names, limit: int
+) -> dict[str, Any]:
     inventories = _inventories(deps)
     if inventories is None:
         reason = "Forever Companion : SavedVariables absentes (inventaire des sacs et de la banque inconnu)"
@@ -308,8 +320,10 @@ def profession_profit(
     newest = max((p.date for p in prices.values()), default=None)
     notes += [
         f"SkillUp Forever (données du client {build or '?'} du {skillup['date'] or '?'}) : réactifs, produits, seuils",
-        f"prix : derniers minimums d'Auctionator du royaume {chosen or '?'} (relevé le plus récent : {newest or '?'}), "
-        "prix d'achat au marchand de SkillUp quand il est moins cher ; montants en pièces de cuivre",
+        (
+            f"prix : derniers minimums d'Auctionator du royaume {chosen or '?'} (relevé le plus récent : "
+            f"{newest or '?'}), prix d'achat au marchand de SkillUp quand il est moins cher ; montants en cuivre"
+        ),
         "produit : quantité moyenne de SkillUp ; recette apprise ou non : inconnu hors du jeu (seuil orange ≤ rang)",
         CUT_NOTE,
     ]
