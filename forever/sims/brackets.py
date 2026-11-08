@@ -694,3 +694,8 @@ def pool_from_sources(
     pool, skipped = candidate_pool(item_database(deps.cache_dir), sources, level=level,
                                    class_id=CLASS_IDS.get(class_name, 0))  # fmt: skip
     return pool, skipped, [name for name, _ in sources]
+
+
+def rank_by_slot(rows: Sequence[Mapping[str, Any]], equipped: Mapping[str, int], *, top: int = 6) -> dict[str, Any]:
+    """Squelette (SIM2 bloc 12)."""
+    raise NotImplementedError
