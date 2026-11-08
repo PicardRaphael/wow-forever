@@ -157,7 +157,7 @@ def test_professions_of_the_profile(make_deps, wow):
     from forever.professions import profession_profit
 
     deps = make_deps(wow_dir=wow)
-    set_character(deps, "Moi", professions={"Tailoring": 50, "Cooking": 50, "Herboristerie": 10})
+    set_character(deps, "Moi", cls="Mage", professions={"Tailoring": 50, "Cooking": 50, "Herboristerie": 10})
     out = profession_profit(deps, realm="Royaume")
     assert [(p["profession"], p["skill"]) for p in out["professions"]] == [("Cooking", 50), ("Tailoring", 50)]
     dish = out["professions"][0]["recipes"][0]
