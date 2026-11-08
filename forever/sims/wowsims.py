@@ -352,6 +352,8 @@ MIN_LEVEL, MAX_LEVEL = 1, 60  # bornes du réglage de niveau du correctif 0001-l
 LEVEL_FLAG = "--forever-level="  # option lue par le correctif 0001-level à l'initialisation du simulateur
 BASE_STATS_FLAG = "--forever-base-stats="  # fichier lu par le correctif 0003-base-stats (statistiques de base)
 BASE_STATS_PATCH = "0003-base-stats.patch"
+ITEMS_FLAG = "--forever-items="  # fichier d'objets ajoutés, lu par le correctif 0004-items
+ITEMS_PATCH = "0004-items.patch"
 
 
 def reference_encounter(presets: Sequence[Preset]) -> dict[str, Any] | None:
@@ -415,6 +417,7 @@ def run_sim(
     runner: gitops.Runner | None = None,
     level: int | None = None,
     base_stats: dict[str, Any] | None = None,
+    items: Path | None = None,
 ) -> dict[str, Any]:
     """Un combat simulé par le binaire épinglé : dégâts par seconde (moyenne, écart type), combats faits, source.
     `level` (SIM2) : niveau du personnage, passé au binaire corrigé (`--forever-level=L`) ; None : 60, comme avant."""
@@ -425,6 +428,11 @@ def run_sim(
     if level is not None and not patches:
         raise WowsimsError(
             "le binaire épinglé de wowsims n'a pas les correctifs forever : il ne calcule qu'au niveau 60.",
+            "lancer `uv run forever sims update` (recompilation avec les correctifs)",
+        )
+    if items is not None and ITEMS_PATCH not in ((pin.get("patches") or {}).get("files") or []):
+        raise WowsimsError(
+            f"le binaire épinglé de wowsims n'a pas le correctif {ITEMS_PATCH} (objets ajoutés).",
             "lancer `uv run forever sims update` (recompilation avec les correctifs)",
         )
     if base_stats is not None and BASE_STATS_PATCH not in ((pin.get("patches") or {}).get("files") or []):
@@ -442,6 +450,8 @@ def run_sim(
     if base_stats is not None:
         statsfile.write_text(json.dumps(base_stats), encoding="utf-8")
         extra.append(f"{BASE_STATS_FLAG}{statsfile}")
+    if items is not None:
+        extra.append(f"{ITEMS_FLAG}{items}")
     try:
         gitops._run(
             runner or gitops.subprocess_runner,
@@ -483,6 +493,7 @@ def run_sim(
             "patches": patches,
             "level": level if level is not None else MAX_LEVEL,
             "base_stats": base_stats is not None,
+            "extra_items": items is not None,
             "certainty": "suppose",
         },
     }

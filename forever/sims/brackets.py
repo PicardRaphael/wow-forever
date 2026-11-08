@@ -177,6 +177,11 @@ def run_brackets(
 
     conv, errors = _legality(deps, class_of(chosen))
     with_patch = bs.PATCH in ((pin.get("patches") or {}).get("files") or [])
+    items_path, items_ids, items_note = (
+        extra_items(deps.cache_dir)
+        if ITEMS_PATCH in ((pin.get("patches") or {}).get("files") or [])
+        else (None, set(), None)
+    )
     encounter = wowsims.reference_encounter(presets)
     race_token = wowsims.race_enum(race)
     rows: list[dict[str, Any]] = []
@@ -192,6 +197,11 @@ def run_brackets(
         try:
             picks = list(picks_at(level)) if picks_at else []
             known = known_items(wowsims_dir(deps.cache_dir) / "forever")
+            if known is not None and items_ids:
+                known = known | items_ids
+                taken = sorted({int(p["item"]) for p in picks if int(p["item"]) in items_ids})
+                if taken:
+                    row["extra_items"] = taken
             unknown = sorted({int(p["item"]) for p in picks if known is not None and int(p["item"]) not in known})
             if unknown:  # objet absent de la base de wowsims : écarté et nommé, jamais remplacé (dégâts sous-estimés)
                 row["unknown_items"] = unknown
@@ -209,13 +219,14 @@ def run_brackets(
                 doc = None
                 row["base_stats"] = (f"statistiques de base du niveau 60 : binaire sans le correctif {bs.PATCH} "
                                      "(lancer `forever sims update`)")  # fmt: skip
-            out = wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc)
+            out = wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc,
+                                  items=items_path)  # fmt: skip
         except ForeverError as err:
             rows.append({**row, "error": {"code": err.code, "message": err.message, "action": err.action}})
             continue
         rows.append({**row, "talents_string": case.talents, "equipment": [p["item"] for p in picks] if picks else "nu",
                      **out})  # fmt: skip
-    notes = [wowsims.source_note(pin), *NOTES]
+    notes = [wowsims.source_note(pin), *NOTES, *([items_note] if items_note else [])]
     if any(r.get("unknown_items") for r in rows):
         notes.append("objets choisis absents de la base de wowsims (unknown_items) : emplacement laissé vide, dégâts "
                      "sous-estimés")  # fmt: skip
@@ -340,6 +351,27 @@ def run_from_sources(
     return out
 
 
+ITEMS_PATCH = "0004-items.patch"
+EXTRA_ITEMS = "extra_items.json"  # fichier des objets ajoutés, dans le dossier de wowsims du cache
+
+
 def extra_items(cache_dir: Path) -> tuple[Path | None, set[int], str | None]:
-    """Squelette (SIM2 bloc 6)."""
-    raise NotImplementedError
+    """Objets absents de la base de wowsims pris dans la base du fork Go épinglé de MythicSim (simulateur de la
+    communauté pour Forever, MIT) : (fichier pour `--forever-items=`, identifiants, note de provenance) ; rien sans
+    MythicSim copié. Un objet connu de wowsims n'est jamais pris (le correctif ne remplace rien non plus)."""
+    from forever.pipeline import mythicsim_build
+
+    source = mythicsim_build.mythicsim_dir(cache_dir) / "go" / DATABASE[0] / DATABASE[1] / "db.json"
+    if not source.is_file():
+        return None, set(), None
+    known = known_items(wowsims_dir(cache_dir) / "forever") or set()
+    items = [i for i in json.loads(source.read_text(encoding="utf-8"))["items"] if int(i["id"]) not in known]
+    path = wowsims_dir(cache_dir) / EXTRA_ITEMS
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"items": items}), encoding="utf-8")
+    revision = str((mythicsim_build.pinned(cache_dir) or {}).get("go_revision") or "?")
+    note = (
+        f"{len(items)} objets absents de la base de wowsims pris dans celle du fork Go de MythicSim (révision "
+        f"{revision[:12]}) : valeurs de cette révision, objet changé depuis par Blizzard non suivi (suppose)"
+    )
+    return path, {int(i["id"]) for i in items}, note

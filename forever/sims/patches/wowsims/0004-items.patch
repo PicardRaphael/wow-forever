@@ -1,0 +1,74 @@
+diff --git a/cmd/wowsimcli/cmd/basic_sim.go b/cmd/wowsimcli/cmd/basic_sim.go
+--- a/cmd/wowsimcli/cmd/basic_sim.go
++++ b/cmd/wowsimcli/cmd/basic_sim.go
+@@ -31,6 +31,7 @@
+ 	// forever (SIM2) : lu par sim/core à l'initialisation (forever_level.go) ; déclaré ici pour être accepté.
+ 	simCmd.Flags().Int32("forever-level", 60, "forever : niveau du personnage simulé (1 à 60)")
+ 	simCmd.Flags().String("forever-base-stats", "", "forever : fichier des statistiques de base au niveau (lu par sim/core)")
++	simCmd.Flags().String("forever-items", "", "forever : fichier d'objets ajoutés à la base (lu par sim/core)")
+ }
+ 
+ func simMain(cmd *cobra.Command, args []string) {
+diff --git a/sim/core/database_load.go b/sim/core/database_load.go
+--- a/sim/core/database_load.go
++++ b/sim/core/database_load.go
+@@ -11,6 +11,7 @@
+ 
+ func init() {
+ 	db := database.Load()
++	foreverMergeItems(db) // forever (SIM2) : objets ajoutés (forever_items.go)
+ 	WITH_DB = true
+ 
+ 	simDB := &proto.SimDatabase{
+diff --git a/sim/core/forever_items.go b/sim/core/forever_items.go
+new file mode 100644
+--- /dev/null
++++ b/sim/core/forever_items.go
+@@ -0,0 +1,47 @@
++//go:build with_db
++
++package core
++
++// forever (SIM2, décision 305) : objets ajoutés à la base de wowsims depuis le fichier donné par
++// --forever-items=<fichier.json> (écrit par forever : objets absents de cette base, pris dans la base d'un autre
++// simulateur de la communauté pour Forever) ; un objet que la base connaît déjà n'est jamais remplacé.
++
++import (
++	"os"
++	"strings"
++
++	"github.com/wowsims/forever/sim/core/proto"
++	"google.golang.org/protobuf/encoding/protojson"
++)
++
++const ForeverItemsFlag = "--forever-items="
++
++func foreverMergeItems(db *proto.UIDatabase) {
++	path := ""
++	for _, arg := range os.Args[1:] {
++		if value, ok := strings.CutPrefix(arg, ForeverItemsFlag); ok {
++			path = value
++		}
++	}
++	if path == "" {
++		return
++	}
++	raw, err := os.ReadFile(path)
++	if err != nil {
++		panic("forever: --forever-items illisible : " + err.Error())
++	}
++	extra := &proto.UIDatabase{}
++	if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(raw, extra); err != nil {
++		panic("forever: --forever-items invalide : " + err.Error())
++	}
++	known := make(map[int32]bool, len(db.Items))
++	for _, item := range db.Items {
++		known[item.Id] = true
++	}
++	for _, item := range extra.Items {
++		if !known[item.Id] {
++			db.Items = append(db.Items, item)
++			known[item.Id] = true
++		}
++	}
++}

@@ -225,3 +225,6 @@ niveau accepté) ; aucune PR publique chez wowsims.
   wowsims et de nos données ; mana de base et critique par point du client disponibles (`character_scaling.json`).
 - **Bloc 4 fait** : correctif `0003-base-stats` (mana de base et critique par point du client au niveau ; relevés d'attributs interpolés avec les tables du 60 de wowsims, écart de race retiré) ; `forever sims update` nettoie les fichiers laissés par les correctifs précédents (`git clean -fd`).
 - **Bloc 5 fait** : ForeverLogger 0.8.0 relève attributs (`UnitStat`) et gains de niveau ; relevés de toutes les SavedVariables lus comme points d'appui. Choix de l'utilisateur (2026-11-08) : ForeverLogger + interpolation.
+- **Bloc 6 fait** : correctif `0004-items` ; objets absents de la base de wowsims pris dans celle du fork Go épinglé de
+  MythicSim (2028 objets, révision du 2026-10-21, `suppose`), jamais à la place d'un objet connu. Prototype : Mage 60
+  246 → 455, Voleur 60 25 → 360, Chaman 25 14 → 31 DPS.
