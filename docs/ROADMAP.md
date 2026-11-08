@@ -302,3 +302,7 @@ Gardées ici pour que leurs identifiants, encore cités ailleurs, renvoient à l
 | Données et règles de la Classic (base Classic Era de Questie, rapprochements Classic) | Retirées (décision 294) | sources Forever, puis VF1 |
 | FA1p, ForeverAssist V2 et V3, comparaison d'équipement de ForeverAssist V1 | Fondues ou retirées (décision 202) | P06b, P06a, AN1, AN2, T10a |
 | Mode « mise à jour automatique complète » (idée du 2026-10-13) | Refusé par la décision 259, puis adopté par la décision 295 | partie 1 (veille automatique) |
+
+> **À rappeler à l'utilisateur** (demande du 2026-11-08) : les champs de bataille ne sont pas encore sortis sur
+> Forever ; dès qu'une version du client porte leurs tables (`BattlemasterList`…) ou qu'une note officielle les
+> annonce, reprendre AMI7 (champs de bataille : accès par niveau, réputations, récompenses) et le lui dire.
