@@ -167,6 +167,19 @@ def test_sim_runner_result_is_a_source():
     assert got == []
 
 
+def test_everloot_result_is_a_source():
+    """AMI7b : un résultat d'un outil du serveur tiers Everloot est une source de chiffres (à citer comme tiers,
+    certitude au mieux `suppose`) ; un chiffre absent de ce résultat reste signalé."""
+    got = hooks.unsourced_numbers(lines("session_everloot.jsonl"), last_text("session_everloot.jsonl"))
+    assert got == ["444 points"]
+
+
+@pytest.mark.parametrize("name", ["mcp__everloot__market_value", "mcp__claude_ai_Everloot__item_page"])
+def test_everloot_tool_names_are_sources(name):
+    assert hooks._is_source_use({"name": name, "input": {}})
+    assert not hooks._is_source_use({"name": "mcp__notloot__market_value", "input": {}})
+
+
 def test_last_message_defaults_to_the_transcript():
     assert hooks.unsourced_numbers(lines("session_invented.jsonl")) == ["18 à 20 points de dégâts", "5 secondes"]
 

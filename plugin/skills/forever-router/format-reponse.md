@@ -130,3 +130,16 @@ N'estime rien de mémoire et ne donne pas de valeur de WoW Classic ou retail à 
 Un chiffre rapporté par le sous-agent `forever-web-researcher` s'écrit comme l'affirmation de sa source, avec son
 type (officielle Blizzard, communautaire, simulateur), sa date et son adresse ; jamais comme un fait du projet. Seuls
 les chiffres des lignes du rapport qui portent l'adresse de leur source se citent.
+
+## Sources tierces (Everloot)
+Everloot (serveur MCP tiers, outils `mcp__everloot__…`, données de joueurs de Forever) répond seulement là où aucun
+outil forever ne couvre la question (routeur, section « 2c. Sources tierces ») :
+- chaque chiffre tiré d'Everloot se dit comme l'affirmation de cette source, jamais comme un fait du projet, avec
+  l'outil et la date que le résultat rend (date des données, du relevé ou de la page) ; date absente : « date non
+  dite » ;
+- certitude au mieux `suppose` (supposé), même si Everloot dit la valeur confirmée par plusieurs joueurs ;
+- une valeur qu'Everloot dit manquante ou incertaine (`[?]`, trou, « non disponible ») reste manquante : « je ne sais
+  pas », jamais comblée de mémoire, de WoW Classic ou de retail ;
+- avant le pied de réponse, une ligne `Source : Everloot (tiers, <outil>, <date>)` ; puis le pied de réponse habituel
+  (provenance de `forever_status`, certitude au plus supposé) ; enfin, si le résultat porte une ligne « More: » avec
+  une page d'everloot.app, recopie-la telle quelle en dernière ligne (elle crédite les données des joueurs).

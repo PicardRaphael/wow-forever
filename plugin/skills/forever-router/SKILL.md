@@ -1,6 +1,6 @@
 ---
 name: forever-router
-description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, PvP des 9 classes (contrôles, affrontements), builds de toutes les classes, familiers du Chasseur (entraînement, capacités, où apprivoiser), fraîcheur des données, dégâts et poids des statistiques au niveau 60 pour toutes les classes (wowsims/forever), et ce que le projet ne couvre pas encore (champs de bataille, Legacy, métiers, réputations, hôtel des ventes, dégâts chiffrés sous le niveau 60 des classes autres que le Mage). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
+description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, PvP des 9 classes (contrôles, affrontements), builds de toutes les classes, familiers du Chasseur (entraînement, capacités, où apprivoiser), fraîcheur des données, dégâts et poids des statistiques au niveau 60 pour toutes les classes (wowsims/forever), hôtel des ventes, prix, métiers, réputations, champs de bataille, PNJ, vendeurs et objets (outils forever d'abord, puis Everloot, source tierce), et ce que le projet ne couvre pas encore (Legacy, dégâts chiffrés sous le niveau 60 des classes autres que le Mage). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
 ---
 
 # Routeur WoW Forever
@@ -87,9 +87,12 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
 | Capacités d'une famille de familier, rangs d'une capacité | `forever_lookup(kind="pets", name=<famille ou capacité>, rank)` | `forever-familiers` |
 | Où apprivoiser la bête qui enseigne un rang, près de ma zone | `forever_lookup(kind="pets", name, rank, zone, level)` | `forever-familiers` |
 | Données à jour ? version du jeu ? | `forever_status` | — |
+| Hôtel des ventes : prix, historique, or | Everloot (tiers) : `mcp__everloot__market_value`, `mcp__everloot__auction_history` (section 2c) | `forever-economie` |
+| Métiers : montée, paliers d'une recette, recette rentable | `forever_lookup(kind="profession", …)` d'abord, puis Everloot : `mcp__everloot__profession_path`, `mcp__everloot__recipe_thresholds` | `forever-economie` |
+| Réputations, champs de bataille, PNJ, vendeurs, objets hors donjon | outils forever de la ligne quand ils existent, puis Everloot : `mcp__everloot__search_knowledge` (`version="forever"`), `mcp__everloot__npc_page`, `mcp__everloot__vendor_page`, `mcp__everloot__item_page` | `forever-economie` |
 
 - Charge le skill du domaine (`forever-leveling`, `forever-mage`, `forever-pvp`, `forever-builds`,
-  `forever-familiers`, `forever-donjons` ou `forever-routes`) dès que la question en relève.
+  `forever-familiers`, `forever-donjons`, `forever-routes` ou `forever-economie`) dès que la question en relève.
 - `forever_explain_mechanic` accepte un identifiant du registre (« A18 ») ou des mots de sa description (« Ignite ») ;
   plusieurs entrées : l'erreur liste « identifiant : description », choisis puis rappelle l'outil.
 - Calcul lourd de leveling du Mage (preset `complet`, plusieurs niveaux, rotations ou jeux de talents à comparer) :
@@ -97,15 +100,22 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
 - Source extérieure demandée (notes de patch, guide, avis de la communauté) : sous-agent `forever-web-researcher` ;
   ce qu'il rapporte reste l'affirmation d'une source, jamais un fait du projet.
 
+## 2c. Sources tierces (Everloot)
+Everloot (serveur MCP tiers, outils `mcp__everloot__…`, données de joueurs de Forever) comble ce que le projet ne
+calcule pas encore : hôtel des ventes (EC1), métiers au-delà de SkillUp Forever (MT1), réputations (RP1), champs de
+bataille (PV2), PNJ, vendeurs, objets hors donjon. Skill `forever-economie` :
+- outils `forever_*` d'abord quand ils couvrent la question ; Everloot ensuite, seulement après avoir vérifié par
+  `ToolSearch` (« everloot ») que ses outils existent ;
+- chaque valeur d'Everloot dite tiers, avec l'outil et la date, certitude au mieux `suppose`, et la ligne « More: »
+  du résultat recopiée en dernière ligne (section « Sources tierces (Everloot) » de `format-reponse.md`) ;
+- outils Everloot absents ou résultat vide ou inconnu : « je ne sais pas », avec la tranche du projet qui le couvrira.
+
 ## 3. Domaines non couverts (réponse « je ne sais pas »)
 
 | Domaine | Tranche qui le couvrira |
 |---|---|
-| PvP : champs de bataille, récompenses, monde ouvert ; rendements décroissants mesurés | PV2 |
+| PvP : monde ouvert ; rendements décroissants mesurés (champs de bataille : Everloot, tiers) | PV2 |
 | Legacy : défis, points, bonus ; suivi de ma progression | LG1, LG2 |
-| Métiers (au-delà de SkillUp Forever) | MT1 |
-| Réputations | RP1 |
-| Hôtel des ventes, prix, économie | EC1 |
 | Mémoire du joueur au-delà du profil (équipement enregistré, historique, fiches datées) | T07 |
 | Plan d'équipement complet (coûts, réputation, raid) ; équipement chiffré sous le 60 des classes autres que le Mage | T10 |
 | Consommables et préparation de raid | T11 |
@@ -114,6 +124,9 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
 | Dégâts, rotations et temps de leveling chiffrés sous le niveau 60, classes autres que le Mage (au 60 : wowsims/forever) | SIM2 (selon la réponse des auteurs des simulateurs) |
 | Chaman calculé sous le 60 (première classe après le Mage) | CM1 |
 | Chasseur : choix du familier chiffré par contexte (le savoir des familiers est couvert) | SIM2 |
+
+Hôtel des ventes (EC1), métiers (MT1), réputations (RP1) et champs de bataille (PV2) ne sont plus dans cette table :
+le projet ne les calcule pas encore, mais Everloot (tiers) y répond (section 2c) ; sans Everloot, « je ne sais pas ».
 
 Pour ces domaines : dis « je ne sais pas » (ou « le projet ne couvre pas encore … »), cite la tranche de
 `docs/ROADMAP.md`, et propose ce qui existe déjà (par exemple le niveau d'un donjon). Ne complète pas avec des
@@ -155,8 +168,8 @@ Quand une réponse bute sur une donnée que ni le client ni mes observations ne 
 - l'agent ne télécharge ni n'installe jamais rien : le joueur décide et installe lui-même.
 
 ### Pas encore construit
-Les objets, les réputations, le PvP des champs de bataille et tout domaine de la table ci-dessus (décision 130) : cite une source
-extérieure si elle existe (sous-agent `forever-web-researcher`, affirmation d'une source datée, jamais un fait du
+Les objets, les réputations, le PvP des champs de bataille : Everloot d'abord (section 2c, tiers). Tout domaine de la
+table ci-dessus (décision 130) : cite une source extérieure si elle existe (sous-agent `forever-web-researcher`, affirmation d'une source datée, jamais un fait du
 projet), sinon dis que le projet ne le couvre pas encore et cite sa tranche.
 
 ### Profil vide ou daté

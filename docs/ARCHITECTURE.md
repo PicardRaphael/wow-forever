@@ -300,7 +300,9 @@ Relie la fenêtre de l'addon ForeverBridge à une conversation Claude Code ; for
 - **Plugin Claude Code** (`plugin/`, installé par `scripts/install_plugin.ps1`, mode d'emploi `docs/USAGE.md`) :
   **mince**, aucun calcul ni chiffre de jeu (`scripts/check_game_numbers.py`). Skills `forever-router`,
   `forever-leveling`, `forever-mage`, `forever-builds`, `forever-pvp`, `forever-familiers`, `forever-donjons`,
-  `forever-routes` ; sous-agents `forever-web-researcher` et `forever-sim-runner` ; hooks `SessionStart` (ligne de
+  `forever-routes`, `forever-economie` (AMI7b : outils forever d'abord, puis le serveur MCP tiers Everloot, cité tiers
+  et au mieux `suppose`, résultats acceptés comme source par le contrôle des chiffres) ; sous-agents
+  `forever-web-researcher` et `forever-sim-runner` ; hooks `SessionStart` (ligne de
   fraîcheur et lancement de la veille) et `Stop` (chiffres de jeu absents des résultats d'outils), logique dans
   `forever/hooks.py`. Version gardée par `plugin/.claude-plugin/fingerprint.json` ; évaluation sans modèle en CI
   (`tests/unit/test_plugin_evals.py`).

@@ -436,7 +436,11 @@ Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24.md),
   le plafond d'honneur à 25 000 (règles du serveur, probable, registre K6) ; date, liste des champs et types de
   royaume restent absents des sources officielles lues. Test : annonces officielles, puis relevé en jeu des coûts.
   *Modifiée le 2026-10-09* : la note du 08/10 corrige l'emplacement d'un point de capture à Shipwreck Cove (signal
-  d'un objectif PvP, sans règle) et retire la réduction des critiques en PvP (PVP6). Priorité : moyenne.
+  d'un objectif PvP, sans règle) et retire la réduction des critiques en PvP (PVP6). *Modifiée le 2026-11-08*
+  (AMI7b) : le dépôt ne lit toujours aucune donnée de champ de bataille (`pvp_rules.json` : rendements décroissants ;
+  `pvp_items.json` : bijoux ; aucune table du client de type `BattlemasterList` décodée, son ajout demanderait un
+  téléchargement et donc un accord) : pas de `forever_lookup(kind="battlegrounds")`. Le plugin route ces questions
+  vers Everloot (source tierce, certitude au mieux `suppose`), sinon « je ne sais pas » (PV2). Priorité : moyenne.
   [Détail](research/questions-ouvertes-detail.md#pvp5)
 - **PVP6 — Quel multiplicateur de critique s'applique désormais en PvP ?** Ajoutée le 2026-10-09 : la note du 08/10
   (t/2360696/5, révision 1) dit que les critiques en PvP n'ont plus d'efficacité réduite, sans donner l'ancienne

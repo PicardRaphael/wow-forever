@@ -18,3 +18,4 @@ Régénération : `build_transcripts.py` du bloc A (hors dépôt), écriture en 
 | `session_negative_values.jsonl` | synthétique, valeurs réelles du passage d'évaluation de T06 (écarts négatifs de `forever_build` : −10,65 s, −0,0016 s) | aucun chiffre signalé (le signe est dit en mots) |
 | `session_game_skill_estimate.jsonl` | synthétique (PV1) : réponse produite avec le skill de jeu `forever-leveling`, estimation « 7 minutes » sans source | « 7 minutes » |
 | `session_tranche_progress.jsonl` | synthétique (PV1) : session de travail sur une tranche (`/tranche`, skill `tranche`), sous-agent et outil forever, compte rendu d'avancement « environ 7 minutes » | aucun contrôle |
+| `session_everloot.jsonl` | synthétique (AMI7b) : réponse du skill `forever-economie` dont les chiffres viennent d'un outil du serveur tiers Everloot (`mcp__everloot__…`), valeurs fictives | « 444 points » (seul chiffre absent du résultat d'Everloot) |
