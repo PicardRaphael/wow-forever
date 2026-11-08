@@ -1979,6 +1979,18 @@ def _step_simulators(run: _Run) -> Step:
                     )
                     extra["mythicsim"] = {"commit": ms_new["commit"], "gaps": ms_report["gaps"]}
                     done = True
+    # SIM2 : analyse complète relancée quand la version change (tâche détachée) ; exécuteur réel seulement (un
+    # exécuteur fabriqué de test ne lance jamais de calcul)
+    if not offline and pin is not None and run.runner in (None, gitops.subprocess_runner):
+        from forever.sims.analysis import relaunch_if_needed
+
+        try:
+            note = relaunch_if_needed(run.deps)
+        except (OSError, ForeverError) as exc:
+            note = f"analyse non relancée : {exc}"
+        if note:
+            details.append(note)
+            extra["analysis"] = note
     return Step("simulateurs", "fait" if done else "rien", " ; ".join(details), extra)
 
 

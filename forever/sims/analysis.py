@@ -178,6 +178,36 @@ def dps_presets(deps: Deps) -> list[tuple[str, str]]:
 LOCK_NAME = "running.json"
 
 
-def relaunch_if_needed(deps: Deps, **kwargs: Any) -> str | None:
-    """Squelette (SIM2 bloc 16)."""
-    raise NotImplementedError
+def lock_path(deps: Deps) -> Path:
+    return deps.cache_dir / FOLDER / LOCK_NAME
+
+
+def relaunch_if_needed(
+    deps: Deps,
+    *,
+    presets: list[tuple[str, str]] | None = None,
+    spawn: Callable[[list[str], Path], Any] | None = None,
+    alive: Callable[[int], Any] | None = None,
+) -> str | None:
+    """Analyses manquantes pour la version courante (données, commit et correctifs de wowsims) : `forever sims
+    analyse` lancé en tâche détachée, sauf si un calcul tient déjà le verrou (processus vivant) ; None si tout est
+    fait. Appelé par la veille (étape « simulateurs »)."""
+    import sys
+    from datetime import UTC, datetime
+
+    from forever import spawn as spawning
+
+    todo = presets if presets is not None else dps_presets(deps)
+    missing = [(k, r) for k, r in todo if not analysis_path(deps, k, r).is_file()]
+    if not missing:
+        return None
+    lock = lock_path(deps)
+    if lock.is_file():
+        pid = int(json.loads(lock.read_text(encoding="utf-8")).get("pid") or 0)
+        if pid and (alive or spawning.pid_alive)(pid):
+            return f"analyse en cours ({len(missing)} spécialisation(s) restantes)"
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+    log = deps.cache_dir / FOLDER / f"run-{stamp}.log"
+    args = [sys.executable, "-u", "-m", "forever", "sims", "analyse"]
+    (spawn or spawning.spawn_detached)(args, log)
+    return f"analyse de {len(missing)} spécialisation(s) lancée en arrière-plan (journal {log.name})"

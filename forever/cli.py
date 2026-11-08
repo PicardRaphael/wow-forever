@@ -1848,8 +1848,13 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
         _emit({**data, "provenance": provenance}, lines, provenance, args.json)
         return EXIT_OK
     if args.sims_command == "analyse":
-        from forever.sims.analysis import analyse_spec, dps_presets
+        import os
 
+        from forever.sims.analysis import analyse_spec, dps_presets, lock_path
+
+        lock = lock_path(deps)
+        lock.parent.mkdir(parents=True, exist_ok=True)
+        lock.write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")  # verrou : un seul calcul à la fois
         todo = dps_presets(deps)
         if args.preset:
             todo = [(args.preset, args.race or dict(todo).get(args.preset, "Human"))]
@@ -1863,6 +1868,7 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
             dps = " | ".join(f"{b.get('dps', 0):.0f}" if b.get("dps") is not None else "ERR" for b in doc["brackets"])
             print(f"{key} ({race}) : {dps}", flush=True)
             done.append(key)
+        lock.unlink(missing_ok=True)
         provenance = local_provenance(deps, certainty="suppose", assumptions=[f"{len(done)} analyse(s) prêtes"])
         _emit({"done": done, "provenance": provenance}, [f"{len(done)} analyse(s) prêtes"], provenance, args.json)
         return EXIT_OK
