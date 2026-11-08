@@ -96,6 +96,39 @@ tranche sous le niveau 30), ainsi que les munitions de bas niveau.
 - **Comparaison de parcours** : deux parcours de talents (par exemple Maxroll contre un build populaire), tranche par
   tranche, avec l'écart et « non départagé » sous deux écarts types (règle de MS1).
 
+### c bis) Tout réglable (demande du 2026-11-08 : « vraiment full customisable »)
+**Portée** : les neuf classes, toutes leurs spécialisations de dégâts, chacune des tranches demandées (une, plusieurs
+ou toutes ; un niveau précis aussi).
+
+Chaque réglage a un défaut dit dans la provenance. Plusieurs valeurs d'un même réglage donnent une grille de cas,
+simulés avec la même graine, avec l'écart entre eux.
+
+| Réglage | Valeurs | Source des données |
+|---|---|---|
+| Tranches | `10-19,20-29,30-39,40-49,50-59,60`, ou un niveau | — |
+| Classe, spécialisation, race | les 9 classes, leurs spécialisations de dégâts, toutes les races du client | client (`classes.json`, `races.json`) |
+| Talents | aucun ; parcours avec ordre (Talents Forever, Polestar, `leveling_plan`) ; liste collée (Maxroll…) ; build populaire le plus joué ; mes talents | addons lus en local, client pour la légalité |
+| Équipement | **aucun** (nu) ; **GearQuest** (choix obtenables au niveau L) ; **BiS de Naowh ou de Forever Companion** au 60 ; **le mien** (API Blizzard, ou relevé de ForeverLogger) ; **liste d'objets** donnée à la main ; arme seule | GearQuest, Naowh, Companion, API Blizzard, base d'objets de wowsims |
+| Enchantements | aucun ; ceux de mon équipement ; ceux du préréglage | idem |
+| Nourriture | aucune ; meilleure obtenable au niveau L ; nom donné | client (niveau requis des objets), base de wowsims |
+| Potions, élixirs, flacons | aucun ; meilleurs obtenables au niveau L ; noms donnés | idem |
+| Pierres à aiguiser, huiles, munitions, carquois | aucune ; meilleures au niveau L ; noms donnés | idem, munitions de wowsims |
+| Buffs reçus | **solo** (aucun) ; groupe de donjon (5) ; buffs nommés (Intelligence des arcanes, Marque du fauve…) au rang du lanceur de niveau L | rangs des sorts du client |
+| Familier (Chasseur, Démoniste) | famille, bonheur, capacités au rang du niveau L, sans familier (Loup solitaire) | client, `pets.json`, wowsims |
+| Cible | monstre normal de niveau L (défaut), élite, boss de donjon de la tranche, niveau +/−N, PV, armure, nombre de cibles (zone) | journaux mesurés, Questie corrigé, `dungeons.json` |
+| Durée du combat | « jusqu'à la mort » (défaut en leveling), ou durée fixe | — |
+| Rotation | préréglage du simulateur filtré aux sorts appris ; rotation nommée ; ma rotation (APL) | wowsims, MythicSim |
+| Moteur | wowsims (défaut), MythicSim, les deux | — |
+| Combats | nombre d'itérations, graine | — |
+
+- **Un consommable ou un objet** que wowsims ne connaît pas encore (souvent ceux de bas niveau) est ajouté à sa base
+  par un patch à partir des données du client, jamais inventé. S'il manque dans le client : refus nommé.
+- **Sorties de chaque cas** : DPS du joueur et du familier, temps pour tuer, XP par heure, mana restante ou temps de
+  repos, écart type. Avec plusieurs cas : tableau tranche par tranche, plus l'écart et « non départagé » sous deux
+  écarts types.
+- **Accès** : outil MCP `forever_simulate(action="brackets", …)`, commande `forever sims brackets` avec les mêmes
+  options, et bouton « Simuler » du pont en jeu (réglages pris dans le contexte du personnage).
+
 ### d) Le Mage
 - `forever_sim_leveling` et le moteur du Mage gelé (révision 7) **ne répondent plus** aux questions de dégâts : ils
   renvoient vers les tranches. Ils restent gelés pour la parité des tests, puis sont retirés après l'essai en jeu
@@ -138,15 +171,18 @@ tranche sous le niveau 30), ainsi que les munitions de bas niveau.
 3. `ranks-hunter` et `pet-level`, puis Chasseur par tranche (parcours de Maxroll comparé au build populaire).
 4. `base-stats` par niveau (`make db`, et mesures ForeverLogger).
 5. Les sept autres classes, une à une (rangs par classe).
+5 bis. Tous les réglages de la section c bis : équipement (nu, GearQuest, BiS, le mien, liste), consommables par niveau,
+   buffs solo ou groupe, cibles, durée, moteur ; grille de cas.
 6. MythicSim sous le niveau 60 (même principe).
 7. Essai en jeu, et retrait du moteur du Mage gelé.
 
 ## 5. Questions pour toi (avant l'exécution)
 1. **foreverdb.net/sim** (règles de Classic là où le client se tait) : écarté, ou gardé comme simple recoupement
    `suppose` ?
-2. **Attributs de base par niveau** (Agi, Int, Esp, puissance d'attaque de base) : les mesurer en jeu par ForeverLogger
-   (personnage nu, une fois par niveau ; un relevé automatique à chaque montée de niveau suffit), ou partir des formules
-   en commentaire dans wowsims (`2L−10` et `2L−20`, `suppose`) en attendant ?
+2. ~~Attributs de base par niveau~~ : **réglé le 2026-11-08** (« tu peux avoir toutes les données »). Toutes les
+   sources sont prises, dans cet ordre : fichiers du client (`make db`, tables par niveau) ; relevé automatique de
+   ForeverLogger à chaque montée de niveau (statistiques sans équipement, calculées à partir des statistiques avec
+   équipement moins les bonus d'objets) ; formules en commentaire dans wowsims, à défaut (`suppose`).
 3. **Une tranche = un niveau représentatif** (15, 25, 35, 45, 55, 60 : rapide) ou **la moyenne de chaque niveau de la
    tranche** (10 simulations par tranche : plus juste, environ 10 fois plus long) ?
 4. **Proposer nos patchs aux mainteneurs** de wowsims (PR publique sur GitHub, sous ton compte) : oui ou non ? S'ils
