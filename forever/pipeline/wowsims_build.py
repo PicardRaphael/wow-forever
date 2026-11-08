@@ -25,6 +25,14 @@ GIT_TIMEOUT_S = 120.0  # une commande git du clone superficiel : au-delà, GitHu
 _PROTOBUF = re.compile(r"google\.golang\.org/protobuf\s+(v[0-9][^\s]*)")
 
 
+PATCHES_DIR = Path(__file__).resolve().parents[1] / "sims" / "patches" / "wowsims"
+
+
+def patchset(patches_dir: Path) -> dict[str, Any]:
+    """Jeu de correctifs (SIM2) : noms dans l'ordre d'application et empreinte."""
+    raise NotImplementedError
+
+
 def wowsims_dir(cache_dir: Path) -> Path:
     return cache_dir.joinpath(*FOLDER)
 
