@@ -89,6 +89,30 @@ def test_mage_orders_agree_and_client_names_are_checked(make_deps):
     assert ms.encode(ws.decode(code)) == code
 
 
+WOWSIMS_64B21DA = SIMS / "wowsims-64b21da"
+
+
+def test_wowsims_proto_with_max_rank_option_is_read(make_deps):
+    """SIM2 : depuis le commit 64b21da, chaque champ à rangs porte aussi `(talent_max_rank) = N` ; tous les champs sont
+    lus (18, 17 et 18 pour le Mage, pas seulement les talents à un rang) et le rang maximal est gardé."""
+    client = client_trees(make_deps(), "Mage")
+    ws = wowsims_layout(WOWSIMS_64B21DA, "Mage", client)
+    assert [len(t) for t in ws.trees] == [18, 17, 18]
+    assert ws.trees[0][0].field == "wand_specialization" and ws.trees[0][0].max_ranks == 2
+    assert ws.trees[0][9].field == "arcane_blast" and ws.trees[0][9].max_ranks is None
+    assert ws.trees[2][17].field == "ice_barrier"
+
+
+def test_wowsims_preset_of_64b21da_converts_to_mythicsim(make_deps):
+    """Préréglage Frost Incin du commit 64b21da : lu par wowsims, réécrit à l'identique pour MythicSim (refusé avant
+    SIM2 : « arbre 1 plus long que l'arbre »)."""
+    client = client_trees(make_deps(), "Mage")
+    ws = wowsims_layout(WOWSIMS_64B21DA, "Mage", client)
+    ms = mythicsim_layout(ENGINE, GO, "Mage", client, wowsims=WOWSIMS_64B21DA)
+    code = "203205-5-053500011121331251"
+    assert ms.encode(ws.decode(code)) == code
+
+
 def test_class_without_a_read_table_is_refused(make_deps):
     with pytest.raises(TalentConversionError, match="Paladin"):
         mythicsim_layout(ENGINE, GO, "Paladin", client_trees(make_deps(), "Paladin"), wowsims=WOWSIMS)
