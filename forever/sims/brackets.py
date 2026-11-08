@@ -53,8 +53,8 @@ NOTES = (
     ),
     (
         "attributs de base (Force, Agilité, Endurance, Intelligence, Esprit), mana de base et critique par point "
-        "d'Intelligence ou d'Agilité : encore ceux du niveau 60 dans wowsims (correctif base-stats à venir) : dégâts "
-        "surestimés sous le 60"
+        "d'Intelligence ou d'Agilité : dits ligne par ligne (base_stats) ; sans relevé ForeverLogger au niveau ou en "
+        "dessous, attributs du niveau 60 (dégâts surestimés) ; PV de base du niveau 60 (sans effet sur les dégâts)"
     ),
 )
 
@@ -157,6 +157,7 @@ def run_brackets(
     picks_at: Callable[[int], Sequence[Mapping[str, Any]]] | None,
     iterations: int | None = None,
     runner: gitops.Runner | None = None,
+    anchors: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Un combat par tranche (voir le module) ; une ligne par tranche : niveau, talents, équipement, dégâts par
     seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche."""
@@ -172,7 +173,10 @@ def run_brackets(
     chosen = next((p for p in presets if p.key == preset), None)
     if chosen is None:
         raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir forever_simulate(action='presets')")
+    from forever.sims import base_stats as bs
+
     conv, errors = _legality(deps, class_of(chosen))
+    with_patch = bs.PATCH in ((pin.get("patches") or {}).get("files") or [])
     encounter = wowsims.reference_encounter(presets)
     race_token = wowsims.race_enum(race)
     rows: list[dict[str, Any]] = []
@@ -195,7 +199,17 @@ def run_brackets(
             case = solo_preset(chosen, talents=conv.wowsims.encode(keys), equipment=equipment_from_picks(picks))
             request = wowsims.request_for(case, race=race_token, encounter=encounter_at(encounter, level),
                                           iterations=iterations or wowsims.DEFAULT_ITERATIONS)  # fmt: skip
-            out = wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level)
+            if with_patch:
+                doc = bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level),
+                                        anchors or [])  # fmt: skip
+                row["base_stats"] = "mana de base et critique par point du client au niveau ; " + bs.anchor_note(
+                    anchors or [], level
+                )
+            else:
+                doc = None
+                row["base_stats"] = (f"statistiques de base du niveau 60 : binaire sans le correctif {bs.PATCH} "
+                                     "(lancer `forever sims update`)")  # fmt: skip
+            out = wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc)
         except ForeverError as err:
             rows.append({**row, "error": {"code": err.code, "message": err.message, "action": err.action}})
             continue

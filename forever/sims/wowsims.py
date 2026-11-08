@@ -350,6 +350,8 @@ def source_note(pin: dict[str, Any]) -> str:
 
 MIN_LEVEL, MAX_LEVEL = 1, 60  # bornes du réglage de niveau du correctif 0001-level (niveau maximal de Forever)
 LEVEL_FLAG = "--forever-level="  # option lue par le correctif 0001-level à l'initialisation du simulateur
+BASE_STATS_FLAG = "--forever-base-stats="  # fichier lu par le correctif 0003-base-stats (statistiques de base)
+BASE_STATS_PATCH = "0003-base-stats.patch"
 
 
 def reference_encounter(presets: Sequence[Preset]) -> dict[str, Any] | None:
@@ -407,7 +409,12 @@ def _binary(cache_dir: Path) -> tuple[Path, dict[str, Any]]:
 
 
 def run_sim(
-    cache_dir: Path, request: dict[str, Any], *, runner: gitops.Runner | None = None, level: int | None = None
+    cache_dir: Path,
+    request: dict[str, Any],
+    *,
+    runner: gitops.Runner | None = None,
+    level: int | None = None,
+    base_stats: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Un combat simulé par le binaire épinglé : dégâts par seconde (moyenne, écart type), combats faits, source.
     `level` (SIM2) : niveau du personnage, passé au binaire corrigé (`--forever-level=L`) ; None : 60, comme avant."""
@@ -420,11 +427,21 @@ def run_sim(
             "le binaire épinglé de wowsims n'a pas les correctifs forever : il ne calcule qu'au niveau 60.",
             "lancer `uv run forever sims update` (recompilation avec les correctifs)",
         )
+    if base_stats is not None and BASE_STATS_PATCH not in ((pin.get("patches") or {}).get("files") or []):
+        raise WowsimsError(
+            f"le binaire épinglé de wowsims n'a pas le correctif {BASE_STATS_PATCH} (statistiques de base au niveau).",
+            "lancer `uv run forever sims update` (recompilation avec les correctifs)",
+        )
     runs = wowsims_dir(cache_dir) / "runs"
     runs.mkdir(parents=True, exist_ok=True)
     name = uuid.uuid4().hex[:12]
     infile, outfile = runs / f"{name}.in.json", runs / f"{name}.out.json"
     infile.write_text(json.dumps(request), encoding="utf-8")
+    extra = [f"{LEVEL_FLAG}{level}"] if level is not None else []
+    statsfile = runs / f"{name}.base.json"
+    if base_stats is not None:
+        statsfile.write_text(json.dumps(base_stats), encoding="utf-8")
+        extra.append(f"{BASE_STATS_FLAG}{statsfile}")
     try:
         gitops._run(
             runner or gitops.subprocess_runner,
@@ -435,7 +452,7 @@ def run_sim(
                 str(infile),
                 "--outfile",
                 str(outfile),
-                *([f"{LEVEL_FLAG}{level}"] if level is not None else []),
+                *extra,
             ],
             runs,
             timeout=TIMEOUT_S,
@@ -448,6 +465,7 @@ def run_sim(
     finally:
         infile.unlink(missing_ok=True)
         outfile.unlink(missing_ok=True)
+        statsfile.unlink(missing_ok=True)
     if result.get("error"):
         err = result["error"]
         message = str(err.get("message", err) if isinstance(err, dict) else err).split("\nStack Trace", 1)[0]
@@ -464,6 +482,7 @@ def run_sim(
             "sha256": pin["sha256"],
             "patches": patches,
             "level": level if level is not None else MAX_LEVEL,
+            "base_stats": base_stats is not None,
             "certainty": "suppose",
         },
     }

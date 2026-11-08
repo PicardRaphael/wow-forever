@@ -76,6 +76,9 @@ def update_wowsims(
     else:
         _out(run, ["git", "fetch", "--depth", "1", "origin"], clone)
         _out(run, ["git", "reset", "--hard", "FETCH_HEAD"], clone)
+        # fichiers créés par les correctifs du passage précédent (non suivis) : retirés avant de les réappliquer ;
+        # fichiers ignorés gardés (code protobuf généré)
+        _out(run, ["git", "clean", "-fd"], clone)
     commit = _out(run, ["git", "rev-parse", "HEAD"], clone)
     patches = patchset(patches_dir)
     for name in patches["files"]:
