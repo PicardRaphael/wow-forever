@@ -72,7 +72,7 @@ def test_each_candidate_is_tried_in_its_slot_and_ranked(make_deps, tmp_path):
     assert set(sim.levels) == {25}
     first = sim.requests[0]["raid"]["parties"][0]["players"][0]
     assert first["equipment"]["items"][SLOT_NAMES.index("Head")] == {"id": 100}  # départ inchangé
-    assert first["talentsString"] == "--0501" and "buffs" not in first
+    assert first["talentsString"] == "--0505" and "buffs" not in first
     assert out["provenance"]["certainty"] == "suppose"
 
 

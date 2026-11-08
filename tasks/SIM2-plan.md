@@ -229,3 +229,4 @@ niveau accepté) ; aucune PR publique chez wowsims.
   MythicSim (2028 objets, révision du 2026-10-21, `suppose`), jamais à la place d'un objet connu. Prototype : Mage 60
   246 → 455, Voleur 60 25 → 360, Chaman 25 14 → 31 DPS.
 - **Bloc 7 fait** : poids des statistiques par tranche (`stats`, `reference` sur `brackets`), tirages appariés dans les conditions de chaque tranche.
+- **Bloc 8 fait** : optimisation de l'équipement par emplacement (`forever sims gear`) ; vérification réelle des 7 classes calculables après 1.60.1.70862.
