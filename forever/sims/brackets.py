@@ -190,6 +190,7 @@ def run_brackets(
     stats: Sequence[str] | None = None,
     reference: str | None = None,
     conditions: str = "solo",
+    rotation: str = "best",
 ) -> dict[str, Any]:
     """Un combat par tranche (voir le module) ; une ligne par tranche : niveau, talents, équipement, dégâts par
     seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche."""
@@ -210,6 +211,16 @@ def run_brackets(
     from forever.sims import base_stats as bs
 
     conv, errors = _legality(deps, class_of(chosen))
+    # rotations essayées : celle du préréglage, et en « best » celles des autres préréglages de la même spé
+    rotations: list[tuple[str, dict[str, Any]]] = [(chosen.key, chosen.rotation)]
+    if rotation == "best":
+        spec_prefix = chosen.key.rsplit("/", 1)[0] + "/"
+        seen = {json.dumps(chosen.rotation, sort_keys=True)}
+        for other in presets:
+            mark = json.dumps(other.rotation, sort_keys=True)
+            if other.key.startswith(spec_prefix) and mark not in seen and other.rotation.get("type") == "TypeAPL":
+                seen.add(mark)
+                rotations.append((other.key, other.rotation))
     with_patch = bs.PATCH in ((pin.get("patches") or {}).get("files") or [])
     items_path, items_ids, items_note = (
         extra_items(deps.cache_dir)
@@ -243,8 +254,6 @@ def run_brackets(
             case = conditioned(chosen, conditions, talents=conv.wowsims.encode(keys),
                                equipment=equipment_from_picks(picks))  # fmt: skip
             fight = encounter_at(encounter, target_level(encounter, level, conditions), crush=conditions == "raid")
-            request = wowsims.request_for(case, race=race_token, encounter=fight,
-                                          iterations=iterations or wowsims.DEFAULT_ITERATIONS)  # fmt: skip
             if with_patch:
                 doc = bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level),
                                         anchors or [])  # fmt: skip
@@ -255,8 +264,17 @@ def run_brackets(
                 doc = None
                 row["base_stats"] = (f"statistiques de base du niveau 60 : binaire sans le correctif {bs.PATCH} "
                                      "(lancer `forever sims update`)")  # fmt: skip
-            out = wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc,
-                                  items=items_path)  # fmt: skip
+            tried: list[tuple[str, Preset, dict[str, Any]]] = []
+            for rot_name, rot in rotations:
+                rot_case = dataclasses.replace(case, rotation=rot)
+                rot_request = wowsims.request_for(rot_case, race=race_token, encounter=fight,
+                                                  iterations=iterations or wowsims.DEFAULT_ITERATIONS)  # fmt: skip
+                tried.append((rot_name, rot_case, wowsims.run_sim(deps.cache_dir, rot_request, runner=runner,
+                                                                  level=level, base_stats=doc, items=items_path)))  # fmt: skip
+            best_name, case, out = max(tried, key=lambda t: float(t[2]["dps"]))
+            row["rotation"] = best_name
+            if len(tried) > 1:
+                row["rotations"] = [{"rotation": n, "dps": o["dps"], "stdev": o["stdev"]} for n, _, o in tried]
             if stats:
                 try:
                     w = wowsims.stat_weights(
@@ -281,6 +299,9 @@ def run_brackets(
         rows.append({**row, "talents_string": case.talents, "equipment": [p["item"] for p in picks] if picks else "nu",
                      **out})  # fmt: skip
     notes = [wowsims.source_note(pin), CONDITION_NOTES[conditions], *NOTES[1:], *([items_note] if items_note else [])]
+    if len(rotations) > 1:
+        notes.append(f"rotation : la meilleure des {len(rotations)} rotations de la spécialisation (APL du dépôt de "
+                     "wowsims), essayées dans les conditions de chaque tranche, même graine")  # fmt: skip
     if stats:
         notes.append(f"poids des statistiques par tranche : tirages appariés (même graine, +{wowsims.STAT_DELTA:g} "
                      "points par statistique) dans les conditions de la tranche ; gain de dégâts par seconde par point")  # fmt: skip

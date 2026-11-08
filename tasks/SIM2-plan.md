@@ -255,3 +255,4 @@ Chaque calcul par tranche (10-19 … 60, ou un niveau) doit couvrir, et pouvoir 
 - **Bloc 12 fait** : 6 meilleurs objets par emplacement (`by_slot`), départ par défaut = ensemble GearQuest du niveau.
 - **Bloc 13 fait** : priorité des statistiques par tranche (`--stats auto`).
 - **Anomalies 1 et 4 corrigées** : correctif `0005-shaman-ranks` (Élémentaire sous 44 : 16/35/63 au lieu de 5/8/12) ; correctif des rangs : seuls les rangs non appris redirigés, effets frères (même niveau) jamais plafonnés (Affliction 55 : 334 au lieu d'un blocage). Restent 2 (rotation Arcanes : essayer toutes les APL) et 3 (type d'arme d'Assassinat).
+- **Bloc 14 fait** : meilleure rotation de la spé par tranche (`rotation=best`, défaut) ; Arcanes 25 : 67 au lieu de 19.
