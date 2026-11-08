@@ -29,7 +29,9 @@ MYTHICSIM_TABLES = {
     "Mage": ("src/classes/mage/prepare.rs", ("FOREVER_ARCANE", "FOREVER_FIRE", "FOREVER_FROST")),
     "Shaman": ("src/classes/shaman/prepare/layout.rs", ("ELEMENTAL", "ENHANCEMENT", "RESTORATION")),
 }
-_FIELD = re.compile(r"^\s*(?:int32|bool)\s+(\w+)\s*=\s*\d+\s*(?:\[\(talent_spell_id\)\s*=\s*(\d+)\])?\s*;")
+# Options du champ : `talent_spell_id`, puis d'autres options possibles (`talent_max_rank` depuis le commit 64b21da).
+_FIELD = re.compile(r"^\s*(?:int32|bool)\s+(\w+)\s*=\s*\d+\s*(?:\[([^\]]*)\])?\s*;")
+_OPTION = re.compile(r"\((\w+)\)\s*=\s*(\d+)")
 _TABLE_ROW = re.compile(r'(?:new_)?talent\(\s*"(\w+)",\s*"([^"]+)",\s*(\d+)\s*\)')
 
 
@@ -113,8 +115,9 @@ def _by_spell(client: Sequence[Sequence[Mapping[str, Any]]]) -> dict[int, Mappin
     return {sid: t for tree in client for t in tree for sid in t.get("spell_ids") or []}
 
 
-def _proto_trees(path: Path, class_name: str) -> list[list[tuple[str, int | None]]]:
-    """Champs du message `<Classe>Talents` par arbre (commentaire d'arbre), avec `talent_spell_id` s'il y en a un."""
+def _proto_trees(path: Path, class_name: str) -> list[list[tuple[str, int | None, int | None]]]:
+    """Champs du message `<Classe>Talents` par arbre (commentaire d'arbre), avec `talent_spell_id` et
+    `talent_max_rank` s'il y en a."""
     if not path.is_file():
         raise TalentConversionError(f"proto des talents introuvable : {path}.", "lancer `uv run forever sims update`")
     text = path.read_text(encoding="utf-8")
@@ -122,7 +125,7 @@ def _proto_trees(path: Path, class_name: str) -> list[list[tuple[str, int | None
     if head not in text:
         raise TalentConversionError(f"message {class_name}Talents absent de {path.name}.")
     block = text.split(head, 1)[1].split("}", 1)[0]
-    trees: list[list[tuple[str, int | None]]] = []
+    trees: list[list[tuple[str, int | None, int | None]]] = []
     for line in block.splitlines():
         if line.strip().startswith("//"):
             trees.append([])
@@ -131,7 +134,8 @@ def _proto_trees(path: Path, class_name: str) -> list[list[tuple[str, int | None
         if m:
             if not trees:
                 trees.append([])
-            trees[-1].append((m.group(1), int(m.group(2)) if m.group(2) else None))
+            options = {k: int(v) for k, v in _OPTION.findall(m.group(2) or "")}
+            trees[-1].append((m.group(1), options.get("talent_spell_id"), options.get("talent_max_rank")))
     return trees
 
 
@@ -141,9 +145,9 @@ def wowsims_layout(clone: Path, class_name: str, client: Sequence[Sequence[Mappi
     trees = []
     for tree in _proto_trees(clone / "proto" / f"{class_name.lower()}.proto", class_name):
         row = []
-        for name, sid in tree:
+        for name, sid, max_ranks in tree:
             hit = by_spell.get(sid) if sid else None
-            row.append(Slot(name, name.replace("_", " ").title(), str(hit["key"]) if hit else None))
+            row.append(Slot(name, name.replace("_", " ").title(), str(hit["key"]) if hit else None, max_ranks))
         trees.append(tuple(row))
     return EngineLayout("wowsims/forever", class_name, tuple(trees))
 
@@ -198,7 +202,7 @@ def mythicsim_layout(
     renamed: dict[str, int] = {}
     if wowsims is not None and (wowsims / "proto" / f"{class_name.lower()}.proto").is_file():
         renamed = {f: s for tree in _proto_trees(wowsims / "proto" / f"{class_name.lower()}.proto", class_name)
-                   for f, s in tree if s}  # fmt: skip
+                   for f, s, _ in tree if s}  # fmt: skip
     by_spell = _by_spell(client)
     trees = []
     for const in consts:

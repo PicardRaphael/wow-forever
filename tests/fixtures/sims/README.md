@@ -1,6 +1,6 @@
 # Extraits des simulateurs de la communauté (MS1, décision 301)
 
-Copiés le 2026-11-04 depuis les clones épinglés en cache, sans modification (seulement tronqués aux blocs lus) :
+Copiés le 2026-11-04 (puis le 2026-11-08 pour SIM2) depuis les clones épinglés en cache, sans modification (seulement tronqués aux blocs lus) :
 
 | Fichier | Source | Révision |
 | --- | --- | --- |
