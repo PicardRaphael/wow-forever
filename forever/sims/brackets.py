@@ -570,3 +570,10 @@ def gearquest_spec(preset_key: str, lead_tree: str) -> str:
     tree = lead_tree.strip().lower().replace(" ", "_")
     name = _GQ_FOLDERS.get(spec_folder) or _GQ_TREES.get(tree, tree)
     return f"{name}-{class_folder}"
+
+
+def candidate_pool(
+    db: Mapping[int, Mapping[str, Any]], sources: Sequence[tuple[str, Sequence[int]]], *, level: int, class_id: int
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Squelette (SIM2 bloc 10)."""
+    raise NotImplementedError
