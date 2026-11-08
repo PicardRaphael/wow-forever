@@ -163,15 +163,31 @@ décision 288 ; une tranche gardée par un événement extérieur est sautée ta
 - Pilote : quêtes et donjons (caches actuels de 194 Mo et 14 Mo sans arrêt anticipé), mesure, puis objets, PNJ,
   sorts, zones. Outils : résumé et identifiants d'abord, détail à la demande, sorties sous 10 000 jetons.
 
-### SIM2 — Simulation sous le niveau 60
-- Questions envoyées le 2026-10-21 (`tasks/messages-auteurs.md`) : wowsims/forever#624 (autres niveaux que le 60,
-  publication des binaires) et Blueteak/SimsForeverExporter#1 (publication du moteur de leveling de Sims Forever).
-- **Si l'un des deux répond oui** : adaptateur mince, épinglé et mis à jour par la veille, sur le modèle de
-  `forever/sims/` ; il remplace le moteur du Mage gelé et donne le leveling des autres classes (temps par monstre, XP
-  par heure, builds par niveau), certitude `suppose`, recoupé par mes journaux.
-- **Sinon** : rien n'est construit (décision 293) ; sous le 60, le Mage reste au moteur gelé, les autres classes au
-  temps par monstre mesuré dans mes journaux, sinon « non calculé » ; la veille regarde à chaque passage si l'une des
-  deux sources change (question SIM1 de `docs/OPEN_QUESTIONS.md`).
+### SIM2 — Simulation sous le niveau 60 (en cours, branche `sim2b`, `tasks/SIM2-plan.md`)
+- Demande du 2026-11-08 (décision 305) : wowsims/forever corrigé chez nous (correctifs `forever/sims/patches/wowsims/`,
+  réappliqués par la veille sur chaque commit), MythicSim pour les objets qui manquent à wowsims.
+- Fait : tranches 10-19 à 60 pour les 9 classes (22 spécialisations de dégâts), rang appris, statistiques de base
+  (client et relevés ForeverLogger 0.8.0), objets, conditions solo/groupe/raid, meilleure rotation, priorité des
+  statistiques, 6 meilleurs objets par emplacement (GearQuest, Naowh, Forever Companion), analyse complète gardée et
+  relancée par la veille après chaque mise à jour.
+- En cours (sous-agents du 2026-11-08) : races par tranche, familiers au niveau, temps par monstre et XP par heure,
+  journaux de combat comparés au calcul, arme compatible avec la rotation, zone (plusieurs cibles).
+
+### AMI — Le meilleur ami de WoW Forever (demande du 2026-11-08 : « meilleur ami, meilleur joueur »)
+Dans cet ordre, chaque tranche par le flux habituel (`/tranche`, tests d'abord, essai en jeu) :
+1. **AMI1, mon personnage en direct** : profil rempli depuis ForeverLogger et l'API Blizzard (classe, race, niveau,
+   talents, équipement porté), sans saisie ; Polestar installé (ordre des talents de toutes les classes).
+2. **AMI2, recoupement continu** : chaque session de jeu comparée au calcul de sa tranche (mesuré contre simulé),
+   écarts notés en questions ouvertes ; certitude `probable` pour les tranches recoupées.
+3. **AMI3, optimisation complète** : équipement enchaîné jusqu'à ce que plus rien ne gagne, puis enchantements,
+   consommables et sacs du niveau ; parcours de talents comparés (plan, populaire, recherche) par tranche.
+4. **AMI4, montée la plus rapide** : temps par monstre et XP par heure par tranche reliés aux routes (RestedXP,
+   Polestar) et aux donjons : où aller, quoi tuer, quelle spé à chaque tranche.
+5. **AMI5, notes de patch** : chaque note officielle et correctif de Blizzard lu à sa sortie (`forever notes`), avec
+   « ce qui change pour moi » (classe, spé, équipement, route).
+6. **AMI6, communauté en recoupement** : classements de MythicSim, Warcraft Logs, foreverlogs.gg lus et comparés,
+   jamais pris pour vérité (étiquette `suppose`).
+7. **AMI7, au-delà des dégâts** : métiers rentables, hôtel des ventes, réputations, champs de bataille.
 
 ### CM1 — Calcul du Chaman
 - Plus de moteur du Chaman écrit par nous (décision 293 ; l'ancien contenu « table de mêlée, soins, totems,
