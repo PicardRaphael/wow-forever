@@ -232,3 +232,22 @@ niveau accepté) ; aucune PR publique chez wowsims.
 - **Bloc 8 fait** : optimisation de l'équipement par emplacement (`forever sims gear`) ; vérification réelle des 7 classes calculables après 1.60.1.70862.
 - **Bloc 9 fait** : builds SIML lus par le binaire (Chasseur, Paladin Vindicte ; rotation simple remplacée par l'APL du dépôt), rotation déclarée dans un objet (Druide félin), fiches GearQuest du Paladin, spécialisation de GearQuest déduite du préréglage.
 - **Bloc 10 fait** : candidats de l'optimisation réunis depuis GearQuest, Naowh et Forever Companion, filtrés au niveau par la base des simulateurs (wowsims + MythicSim).
+
+## 9. Exigences de l'utilisateur (2026-11-08, suite) : « toute classe, toute spé, toute race… meilleur DPS, rotation,
+   meilleur équipement, AoE, single »
+Chaque calcul par tranche (10-19 … 60, ou un niveau) doit couvrir, et pouvoir classer :
+- **Toutes les classes et spécialisations de dégâts** : 22 préréglages calculés au 2026-11-08 (Mage ×3, Guerrier ×2,
+  Voleur ×3, Chaman ×2, Prêtre ×2, Druide Équilibre et félin, Démoniste ×3, Chasseur ×3, Paladin Vindicte ×2).
+  Restent : anomalies (Élémentaire avant 45, Arcanes au 25, Assassinat, Affliction bloquée au 55), familiers au niveau.
+- **Toutes les races jouables** de la classe (`races.json`) : tableau par race et par tranche, même graine, écart et
+  « non départagé » (étendre `compare_races`, aujourd'hui au 60, aux tranches).
+- **Meilleure rotation** : toutes les rotations du dépôt de la spé (APL de wowsims, et du fork de MythicSim) essayées
+  par tranche, sorts non appris retirés ; la meilleure gardée, avec l'écart.
+- **Meilleur équipement** : optimisation enchaînée sur la réserve de candidats (GearQuest, Naowh, Companion ; bloc 10)
+  jusqu'à ce que plus rien ne gagne, par tranche ; enchantements et consommables obtenables au niveau ensuite.
+- **Mono-cible et zone** : rencontre à une cible (défaut) et à plusieurs cibles (nombre réglable, 3 et 5 par défaut
+  en zone), rotations de zone du dépôt quand elles existent.
+- **Conditions** : solo (leveling, défaut), groupe de donjon, raid (buffs, consommables, boss 63 : recoupement avec
+  MythicSim et ses classements, ex. Mage Givre 741 contre 744,5 chez nous).
+- **Sortie de synthèse** : par tranche, le meilleur choix (spé, race, rotation, équipement, cible) et l'écart avec le
+  suivant, provenance complète.
