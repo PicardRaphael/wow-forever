@@ -173,3 +173,11 @@ def dps_presets(deps: Deps) -> list[tuple[str, str]]:
         if p.key.rsplit("/", 1)[0] in DPS_SPECS and races.get(class_of(p)):
             out.append((p.key, races[class_of(p)].removeprefix("Race")))
     return out
+
+
+LOCK_NAME = "running.json"
+
+
+def relaunch_if_needed(deps: Deps, **kwargs: Any) -> str | None:
+    """Squelette (SIM2 bloc 16)."""
+    raise NotImplementedError
