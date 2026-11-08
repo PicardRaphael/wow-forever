@@ -170,6 +170,11 @@ def build_server(deps: Deps) -> MCPServer:
         Sources (étape b) : `kind="profession"` avec `name` (métier, nom anglais) et `level` (rang actuel) : recettes qui
         font encore monter le métier, lues dans SkillUp Forever (orange puis jaune), fraîcheur, et l'itinéraire complet
         calculé en jeu par l'addon (`/skillup`) ; `suppose`.
+        AMI7a : `kind="profession_profit"` avec `name` (métier, nom anglais ; vide : métiers du profil), `level` (rang ;
+        défaut : celui du profil), `realm` (royaume des prix d'Auctionator, exigé s'il y en a plusieurs), `character`
+        (sacs et banque lus) et `limit` : recettes faisables classées par profit à l'hôtel des ventes (SkillUp Forever,
+        Auctionator ; cuivre ; taxe absente, profit brut ; prix manquants nommés) et objets à vendre (Forever
+        Companion) ; `suppose`.
         Sources (étape b, décision 291) : `kind="class_guide"` avec `name` (classe), `level` et `class_name` facultatif
         (spécialisation) : guide de la classe lu dans Forever Companion (build adapté au niveau en nos clés et contrôlé,
         builds écartés avec leur raison, rotation en prose au niveau 30, fraîcheur de la source ; `suppose`).
@@ -258,6 +263,12 @@ def build_server(deps: Deps) -> MCPServer:
                 if not name or level is None:
                     raise InvalidArgumentError("Métier ou rang manquant.", "donner name (métier) et level (rang)")
                 return lookup_profession(deps, name, rank=level)
+            if kind == "profession_profit":
+                from forever.professions import profession_profit
+
+                return profession_profit(
+                    deps, profession=name or None, skill=level, realm=realm, character=character, limit=limit
+                )
             if kind == "class_guide":
                 from forever.lookup import lookup_class_guide
 

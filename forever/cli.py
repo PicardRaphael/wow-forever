@@ -802,6 +802,16 @@ def build_parser() -> argparse.ArgumentParser:
         a_cmd = auto_sub.add_parser(name, help=text)
         a_cmd.add_argument("--json", action="store_true", help="sortie JSON")
 
+    prof = sub.add_parser("professions", help="métiers (AMI7a) : SkillUp Forever, Auctionator, Forever Companion")
+    prof_sub = prof.add_subparsers(dest="professions_command", required=True, parser_class=_Parser)
+    p_profit = prof_sub.add_parser("profit", help="recettes faisables classées par profit à l'hôtel des ventes")
+    p_profit.add_argument("--profession", help="métier, nom anglais (défaut : métiers du profil)")
+    p_profit.add_argument("--skill", type=int, help="rang actuel du métier (défaut : celui du profil)")
+    p_profit.add_argument("--realm", help="royaume des prix d'Auctionator (exigé s'il y en a plusieurs)")
+    p_profit.add_argument("--character", help="personnage dont les sacs et la banque sont lus (défaut : tous)")
+    p_profit.add_argument("--limit", type=int, default=20, help="recettes et objets rendus au plus")
+    p_profit.add_argument("--json", action="store_true", help="sortie JSON")
+
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
     hot.add_argument("--since-install", action="store_true", help="seulement depuis la révision installée")
@@ -4893,6 +4903,59 @@ def _cmd_origins(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _item_label(item_id: int, name: str | None) -> str:
+    return f"{name} ({item_id})" if name else str(item_id)
+
+
+def _cmd_professions(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever professions profit` (AMI7a) : recettes faisables classées par profit, objets à vendre."""
+    from forever.professions import profession_profit
+
+    out = profession_profit(
+        deps, profession=args.profession, skill=args.skill, realm=args.realm, character=args.character,
+        limit=args.limit,
+    )  # fmt: skip
+    if not out["available"]:
+        _emit(out, [out["reason"]], out["provenance"], args.json)
+        return EXIT_OK
+    lines = [f"Métiers rentables, prix d'Auctionator du royaume {out['realm'] or '?'} (montants en cuivre)"]
+    for p in out["professions"]:
+        lines.append(
+            f"\n{p['profession']} (rang {p['skill']}) : {p['total']} recettes faisables, {p['priced']} chiffrées"
+        )
+        for r in p["recipes"]:
+            if r["profit"] is not None:
+                lines.append(
+                    f"  {r['name']} [{r['color']}] : profit {r['profit']} (vente {r['sale']}, coût {r['cost']})"
+                )
+            elif r["reagents_unknown"]:
+                lines.append(f"  {r['name']} [{r['color']}] : profit inconnu, réactifs absents de SkillUp")
+            else:
+                names = {x["item_id"]: x["name"] for x in [*r["reagents"], r["output"]]}
+                missing = ", ".join(_item_label(i, names.get(i)) for i in r["missing"])
+                lines.append(f"  {r['name']} [{r['color']}] : profit inconnu, prix manquants : {missing}")
+        if p["total"] > len(p["recipes"]):
+            lines.append(f"  … et {p['total'] - len(p['recipes'])} autre(s)")
+    if out["uncovered"]:
+        lines.append(f"\nMétiers non couverts par SkillUp Forever : {', '.join(out['uncovered'])}")
+    lines.append("\nTaxe de l'hôtel des ventes : absente des données, non déduite (profit brut).")
+    sell = out["to_sell"]
+    if not sell["available"]:
+        lines.append(f"Objets à vendre : {sell['reason']}.")
+    else:
+        lines.append("Objets à vendre (sacs, banque, courrier ; Forever Companion) :")
+        for i in sell["items"]:
+            lines.append(
+                f"  {_item_label(i['item_id'], i['name'])} × {i['count']} : {i['total']} ({i['unit_price']} l'unité, "
+                f"relevé du {i['date']})"
+            )
+        if sell["missing"]:
+            lines.append("  sans prix d'Auctionator : " + ", ".join(map(str, sell["missing"])))
+    lines.append(out["in_game"])
+    _emit(out, lines, out["provenance"], args.json)
+    return EXIT_OK
+
+
 def _account_svs(deps: Deps) -> list[Path]:
     """Dossiers `WTF/Account/*/SavedVariables` de tous les comptes du client (LN1)."""
     if deps.wow_dir is None:
@@ -5433,6 +5496,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "xp": _cmd_xp,
         "origins": _cmd_origins,
         "hotfixes": _cmd_hotfixes,
+        "professions": _cmd_professions,
         "addons": _cmd_addons,
         "bridge": _cmd_bridge,
         "watch": _cmd_watch,
