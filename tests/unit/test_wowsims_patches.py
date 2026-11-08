@@ -88,6 +88,7 @@ def test_repository_patches_name_their_reason():
         "0003-base-stats.patch",
         "0004-items.patch",
         "0005-shaman-ranks.patch",
+        "0006-pets.patch",
     ]
     level = (PATCHES_DIR / "0001-level.patch").read_text(encoding="utf-8")
     ranks = (PATCHES_DIR / "0002-ranks.patch").read_text(encoding="utf-8")

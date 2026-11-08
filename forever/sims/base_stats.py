@@ -4,7 +4,9 @@
 - Mana de base et critique par point d'Intelligence ou d'Agilité : tables du client au niveau
   (`character_scaling.json`, PlayerExpectedStat), en pour cent comme wowsims les compte (la donnée est une fraction).
 - Attributs sans équipement : relevés en jeu (ForeverLogger), transmis tels quels ; le correctif retire l'écart de race
-  de wowsims et interpole entre eux et ses tables du niveau 60 (`suppose`)."""
+  de wowsims et interpole entre eux et ses tables du niveau 60 (`suppose`).
+- Familiers (correctif `0006-pets`) : valeurs de créature du client au niveau (`character_scaling.json`, bloc
+  `creature`, ExpectedStat), passées à part par `run_sim` (`--forever-pet-stats=`) ; sans elles, valeurs du 60."""
 
 from __future__ import annotations
 
@@ -13,6 +15,7 @@ from typing import Any
 
 from forever.config import Deps
 from forever.errors import InvalidArgumentError
+from forever.sims.wowsims import PETS_KEY, PETS_PATCH
 
 CHARACTER_FILE = "character_scaling.json"
 PERCENT = 100  # fraction du client -> pour cent de wowsims
@@ -35,10 +38,48 @@ def client_scaling(deps: Deps, class_name: str, level: int) -> dict[str, float]:
 
 
 def base_stats_doc(
-    class_token: str, scaling: Mapping[str, float], anchors: Sequence[Mapping[str, Any]]
+    class_token: str,
+    scaling: Mapping[str, float],
+    anchors: Sequence[Mapping[str, Any]],
+    pets: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
-    """Fichier lu par le correctif 0003-base-stats (`--forever-base-stats=`)."""
-    return {"class": class_token, **scaling, "anchors": [dict(a) for a in anchors]}
+    """Fichier lu par le correctif 0003-base-stats (`--forever-base-stats=`). `pets` : valeurs de créature au niveau,
+    que `run_sim` sépare dans le fichier du correctif 0006-pets (`--forever-pet-stats=`)."""
+    doc: dict[str, Any] = {"class": class_token, **scaling, "anchors": [dict(a) for a in anchors]}
+    if pets is not None:
+        doc[PETS_KEY] = dict(pets)
+    return doc
+
+
+PET_KEYS = {"health": "creature_health", "armor": "creature_armor", "auto_attack_dps": "creature_auto_attack_dps"}
+
+
+def pet_stats_at(scaling: Mapping[str, Any], level: int) -> dict[str, float] | None:
+    """Valeurs de créature du client au niveau (bloc `creature` de character_scaling.json), clés du correctif
+    0006-pets ; None si les données n'ont pas encore ce bloc (familiers aux valeurs du niveau 60, rien d'inventé)."""
+    creature = scaling.get("creature")
+    if not isinstance(creature, Mapping) or not all(k in creature for k in PET_KEYS):
+        return None
+    return {name: float(creature[key][level - 1]) for key, name in PET_KEYS.items()}
+
+
+def client_pet_stats(deps: Deps, level: int) -> dict[str, float] | None:
+    """Valeurs de créature au niveau, lues dans les données installées (voir `pet_stats_at`)."""
+    from forever.store import load_version
+
+    return pet_stats_at(load_version(deps).read_json(CHARACTER_FILE), level)
+
+
+def pet_note(pets: Mapping[str, float] | None, level: int, *, pinned: bool) -> str:
+    """Ce que valent les familiers (Chasseur, Démoniste) au niveau du calcul."""
+    if not pinned:
+        return f"familiers aux valeurs du niveau 60 : binaire sans le correctif {PETS_PATCH} (lancer `forever sims update`)"
+    if level >= 60:
+        return "familiers aux valeurs de créature du niveau 60 (client)"
+    if pets is None:
+        return (f"familiers aux valeurs du niveau 60 (surestimés au niveau {level}) : valeurs de créature par niveau "
+                f"absentes de {CHARACTER_FILE} (relancer `forever update`)")  # fmt: skip
+    return f"familiers aux valeurs de créature du client au niveau {level} (ExpectedStat)"
 
 
 def anchor_note(anchors: Sequence[Mapping[str, Any]], level: int) -> str:

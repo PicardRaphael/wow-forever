@@ -147,7 +147,10 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     ),
     "LevelExperience": _cols("ID:int Level:int ContentSetID:int Experience:int"),
     "Exhaustion": _cols("ID:int Name_lang:str Xp:int Factor:float OutdoorHours:float InnHours:float Threshold:float"),
-    "ExpectedStat": _cols("ID:int ExpansionID:int ContentSetID:int Lvl:int ArmorConstant:float CreatureHealth:float"),
+    "ExpectedStat": _cols(
+        "ID:int ExpansionID:int ContentSetID:int Lvl:int ArmorConstant:float CreatureHealth:float CreatureArmor:float "
+        "CreatureAutoAttackDps:float"
+    ),
     "GlobalCurve": _cols("ID:int CurveID:int Type:int Subtype:int"),
     "NumTalentsAtLevel": _cols("ID:int NumTalents:int"),
     "TraitCond": _cols(
