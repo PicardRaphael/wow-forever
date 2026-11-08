@@ -267,6 +267,12 @@ def run_brackets(
                     row["weights"] = {k: w[k] for k in ("per_point", "normalised", "reference", "delta", "base_dps")}
                     # ordre de priorité : du plus grand au plus petit gain par point
                     row["weights"]["priority"] = sorted(w["per_point"], key=lambda s: -float(w["per_point"][s]))
+                    if reference is None:  # sans référence donnée : poids rapportés à la meilleure statistique
+                        top = max(float(v) for v in w["per_point"].values())
+                        row["weights"]["reference"] = row["weights"]["priority"][0]
+                        row["weights"]["normalised"] = {
+                            s: (float(v) / top if top > 0 else 0.0) for s, v in w["per_point"].items()
+                        }
                 except ForeverError as err:
                     row["weights_error"] = {"code": err.code, "message": err.message, "action": err.action}
         except ForeverError as err:

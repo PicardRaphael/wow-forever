@@ -87,8 +87,9 @@ def simulate(
             wanted = [s for s in wowsims.STAT_TO_GUIDE if s in known]
         else:
             wanted = [_stat(s) for s in (stats or "").split(",") if s.strip()]
-        ref = _stat(reference) if reference else (wanted[0] if wanted else None)
-        if wanted and ref not in wanted:
+        auto = (stats or "").strip().lower() == "auto"
+        ref = _stat(reference) if reference else (None if auto else (wanted[0] if wanted else None))
+        if wanted and ref is not None and ref not in wanted:
             raise InvalidArgumentError(f"reference « {reference} » absente de stats.",
                                        "donner reference parmi stats (ex. SpellDamage)")  # fmt: skip
         return run_from_sources(deps, preset=preset, race=race, brackets=brackets, path=path, gear=gear, spec=spec,

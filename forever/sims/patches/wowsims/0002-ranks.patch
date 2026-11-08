@@ -36,10 +36,10 @@ index 9f0d50e..d05ca36 100644
  		panic(fmt.Sprintf("Over 1000 registered spells when registering %s! There is probably a spell being registered every iteration.", config.ActionID))
  	}
 diff --git a/sim/core/spelldata/ladder.go b/sim/core/spelldata/ladder.go
-index c0903b6..fcd8e88 100644
+index c0903b6..34bf646 100644
 --- a/sim/core/spelldata/ladder.go
 +++ b/sim/core/spelldata/ladder.go
-@@ -21,7 +21,48 @@ func Ranked(ids ...int32) Ladder {
+@@ -21,7 +21,67 @@ func Ranked(ids ...int32) Ladder {
  	for i, id := range ids {
  		ranks[i] = MustFind(id)
  	}
@@ -61,13 +61,32 @@ index c0903b6..fcd8e88 100644
 +	return best
 +}
 +
++// forever (SIM2) : une échelle de plusieurs entrées toutes du même niveau d'apprentissage réunit des effets
++// frères (Demonic Sacrifice : un effet par démon), pas des rangs : jamais plafonnée.
++func (l Ladder) foreverSiblings() bool {
++	if len(l.ranks) < 2 {
++		return false
++	}
++	for _, s := range l.ranks {
++		if s.SpellLevel != l.ranks[0].SpellLevel {
++			return false
++		}
++	}
++	return true
++}
++
 +// forever (SIM2) : chaque rang de l'échelle désigne, pour l'APL, le rang appris (0 : aucun appris).
 +func (l Ladder) foreverAlias() {
-+	if core.CharacterLevel >= 60 {
++	if core.CharacterLevel >= 60 || l.foreverSiblings() {
 +		return
 +	}
++	// seuls les rangs pas encore appris sont redirigés : un rang appris garde son identifiant (une échelle peut
++	// réunir des effets frères, comme Demonic Sacrifice, qui ne sont pas des rangs)
 +	learned := l.foreverLearned()
 +	for _, s := range l.ranks {
++		if int32(s.SpellLevel) <= core.CharacterLevel {
++			continue
++		}
 +		if learned == nil {
 +			core.ForeverRankAlias[s.ID] = 0
 +		} else {
@@ -79,7 +98,7 @@ index c0903b6..fcd8e88 100644
 +// forever (SIM2) : rang retenu au lieu d'un rang pas encore appris ; le premier rang si aucun ne l'est
 +// (le sort reste enregistré, mais l'APL ne le trouve plus : foreverAlias).
 +func (l Ladder) foreverCap(s *Spell) *Spell {
-+	if int32(s.SpellLevel) <= core.CharacterLevel {
++	if int32(s.SpellLevel) <= core.CharacterLevel || l.foreverSiblings() {
 +		return s
 +	}
 +	if learned := l.foreverLearned(); learned != nil {
@@ -89,7 +108,7 @@ index c0903b6..fcd8e88 100644
  }
  
  // A ladder of a trait-tree talent, which is one spell whose per-rank numbers live in a curve. Each
-@@ -69,7 +110,7 @@ func (l Ladder) Highest() *Spell {
+@@ -69,7 +129,7 @@ func (l Ladder) Highest() *Spell {
  	if len(l.ranks) == 0 {
  		return Nil
  	}
@@ -98,7 +117,7 @@ index c0903b6..fcd8e88 100644
  }
  
  // The rank with this spell id. Panics on an id the ladder does not carry, the way MustFind does on a
-@@ -77,7 +118,7 @@ func (l Ladder) Highest() *Spell {
+@@ -77,7 +137,7 @@ func (l Ladder) Highest() *Spell {
  func (l Ladder) ByID(id int32) *Spell {
  	for _, s := range l.ranks {
  		if s.ID == id {
