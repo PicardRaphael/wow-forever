@@ -82,7 +82,11 @@ def simulate(
 
         if not preset:
             raise InvalidArgumentError("Préréglage manquant.", "donner preset (voir action=presets)")
-        wanted = [_stat(s) for s in (stats or "").split(",") if s.strip()]
+        if (stats or "").strip().lower() == "auto":  # toutes les statistiques d'équipement connues du proto épinglé
+            known = wowsims.stat_names(wowsims_dir(deps.cache_dir) / "forever")
+            wanted = [s for s in wowsims.STAT_TO_GUIDE if s in known]
+        else:
+            wanted = [_stat(s) for s in (stats or "").split(",") if s.strip()]
         ref = _stat(reference) if reference else (wanted[0] if wanted else None)
         if wanted and ref not in wanted:
             raise InvalidArgumentError(f"reference « {reference} » absente de stats.",

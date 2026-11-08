@@ -544,7 +544,11 @@ def build_parser() -> argparse.ArgumentParser:
     s_brk.add_argument("--gear", default="gearquest", choices=["gearquest", "none"], help="équipement")
     s_brk.add_argument("--spec", default=None, help="spécialisation du plan de leveling (nom anglais)")
     s_brk.add_argument("--iterations", type=int, default=None, help="combats par tranche (défaut de l'outil)")
-    s_brk.add_argument("--stats", default=None, help="poids de ces statistiques par tranche, ex. Intellect,SpellDamage")
+    s_brk.add_argument(
+        "--stats",
+        default=None,
+        help="poids et priorité des statistiques par tranche : auto (toutes), ou ex. Intellect,SpellDamage",
+    )
     s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
     s_brk.add_argument("--conditions", default="solo", choices=["solo", "group", "raid"], help="conditions du combat")
     s_gear = sims_sub.add_parser("gear", help="optimisation de l'équipement par emplacement au niveau (SIM2)")
@@ -1868,8 +1872,9 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
                 lines.append(f"  {row['bracket']} (niveau {row['level']}) : {row['dps']:.1f} DPS (écart type "
                              f"{row['stdev']:.1f}), équipement {row['equipment']}")  # fmt: skip
                 if row.get("weights"):
-                    lines.append("    poids : " + ", ".join(f"{k.removeprefix('Stat')} {v:.2f}"
-                                                            for k, v in row["weights"]["normalised"].items()))  # fmt: skip
+                    w = row["weights"]
+                    lines.append("    priorité : " + " > ".join(f"{s.removeprefix('Stat')} {w['normalised'][s]:.2f}"
+                                                               for s in w["priority"] if w["per_point"][s] > 0))  # fmt: skip
         _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command in ("compare", "builds"):

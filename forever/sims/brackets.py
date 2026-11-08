@@ -265,6 +265,8 @@ def run_brackets(
                         runner=runner, level=level, base_stats=doc, items=items_path,
                     )  # fmt: skip
                     row["weights"] = {k: w[k] for k in ("per_point", "normalised", "reference", "delta", "base_dps")}
+                    # ordre de priorité : du plus grand au plus petit gain par point
+                    row["weights"]["priority"] = sorted(w["per_point"], key=lambda s: -float(w["per_point"][s]))
                 except ForeverError as err:
                     row["weights_error"] = {"code": err.code, "message": err.message, "action": err.action}
         except ForeverError as err:

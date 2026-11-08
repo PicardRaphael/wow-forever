@@ -253,3 +253,4 @@ Chaque calcul par tranche (10-19 … 60, ou un niveau) doit couvrir, et pouvoir 
   suivant, provenance complète.
 - **Bloc 11 fait** : conditions solo (défaut), groupe, raid.
 - **Bloc 12 fait** : 6 meilleurs objets par emplacement (`by_slot`), départ par défaut = ensemble GearQuest du niveau.
+- **Bloc 13 fait** : priorité des statistiques par tranche (`--stats auto`).
