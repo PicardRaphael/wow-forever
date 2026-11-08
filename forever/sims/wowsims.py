@@ -550,6 +550,9 @@ def stat_weights(
     iterations: int = DEFAULT_ITERATIONS,
     seed: int = DEFAULT_SEED,
     runner: gitops.Runner | None = None,
+    level: int | None = None,
+    base_stats: dict[str, Any] | None = None,
+    items: Path | None = None,
 ) -> dict[str, Any]:
     """Poids des statistiques par tirages appariés : un combat sans bonus, puis un par statistique avec `delta` points
     de plus (même préréglage, même graine) ; gain de dégâts par seconde par point, et rapporté à `reference`."""
@@ -561,14 +564,15 @@ def stat_weights(
             f"statistiques inconnues du proto épinglé : {', '.join(unknown)}.", "voir proto/common.proto"
         )
     base_req = request_for(preset, race=race, encounter=encounter, iterations=iterations, seed=seed)
-    base = run_sim(cache_dir, base_req, runner=runner)
+    run_kw: dict[str, Any] = {"runner": runner, "level": level, "base_stats": base_stats, "items": items}
+    base = run_sim(cache_dir, base_req, **run_kw)
     per_point: dict[str, float] = {}
     for stat in dict.fromkeys([*stats, reference]):
         req = request_for(preset, race=race, encounter=encounter, iterations=iterations, seed=seed)
         bonus = [0.0] * len(names)
         bonus[names.index(stat)] = delta
         req["raid"]["parties"][0]["players"][0]["bonusStats"] = {"stats": bonus}
-        per_point[stat] = (run_sim(cache_dir, req, runner=runner)["dps"] - base["dps"]) / delta
+        per_point[stat] = (run_sim(cache_dir, req, **run_kw)["dps"] - base["dps"]) / delta
     ref = per_point[reference]
     normalised = {s: (per_point[s] / ref if ref else 0.0) for s in stats}
     return {"base_dps": base["dps"], "per_point": {s: per_point[s] for s in stats}, "normalised": normalised,

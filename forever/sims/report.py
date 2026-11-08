@@ -67,8 +67,13 @@ def simulate(
 
         if not preset:
             raise InvalidArgumentError("Préréglage manquant.", "donner preset (voir action=presets)")
+        wanted = [_stat(s) for s in (stats or "").split(",") if s.strip()]
+        ref = _stat(reference) if reference else (wanted[0] if wanted else None)
+        if wanted and ref not in wanted:
+            raise InvalidArgumentError(f"reference « {reference} » absente de stats.",
+                                       "donner reference parmi stats (ex. SpellDamage)")  # fmt: skip
         return run_from_sources(deps, preset=preset, race=race, brackets=brackets, path=path, gear=gear, spec=spec,
-                                iterations=iterations)  # fmt: skip
+                                iterations=iterations, stats=wanted or None, reference=ref)  # fmt: skip
     pin = pinned(deps.cache_dir)
     if pin is None:
         raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")

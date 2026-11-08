@@ -158,6 +158,8 @@ def run_brackets(
     iterations: int | None = None,
     runner: gitops.Runner | None = None,
     anchors: Sequence[Mapping[str, Any]] | None = None,
+    stats: Sequence[str] | None = None,
+    reference: str | None = None,
 ) -> dict[str, Any]:
     """Un combat par tranche (voir le module) ; une ligne par tranche : niveau, talents, équipement, dégâts par
     seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche."""
@@ -221,12 +223,25 @@ def run_brackets(
                                      "(lancer `forever sims update`)")  # fmt: skip
             out = wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc,
                                   items=items_path)  # fmt: skip
+            if stats:
+                try:
+                    w = wowsims.stat_weights(
+                        deps.cache_dir, case, list(stats), reference=reference or stats[0], race=race_token,
+                        encounter=encounter_at(encounter, level), iterations=iterations or wowsims.DEFAULT_ITERATIONS,
+                        runner=runner, level=level, base_stats=doc, items=items_path,
+                    )  # fmt: skip
+                    row["weights"] = {k: w[k] for k in ("per_point", "normalised", "reference", "delta", "base_dps")}
+                except ForeverError as err:
+                    row["weights_error"] = {"code": err.code, "message": err.message, "action": err.action}
         except ForeverError as err:
             rows.append({**row, "error": {"code": err.code, "message": err.message, "action": err.action}})
             continue
         rows.append({**row, "talents_string": case.talents, "equipment": [p["item"] for p in picks] if picks else "nu",
                      **out})  # fmt: skip
     notes = [wowsims.source_note(pin), *NOTES, *([items_note] if items_note else [])]
+    if stats:
+        notes.append(f"poids des statistiques par tranche : tirages appariés (même graine, +{wowsims.STAT_DELTA:g} "
+                     "points par statistique) dans les conditions de la tranche ; gain de dégâts par seconde par point")  # fmt: skip
     if any(r.get("unknown_items") for r in rows):
         notes.append("objets choisis absents de la base de wowsims (unknown_items) : emplacement laissé vide, dégâts "
                      "sous-estimés")  # fmt: skip
@@ -296,6 +311,8 @@ def run_from_sources(
     spec: str | None = None,
     gear_spec: str | None = None,
     iterations: int | None = None,
+    stats: Sequence[str] | None = None,
+    reference: str | None = None,
 ) -> dict[str, Any]:
     """`run_brackets` avec les sources installées : parcours `path` (plan de leveling ou aucun) et équipement `gear`
     (choix de GearQuest au niveau de chaque tranche, ou nu)."""
@@ -346,7 +363,7 @@ def run_from_sources(
     notes.append(f"relevés d'attributs de ForeverLogger : {len(anchors)} point(s) de la classe dans {len(files)} "
                  "fichier(s) de SavedVariables (connexion et montée de niveau, ForeverLogger 0.8.0)")  # fmt: skip
     out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
-                       iterations=iterations, anchors=anchors)  # fmt: skip
+                       iterations=iterations, anchors=anchors, stats=stats, reference=reference)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out
 

@@ -228,3 +228,4 @@ niveau accepté) ; aucune PR publique chez wowsims.
 - **Bloc 6 fait** : correctif `0004-items` ; objets absents de la base de wowsims pris dans celle du fork Go épinglé de
   MythicSim (2028 objets, révision du 2026-10-21, `suppose`), jamais à la place d'un objet connu. Prototype : Mage 60
   246 → 455, Voleur 60 25 → 360, Chaman 25 14 → 31 DPS.
+- **Bloc 7 fait** : poids des statistiques par tranche (`stats`, `reference` sur `brackets`), tirages appariés dans les conditions de chaque tranche.

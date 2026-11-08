@@ -544,6 +544,8 @@ def build_parser() -> argparse.ArgumentParser:
     s_brk.add_argument("--gear", default="gearquest", choices=["gearquest", "none"], help="équipement")
     s_brk.add_argument("--spec", default=None, help="spécialisation du plan de leveling (nom anglais)")
     s_brk.add_argument("--iterations", type=int, default=None, help="combats par tranche (défaut de l'outil)")
+    s_brk.add_argument("--stats", default=None, help="poids de ces statistiques par tranche, ex. Intellect,SpellDamage")
+    s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
     s_brk.add_argument("--json", action="store_true", help="sortie JSON")
     r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
     r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
@@ -1830,7 +1832,8 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
         from forever.sims.report import simulate
 
         doc = simulate(deps, "brackets", preset=args.preset, race=args.race, brackets=args.brackets, path=args.path,
-                       gear=args.gear, spec=args.spec, iterations=args.iterations)  # fmt: skip
+                       gear=args.gear, spec=args.spec, iterations=args.iterations, stats=args.stats,
+                       reference=args.reference)  # fmt: skip
         lines = [f"Dégâts par tranche, {doc['preset']} ({doc['race']}, wowsims corrigé, solo) :"]
         for row in doc["rows"]:
             if "error" in row:
@@ -1838,6 +1841,9 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
             else:
                 lines.append(f"  {row['bracket']} (niveau {row['level']}) : {row['dps']:.1f} DPS (écart type "
                              f"{row['stdev']:.1f}), équipement {row['equipment']}")  # fmt: skip
+                if row.get("weights"):
+                    lines.append("    poids : " + ", ".join(f"{k.removeprefix('Stat')} {v:.2f}"
+                                                            for k, v in row["weights"]["normalised"].items()))  # fmt: skip
         _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command in ("compare", "builds"):
