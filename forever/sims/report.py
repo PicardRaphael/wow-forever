@@ -19,7 +19,7 @@ MAGE_ENGINE_FROZEN = (
     "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
 )
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
-ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets", "gear")
+ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets", "gear", "analysis")
 ENGINES = ("wowsims", "mythicsim", "both")
 
 
@@ -66,6 +66,20 @@ def simulate(
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
     if engine not in ENGINES:
         raise InvalidArgumentError(f"Moteur inconnu : « {engine} ».", "choisir " + ", ".join(ENGINES))
+    if action == "analysis":  # SIM2 bloc 15 : analyse gardée (forever sims analyse), jamais recalculée ici
+        from forever.sims.analysis import dps_presets, read_analysis
+
+        if not preset:
+            listed = [{"preset": k, "race": r, "ready": read_analysis(deps, k, r) is not None}
+                      for k, r in dps_presets(deps)]  # fmt: skip
+            return {"analyses": listed, "provenance": local_provenance(deps, certainty="suppose", assumptions=[])}
+        doc = read_analysis(deps, preset, race or dict(dps_presets(deps)).get(preset, ""))
+        if doc is None:
+            raise InvalidArgumentError(f"Analyse absente pour « {preset} ».",
+                                       "lancer `uv run forever sims analyse --preset …` (ou --all)")  # fmt: skip
+        if level is not None:
+            doc = {**doc, "brackets": [b for b in doc["brackets"] if b["level"] == level] or doc["brackets"]}
+        return doc
     if action == "gear":  # SIM2 bloc 8 : optimisation de l'équipement par emplacement au niveau
         from forever.sims.brackets import optimise_from_sources, parse_equipped
 

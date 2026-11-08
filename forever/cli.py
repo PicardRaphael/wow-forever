@@ -551,6 +551,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
     s_brk.add_argument("--conditions", default="solo", choices=["solo", "group", "raid"], help="conditions du combat")
+    s_ana = sims_sub.add_parser("analyse", help="analyse complète gardée par spécialisation et tranche (SIM2)")
+    s_ana.add_argument("--preset", default=None, help="préréglage (défaut : toutes les spécialisations de dégâts)")
+    s_ana.add_argument("--race", default=None, help="race (défaut : race jouable par défaut de la classe)")
+    s_ana.add_argument("--iterations", type=int, default=None, help="combats par essai")
+    s_ana.add_argument("--json", action="store_true", help="sortie JSON")
     s_gear = sims_sub.add_parser("gear", help="optimisation de l'équipement par emplacement au niveau (SIM2)")
     s_gear.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
     s_gear.add_argument("--race", required=True, help="race du joueur")
@@ -1841,6 +1846,25 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
                 )
         provenance = local_provenance(deps, certainty="suppose", assumptions=notes)
         _emit({**data, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.sims_command == "analyse":
+        from forever.sims.analysis import analyse_spec, dps_presets
+
+        todo = dps_presets(deps)
+        if args.preset:
+            todo = [(args.preset, args.race or dict(todo).get(args.preset, "Human"))]
+        done = []
+        for key, race in todo:
+            try:
+                doc = analyse_spec(deps, preset=key, race=race, iterations=args.iterations)
+            except ForeverError as err:
+                print(f"{key} : {err.message}", flush=True)
+                continue
+            dps = " | ".join(f"{b.get('dps', 0):.0f}" if b.get("dps") is not None else "ERR" for b in doc["brackets"])
+            print(f"{key} ({race}) : {dps}", flush=True)
+            done.append(key)
+        provenance = local_provenance(deps, certainty="suppose", assumptions=[f"{len(done)} analyse(s) prêtes"])
+        _emit({"done": done, "provenance": provenance}, [f"{len(done)} analyse(s) prêtes"], provenance, args.json)
         return EXIT_OK
     if args.sims_command == "gear":
         from forever.sims.report import simulate
