@@ -53,6 +53,7 @@ def simulate(
     equipped: str | None = None,
     candidates: str | None = None,
     conditions: str = "solo",
+    targets: int = 1,
 ) -> dict[str, Any]:
     """`action` : `presets` (liste, objets équipés de chacun), `races` (races séparées par des virgules, sur
     `preset`), `weights` (statistiques séparées par des virgules, rapportées à `reference`, `race` du joueur exigée),
@@ -108,7 +109,7 @@ def simulate(
                                        "donner reference parmi stats (ex. SpellDamage)")  # fmt: skip
         return run_from_sources(deps, preset=preset, race=race, brackets=brackets, path=path, gear=gear, spec=spec,
                                 iterations=iterations, stats=wanted or None, reference=ref,
-                                conditions=conditions)  # fmt: skip
+                                conditions=conditions, targets=targets)  # fmt: skip
     pin = pinned(deps.cache_dir)
     if pin is None:
         raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")

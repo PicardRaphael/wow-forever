@@ -551,6 +551,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
     s_brk.add_argument("--conditions", default="solo", choices=["solo", "group", "raid"], help="conditions du combat")
+    s_brk.add_argument("--targets", type=int, default=1, help="nombre de cibles identiques (zone au-delà de 1)")
     s_ana = sims_sub.add_parser("analyse", help="analyse complète gardée par spécialisation et tranche (SIM2)")
     s_ana.add_argument("--preset", default=None, help="préréglage (défaut : toutes les spécialisations de dégâts)")
     s_ana.add_argument("--race", default=None, help="race (défaut : race jouable par défaut de la classe)")
@@ -1893,8 +1894,11 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
 
         doc = simulate(deps, "brackets", preset=args.preset, race=args.race, brackets=args.brackets, path=args.path,
                        gear=args.gear, spec=args.spec, iterations=args.iterations, stats=args.stats,
-                       reference=args.reference, conditions=args.conditions)  # fmt: skip
-        lines = [f"Dégâts par tranche, {doc['preset']} ({doc['race']}, wowsims corrigé, {doc['conditions']}) :"]
+                       reference=args.reference, conditions=args.conditions, targets=args.targets)  # fmt: skip
+        head = (
+            f"{doc['preset']} ({doc['race']}, wowsims corrigé, {doc['conditions']}, {doc.get('targets', 1)} cible(s))"
+        )
+        lines = [f"Dégâts par tranche, {head} :"]
         for row in doc["rows"]:
             if "error" in row:
                 lines.append(f"  {row['bracket']} (niveau {row['level']}) : {row['error']['message']}")

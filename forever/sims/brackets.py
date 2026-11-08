@@ -221,9 +221,16 @@ def solo_preset(preset: Preset, *, talents: str, equipment: dict[str, Any]) -> P
                                individual_buffs={}, debuffs={}, consumables={})  # fmt: skip
 
 
-def encounter_at(encounter: dict[str, Any] | None, level: int, *, crush: bool = False) -> dict[str, Any]:
-    """Copie de la rencontre dont chaque cible est au niveau `level` (coups écrasants seulement si `crush`)."""
+def encounter_at(
+    encounter: dict[str, Any] | None, level: int, *, crush: bool = False, targets: int = 1
+) -> dict[str, Any]:
+    """Copie de la rencontre dont chaque cible est au niveau `level` (coups écrasants seulement si `crush`) ; au-delà
+    d'une cible, `targets` copies identiques de la première (le proto de wowsims porte une liste de cibles,
+    `repeated Target targets`, et son simulateur crée une cible par entrée)."""
     out = copy.deepcopy(encounter) if encounter else {"targets": [{}]}
+    if targets > 1:
+        first = (out.get("targets") or [{}])[0]
+        out["targets"] = [copy.deepcopy(first) for _ in range(targets)]
     for target in out.get("targets") or []:
         target["level"] = level
         target["canCrush"] = crush
@@ -296,6 +303,8 @@ def run_brackets(
     from forever.sims.engines import class_of
 
     wanted = parse_brackets(brackets)
+    if targets < 1:
+        raise InvalidArgumentError(f"Nombre de cibles impossible : {targets}.", "donner targets=1 ou plus")
     if conditions not in CONDITIONS:
         raise InvalidArgumentError(f"conditions inconnues : « {conditions} ».", "choisir " + ", ".join(CONDITIONS))
     if not race:
@@ -354,7 +363,8 @@ def run_brackets(
                 picks = [p for p in picks if int(p["item"]) not in unknown]
             case = conditioned(chosen, conditions, talents=conv.wowsims.encode(keys),
                                equipment=equipment_from_picks(picks))  # fmt: skip
-            fight = encounter_at(encounter, target_level(encounter, level, conditions), crush=conditions == "raid")
+            fight = encounter_at(encounter, target_level(encounter, level, conditions), crush=conditions == "raid",
+                                targets=targets)  # fmt: skip
             if with_patch:
                 doc = bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level),
                                         anchors or [])  # fmt: skip
@@ -422,6 +432,12 @@ def run_brackets(
         rows.append({**row, "talents_string": case.talents, "equipment": [p["item"] for p in picks] if picks else "nu",
                      **out})  # fmt: skip
     notes = [wowsims.source_note(pin), CONDITION_NOTES[conditions], *NOTES[1:], *([items_note] if items_note else [])]
+    if targets > 1:
+        notes.append(f"zone : rencontre à {targets} cibles identiques (copies de la cible de la rencontre de référence "
+                     "de wowsims, au même niveau) ; dégâts par seconde sur toutes les cibles ; rotation des APL du "
+                     "dépôt (pas de rotation de zone dédiée quand le dépôt n'en a pas)")  # fmt: skip
+    else:
+        notes.append("une seule cible")
     if len(rotations) > 1:
         notes.append(f"rotation : la meilleure des {len(rotations)} rotations de la spécialisation (APL du dépôt de "
                      "wowsims), essayées dans les conditions de chaque tranche, même graine")  # fmt: skip
@@ -436,7 +452,7 @@ def run_brackets(
     if any(r.get("unknown_items") for r in rows):
         notes.append("objets choisis absents de la base de wowsims (unknown_items) : emplacement laissé vide, dégâts "
                      "sous-estimés")  # fmt: skip
-    return {"preset": chosen.key, "race": race_token, "conditions": conditions, "rows": rows,
+    return {"preset": chosen.key, "race": race_token, "conditions": conditions, "targets": targets, "rows": rows,
             "provenance": local_provenance(deps, certainty="suppose", assumptions=notes)}  # fmt: skip
 
 
@@ -505,6 +521,7 @@ def run_from_sources(
     stats: Sequence[str] | None = None,
     reference: str | None = None,
     conditions: str = "solo",
+    targets: int = 1,
 ) -> dict[str, Any]:
     """`run_brackets` avec les sources installées : parcours `path` (plan de leveling ou aucun) et équipement `gear`
     (choix de GearQuest au niveau de chaque tranche, ou nu)."""
@@ -567,7 +584,8 @@ def run_from_sources(
                  "fichier(s) de SavedVariables (connexion et montée de niveau, ForeverLogger 0.8.0)")  # fmt: skip
     out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
                        iterations=iterations, anchors=anchors, stats=stats, reference=reference,
-                       conditions=conditions, candidates_at=candidates_at)  # fmt: skip
+                       conditions=conditions, candidates_at=candidates_at,
+                       targets=targets)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out
 
