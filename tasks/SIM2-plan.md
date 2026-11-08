@@ -201,3 +201,18 @@ simulés avec la même graine, avec l'écart entre eux.
 - Réseau : seulement celui de `forever sims update` et de `forever update`, déjà autorisés. `make db` lit les fichiers
   du client par l'outillage de wowsims ; s'il demande un téléchargement, je m'arrête et je te demande.
 - Gros chantier : étapes 1 à 3 (Mage et Chasseur) d'abord, livrables seules ; le reste suit, classe par classe.
+
+## 8. Exécution (2026-11-08, branche `sim2`)
+Questions 1, 3 et 4 tranchées par défaut, à confirmer : foreverdb écarté ; un niveau représentatif par tranche (tout
+niveau accepté) ; aucune PR publique chez wowsims.
+
+- **Bloc 1 fait** : la conversion des talents vers MythicSim cassait parce que wowsims a ajouté `(talent_max_rank) = N`
+  à ses protos (seuls les talents à un rang étaient lus). Lecture des options corrigée ; les six Mages repassent.
+- **Bloc 2 fait** : correctifs `0001-level` et `0002-ranks`, appliqués et épinglés par empreinte.
+  - Écart au plan : le niveau passe par l'option `--forever-level=L` (lue à l'initialisation), pas par la requête :
+    les rangs sont choisis par des variables de paquet évaluées avant `main`.
+  - Écart au plan : un seul correctif de rangs dans `Ladder` (719 sites, toutes classes) au lieu d'un par classe ; les
+    identifiants de l'APL sont ramenés au rang appris dans `ProtoToActionID`.
+- **Reporté** : carte de veille quand une classe convertie au passage précédent ne l'est plus (`skipped` de
+  `replay_reference`) ; statistiques de base par niveau (étape 4, données dans `forever/data/`, jamais dans un patch) ;
+  action `brackets` (talents tronqués, solo, cible de niveau L) ; Chasseur et familier ; MythicSim sous le 60.
