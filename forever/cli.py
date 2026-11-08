@@ -1844,9 +1844,12 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
         doc = simulate(deps, "gear", preset=args.preset, race=args.race, level=args.level, equipped=args.equipped,
                        candidates=args.candidates, path=args.path, iterations=args.iterations)  # fmt: skip
         lines = [f"Équipement au niveau {doc['level']}, {doc['preset']} : départ {doc['base']['dps']:.1f} DPS"]
-        for row in doc["candidates"]:
-            lines.append(f"  {row['slot']} : {row['item']} à la place de {row['replaces']} : {row['gain']:+.1f} DPS "
-                         f"({row['verdict']}, seuil {row['threshold']:.1f})")  # fmt: skip
+        for slot, group in doc["by_slot"].items():
+            lines.append(f"  {slot} (porté : {', '.join(map(str, group['equipped'])) or 'rien'}) :")
+            for row in group["best"]:
+                lines.append(
+                    f"    {row['item']} : {row['gain']:+.1f} DPS ({row['verdict']}, seuil {row['threshold']:.1f})"
+                )
         for row in doc["skipped"]:
             lines.append(f"  écarté : {row['item']} ({row['slot']}) : {row['reason']}")
         _emit(doc, lines, doc["provenance"], args.json)

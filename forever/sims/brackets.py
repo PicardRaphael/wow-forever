@@ -531,7 +531,8 @@ def optimise_gear(
     notes = [wowsims.source_note(pin), *NOTES, *([items_note] if items_note else []),
              ("optimisation : chaque candidat à sa place sur l'équipement porté, même graine ; « non départagé » : "
               "gain sous deux erreurs types de la différence (règle de MS1)")]  # fmt: skip
-    return {"preset": chosen.key, "race": race_token, "level": level, "base": {"dps": base["dps"],
+    return {"preset": chosen.key, "race": race_token, "level": level, "by_slot": rank_by_slot(rows, equipped),
+            "base": {"dps": base["dps"],
             "stdev": base["stdev"], "equipped": dict(equipped)}, "candidates": rows, "skipped": skipped,
             "provenance": local_provenance(deps, certainty="suppose", assumptions=notes)}  # fmt: skip
 
@@ -584,6 +585,13 @@ def optimise_from_sources(
         candidates, set_aside, names = pool_from_sources(deps, class_name, gear_spec, level, race or "Orc")
         notes.append(f"candidats : {len(candidates)} objets de {', '.join(names)}, filtrés au niveau {level} par la "
                      f"base des simulateurs ({len(set_aside)} écartés)")  # fmt: skip
+    if not equipped:
+        from forever.gear import gear_report
+
+        picks = gear_report(deps, "leveling", class_name=class_name, level=level, race=race or "Orc", spec=gear_spec)
+        items = equipment_from_picks(picks["picks"])["items"]
+        equipped = {slot: int(i["id"]) for slot, i in zip(SLOT_NAMES, items, strict=True) if i}
+        notes.append("départ : ensemble de GearQuest du niveau (aucun équipement porté donné)")
     anchors, _files = logger_anchors(deps, chosen.class_token)
     out = optimise_gear(deps, preset=preset, race=race, level=level, equipped=equipped, candidates=candidates,
                         steps=steps, iterations=iterations, anchors=anchors)  # fmt: skip
@@ -696,6 +704,22 @@ def pool_from_sources(
     return pool, skipped, [name for name, _ in sources]
 
 
-def rank_by_slot(rows: Sequence[Mapping[str, Any]], equipped: Mapping[str, int], *, top: int = 6) -> dict[str, Any]:
-    """Squelette (SIM2 bloc 12)."""
-    raise NotImplementedError
+_SLOT_GROUPS = {"Finger1": "Finger", "Finger2": "Finger", "Trinket1": "Trinket", "Trinket2": "Trinket"}
+TOP_PER_SLOT = 6  # objets gardés par emplacement (« les 5 ou 6 meilleurs », demande du 2026-11-08)
+
+
+def rank_by_slot(
+    rows: Sequence[Mapping[str, Any]], equipped: Mapping[str, int], *, top: int = TOP_PER_SLOT
+) -> dict[str, Any]:
+    """Essais de l'optimisation regroupés par emplacement (bagues et bijoux ensemble), du plus grand gain au plus
+    petit, au plus `top` ; objets portés de l'emplacement ; emplacements dans l'ordre de wowsims."""
+    groups: dict[str, list[Mapping[str, Any]]] = {}
+    for row in rows:
+        groups.setdefault(_SLOT_GROUPS.get(str(row["slot"]), str(row["slot"])), []).append(row)
+    order = list(dict.fromkeys(_SLOT_GROUPS.get(s, s) for s in SLOT_NAMES))
+    out: dict[str, Any] = {}
+    for group in sorted(groups, key=order.index):
+        worn = [int(v) for s, v in equipped.items() if _SLOT_GROUPS.get(s, s) == group]
+        best = sorted(groups[group], key=lambda r: -float(r["gain"]))[:top]
+        out[group] = {"equipped": worn, "best": [dict(r) for r in best]}
+    return out

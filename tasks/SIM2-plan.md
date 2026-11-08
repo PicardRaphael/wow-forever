@@ -252,3 +252,4 @@ Chaque calcul par tranche (10-19 … 60, ou un niveau) doit couvrir, et pouvoir 
 - **Sortie de synthèse** : par tranche, le meilleur choix (spé, race, rotation, équipement, cible) et l'écart avec le
   suivant, provenance complète.
 - **Bloc 11 fait** : conditions solo (défaut), groupe, raid.
+- **Bloc 12 fait** : 6 meilleurs objets par emplacement (`by_slot`), départ par défaut = ensemble GearQuest du niveau.

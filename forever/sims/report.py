@@ -111,7 +111,13 @@ def simulate(
             rows, fight_conditions = wowsims.compare_presets(
                 deps.cache_dir, pairs, wowsims.reference_encounter(presets), consumables=consumables, **kw
             )
-            return {"level": LEVEL, "engine": engine, "rows": rows, "conditions": fight_conditions, "provenance": provenance}
+            return {
+                "level": LEVEL,
+                "engine": engine,
+                "rows": rows,
+                "conditions": fight_conditions,
+                "provenance": provenance,
+            }
         return engines.compare(deps, pairs, presets, engine=engine, talents=talents, consumables=consumables,
                                rotation=rotation, ws_note=wowsims.source_note(pin), **kw)  # fmt: skip
     if action == "builds":
