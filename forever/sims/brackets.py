@@ -540,16 +540,14 @@ def optimise_from_sources(
         steps, label = _popular_steps(deps, class_name, chosen)
         notes.append(f"talents : {label}, ordre de prise légal généré, tronqué au niveau")
     if candidates is None:
-        from forever.gear import gear_report
-
         if gear_spec is None:
             from forever.sims.engines import ClassTalents
 
             conv = ClassTalents(deps, class_name)
             gear_spec = gearquest_spec(chosen.key, conv.lead_tree(conv.wowsims.decode(chosen.talents)))
-        doc = gear_report(deps, "leveling", class_name=class_name, level=level, race=race or "Orc", spec=gear_spec)
-        candidates = list(doc.get("picks") or [])
-        notes.append("candidats : choix de GearQuest au niveau (forever_gear action=leveling)")
+        candidates, set_aside, names = pool_from_sources(deps, class_name, gear_spec, level, race or "Orc")
+        notes.append(f"candidats : {len(candidates)} objets de {', '.join(names)}, filtrés au niveau {level} par la "
+                     f"base des simulateurs ({len(set_aside)} écartés)")  # fmt: skip
     anchors, _files = logger_anchors(deps, chosen.class_token)
     out = optimise_gear(deps, preset=preset, race=race, level=level, equipped=equipped, candidates=candidates,
                         steps=steps, iterations=iterations, anchors=anchors)  # fmt: skip
@@ -575,5 +573,88 @@ def gearquest_spec(preset_key: str, lead_tree: str) -> str:
 def candidate_pool(
     db: Mapping[int, Mapping[str, Any]], sources: Sequence[tuple[str, Sequence[int]]], *, level: int, class_id: int
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Squelette (SIM2 bloc 10)."""
-    raise NotImplementedError
+    """Réserve de candidats : objets de toutes les `sources` (nom, objets), emplacement déduit du type de la base,
+    filtrés par niveau requis et classe permise ; (candidats avec leurs sources, objets écartés avec la raison)."""
+    found: dict[int, list[str]] = {}
+    for name, items in sources:
+        for item in items:
+            found.setdefault(int(item), [])
+            if name not in found[int(item)]:
+                found[int(item)].append(name)
+    pool: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    for item, names in found.items():
+        row = db.get(item)
+        slot = _slot_of(row) if row else None
+        reason = None
+        if row is None:
+            reason = "absent des bases de wowsims et de MythicSim"
+        elif int(row.get("reqLvl") or 0) > level:
+            reason = f"niveau requis {int(row['reqLvl'])}"
+        elif row.get("classAllowlist") and class_id not in row["classAllowlist"]:
+            reason = "réservé à d'autres classes"
+        elif slot is None:
+            reason = "emplacement inconnu"
+        if reason:
+            skipped.append({"item": item, "reason": reason, "sources": names})
+        else:
+            pool.append({"item": item, "slot": slot, "sources": names})
+    return pool, skipped
+
+
+# type d'objet de wowsims (`ItemType` de proto/common.proto) -> emplacement des choix (bague et bijou : deux places)
+_ITEM_TYPE_SLOTS = {1: "Head", 2: "Neck", 3: "Shoulder", 4: "Back", 5: "Chest", 6: "Wrist", 7: "Hands", 8: "Waist",
+                    9: "Legs", 10: "Feet", 11: "Finger", 12: "Trinket", 14: "Ranged"}  # fmt: skip
+_WEAPON, _OFF_HAND = 13, 3  # ItemTypeWeapon, HandTypeOffHand
+
+
+def _slot_of(row: Mapping[str, Any]) -> str | None:
+    kind = int(row.get("type") or 0)
+    if kind == _WEAPON:
+        return "OffHand" if int(row.get("handType") or 0) == _OFF_HAND else "MainHand"
+    return _ITEM_TYPE_SLOTS.get(kind)
+
+
+# classe du client -> identifiant de classe (`classAllowlist` des bases d'objets)
+CLASS_IDS = {"Warrior": 1, "Paladin": 2, "Hunter": 3, "Rogue": 4, "Priest": 5, "Shaman": 7, "Mage": 8, "Warlock": 9,
+             "Druid": 11}  # fmt: skip
+
+
+def item_database(cache_dir: Path) -> dict[int, dict[str, Any]]:
+    """Base d'objets des simulateurs : wowsims (db.json, leftover_db.json) puis les objets en plus du fork Go de
+    MythicSim, sans jamais remplacer un objet de wowsims."""
+    from forever.pipeline import mythicsim_build
+
+    out: dict[int, dict[str, Any]] = {}
+    ws = wowsims_dir(cache_dir) / "forever" / DATABASE[0] / DATABASE[1]
+    ms = mythicsim_build.mythicsim_dir(cache_dir) / "go" / DATABASE[0] / DATABASE[1]
+    for path in (ws / "db.json", ws / "leftover_db.json", ms / "db.json"):
+        if path.is_file():
+            for row in json.loads(path.read_text(encoding="utf-8")).get("items") or []:
+                out.setdefault(int(row["id"]), row)
+    return out
+
+
+def pool_from_sources(
+    deps: Deps, class_name: str, gear_spec: str, level: int, race: str
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    """Réserve de candidats depuis les addons installés : choix de GearQuest au niveau, listes BiS de Naowh Forever
+    et de Forever Companion de la classe ; (candidats, écartés, sources lues)."""
+    from forever.gear import _addons_dir, gear_report
+    from forever.pipeline.gear_sources import read_companion_bis, read_naowh_bis
+
+    addons = _addons_dir(deps)
+    sources: list[tuple[str, list[int]]] = []
+    picks = gear_report(deps, "leveling", class_name=class_name, level=level, race=race, spec=gear_spec)["picks"]
+    sources.append(("GearQuest", [int(p["item"]) for p in picks]))
+    token = class_name.upper()
+    naowh, _ = read_naowh_bis(addons)
+    for key, bis in naowh.items():
+        if bis.class_token.upper() == token:
+            sources.append((f"Naowh {key}", [i for ids in bis.slots.values() for i in ids]))
+    for (cls, spec), slots in read_companion_bis(addons).items():
+        if cls.upper() == token:
+            sources.append((f"Forever Companion {spec}", [i for ids in slots.values() for i in ids]))
+    pool, skipped = candidate_pool(item_database(deps.cache_dir), sources, level=level,
+                                   class_id=CLASS_IDS.get(class_name, 0))  # fmt: skip
+    return pool, skipped, [name for name, _ in sources]
