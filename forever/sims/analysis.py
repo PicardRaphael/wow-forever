@@ -192,11 +192,17 @@ def relaunch_if_needed(
     """Analyses manquantes pour la version courante (données, commit et correctifs de wowsims) : `forever sims
     analyse` lancé en tâche détachée, sauf si un calcul tient déjà le verrou (processus vivant) ; None si tout est
     fait. Appelé par la veille (étape « simulateurs »)."""
+    import os
     import sys
     from datetime import UTC, datetime
 
     from forever import spawn as spawning
+    from forever.pipeline.http_client import urllib_get
 
+    # jamais pendant les tests ni sans les vraies dépendances (un test de la veille ne lance jamais de calcul) ;
+    # `spawn` injecté : appel d'un test qui le veut explicitement
+    if spawn is None and ("PYTEST_CURRENT_TEST" in os.environ or deps.http_get is not urllib_get):
+        return None
     todo = presets if presets is not None else dps_presets(deps)
     missing = [(k, r) for k, r in todo if not analysis_path(deps, k, r).is_file()]
     if not missing:
