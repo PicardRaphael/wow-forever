@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 from forever.pipeline import gitops
+from forever.pipeline.gitops import path_with_cargo  # noqa: F401 : réexporté
 
 REPO = "https://github.com/sage3648/mythicsim-forever-engine.git"
 GO_REPO = "https://github.com/sage3648/mythicsim-forever-engine-go.git"

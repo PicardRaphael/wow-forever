@@ -68,11 +68,22 @@ class MergeResult(NamedTuple):
     reason: str | None  # None | main_moved
 
 
+def path_with_cargo(path: str, *, home: Path | None = None) -> str:
+    """PATH complété par `<home>/.cargo/bin` (dossier de rustup) s'il existe et n'y est pas : la veille lance ses
+    commandes sans le PATH de l'utilisateur (MythicSim : rustup et cargo)."""
+    cargo = (home or Path.home()) / ".cargo" / "bin"
+    parts = [p for p in path.split(os.pathsep) if p]
+    if not cargo.is_dir() or any(Path(p) == cargo for p in parts):
+        return path
+    return os.pathsep.join([*parts, str(cargo)])
+
+
 def subprocess_runner(args: Sequence[str], cwd: Path, timeout: float | None = None) -> subprocess.CompletedProcess[str]:
     """Exécuteur de production : liste d'arguments, sans shell ni saisie (aucune invite d'authentification, entrée
     standard fermée), sans fenêtre de console sous Windows ; la sortie va au journal du passage."""
     env = {
         **os.environ,
+        "PATH": path_with_cargo(os.environ.get("PATH", "")),
         "GIT_TERMINAL_PROMPT": "0",
         "GH_PROMPT_DISABLED": "1",
         "GCM_INTERACTIVE": "never",
