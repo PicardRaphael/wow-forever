@@ -338,3 +338,8 @@ def run_from_sources(
                        iterations=iterations, anchors=anchors)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out
+
+
+def extra_items(cache_dir: Path) -> tuple[Path | None, set[int], str | None]:
+    """Squelette (SIM2 bloc 6)."""
+    raise NotImplementedError
