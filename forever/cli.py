@@ -546,6 +546,15 @@ def build_parser() -> argparse.ArgumentParser:
     s_brk.add_argument("--iterations", type=int, default=None, help="combats par tranche (défaut de l'outil)")
     s_brk.add_argument("--stats", default=None, help="poids de ces statistiques par tranche, ex. Intellect,SpellDamage")
     s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
+    s_gear = sims_sub.add_parser("gear", help="optimisation de l'équipement par emplacement au niveau (SIM2)")
+    s_gear.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
+    s_gear.add_argument("--race", required=True, help="race du joueur")
+    s_gear.add_argument("--level", type=int, required=True, help="niveau du personnage")
+    s_gear.add_argument("--equipped", default="", help="objets portés, Emplacement:objet séparés par des virgules")
+    s_gear.add_argument("--candidates", default=None, help="candidats (même forme ; défaut : choix de GearQuest)")
+    s_gear.add_argument("--path", default="auto", choices=["auto", "plan", "popular", "none"], help="talents")
+    s_gear.add_argument("--iterations", type=int, default=None, help="combats par essai")
+    s_gear.add_argument("--json", action="store_true", help="sortie JSON")
     s_brk.add_argument("--json", action="store_true", help="sortie JSON")
     r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
     r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
@@ -1827,6 +1836,19 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
                 )
         provenance = local_provenance(deps, certainty="suppose", assumptions=notes)
         _emit({**data, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.sims_command == "gear":
+        from forever.sims.report import simulate
+
+        doc = simulate(deps, "gear", preset=args.preset, race=args.race, level=args.level, equipped=args.equipped,
+                       candidates=args.candidates, path=args.path, iterations=args.iterations)  # fmt: skip
+        lines = [f"Équipement au niveau {doc['level']}, {doc['preset']} : départ {doc['base']['dps']:.1f} DPS"]
+        for row in doc["candidates"]:
+            lines.append(f"  {row['slot']} : {row['item']} à la place de {row['replaces']} : {row['gain']:+.1f} DPS "
+                         f"({row['verdict']}, seuil {row['threshold']:.1f})")  # fmt: skip
+        for row in doc["skipped"]:
+            lines.append(f"  écarté : {row['item']} ({row['slot']}) : {row['reason']}")
+        _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command == "brackets":
         from forever.sims.report import simulate

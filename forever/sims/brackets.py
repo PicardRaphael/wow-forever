@@ -395,10 +395,152 @@ def extra_items(cache_dir: Path) -> tuple[Path | None, set[int], str | None]:
 
 
 def parse_equipped(text: str) -> dict[str, int]:
-    """Squelette (SIM2 bloc 8)."""
-    raise NotImplementedError
+    """« Emplacement:objet,… » (emplacements de wowsims : Head, Finger1, MainHand…) -> dictionnaire."""
+    out: dict[str, int] = {}
+    for item in (part.strip() for part in text.split(",") if part.strip()):
+        slot, sep, value = item.partition(":")
+        if not sep or not value.strip().isdigit():
+            raise InvalidArgumentError(f"Objet porté illisible : « {item} ».",
+                                       "donner equipped en Emplacement:objet séparés par des virgules")  # fmt: skip
+        out[slot.strip()] = int(value)
+    return out
 
 
-def optimise_gear(deps: Deps, **kwargs: Any) -> dict[str, Any]:
-    """Squelette (SIM2 bloc 8)."""
-    raise NotImplementedError
+def optimise_gear(
+    deps: Deps,
+    *,
+    preset: str,
+    race: str | None,
+    level: int,
+    equipped: Mapping[str, int],
+    candidates: Sequence[Mapping[str, Any]],
+    steps: Sequence[Mapping[str, Any]],
+    iterations: int | None = None,
+    runner: gitops.Runner | None = None,
+    anchors: Sequence[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Chaque candidat essayé à sa place sur l'équipement porté, au niveau `level`, conditions des tranches, même
+    graine ; gain, seuil de bruit et verdict (règle de MS1) ; triés par gain. Voir le module."""
+    from forever.sims import base_stats as bs
+    from forever.sims.builds import decide
+    from forever.sims.engines import class_of
+
+    if not race:
+        raise InvalidArgumentError("Race manquante.", "demander la race au joueur (question ou profil), puis race=…")
+    unknown_slots = sorted(k for k in equipped if k not in SLOT_NAMES)
+    if unknown_slots:
+        raise InvalidArgumentError(f"Emplacement inconnu de wowsims : {', '.join(unknown_slots)}.",
+                                   "emplacements : " + ", ".join(SLOT_NAMES))  # fmt: skip
+    pin = pinned(deps.cache_dir)
+    if pin is None:
+        raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")
+    presets = wowsims.read_presets(wowsims_dir(deps.cache_dir) / "forever")
+    chosen = next((p for p in presets if p.key == preset), None)
+    if chosen is None:
+        raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir forever_simulate(action='presets')")
+    conv, errors = _legality(deps, class_of(chosen))
+    keys = talents_at(steps, level)
+    problems = errors(keys, level)
+    if problems:
+        raise InvalidArgumentError(f"Talents illégaux au niveau {level} : {' ; '.join(problems)}.",
+                                   "corriger le parcours de talents")  # fmt: skip
+    files = (pin.get("patches") or {}).get("files") or []
+    doc = (bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level), anchors or [])
+           if bs.PATCH in files else None)  # fmt: skip
+    items_path, items_ids, items_note = extra_items(deps.cache_dir) if ITEMS_PATCH in files else (None, set(), None)
+    known = known_items(wowsims_dir(deps.cache_dir) / "forever")
+    known = None if known is None else known | items_ids
+    encounter = encounter_at(wowsims.reference_encounter(presets), level)
+    race_token = wowsims.race_enum(race)
+    code = conv.wowsims.encode(keys)
+    n = iterations or wowsims.DEFAULT_ITERATIONS
+
+    def run(gear: Mapping[str, int]) -> dict[str, Any]:
+        items: list[dict[str, Any]] = [{} for _ in SLOT_NAMES]
+        for slot, item in gear.items():
+            items[SLOT_NAMES.index(slot)] = {"id": int(item)}
+        case = solo_preset(chosen, talents=code, equipment={"items": items})
+        request = wowsims.request_for(case, race=race_token, encounter=encounter, iterations=n)
+        return wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc, items=items_path)
+
+    base_gear = {k: v for k, v in equipped.items() if known is None or v in known}
+    base = run(base_gear)
+    rows: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    worn = set(equipped.values())
+    for cand in candidates:
+        item, slot = int(cand["item"]), str(cand.get("slot"))
+        targets = _SLOT_ALIASES.get(slot, (slot,) if slot in SLOT_NAMES else ())
+        if item in worn:
+            continue
+        if not targets or (known is not None and item not in known):
+            skipped.append({"slot": slot, "item": item,
+                            "reason": "emplacement inconnu" if not targets else "objet absent de wowsims et de MythicSim"})  # fmt: skip
+            continue
+        best: dict[str, Any] | None = None
+        for target in targets:
+            trial = run({**base_gear, target: item})
+            if best is None or trial["dps"] > best["dps"]:
+                best = {**trial, "slot": target}
+        assert best is not None
+        rows.append({"item": item, "slot": best["slot"], "replaces": equipped.get(best["slot"]),
+                     "dps": best["dps"], **decide(base, best)})  # fmt: skip
+    rows.sort(key=lambda r: -float(r["gain"]))
+    notes = [wowsims.source_note(pin), *NOTES, *([items_note] if items_note else []),
+             ("optimisation : chaque candidat à sa place sur l'équipement porté, même graine ; « non départagé » : "
+              "gain sous deux erreurs types de la différence (règle de MS1)")]  # fmt: skip
+    return {"preset": chosen.key, "race": race_token, "level": level, "base": {"dps": base["dps"],
+            "stdev": base["stdev"], "equipped": dict(equipped)}, "candidates": rows, "skipped": skipped,
+            "provenance": local_provenance(deps, certainty="suppose", assumptions=notes)}  # fmt: skip
+
+
+def optimise_from_sources(
+    deps: Deps,
+    *,
+    preset: str,
+    race: str | None,
+    level: int,
+    equipped: Mapping[str, int],
+    candidates: Sequence[Mapping[str, Any]] | None = None,
+    path: str = "auto",
+    spec: str | None = None,
+    gear_spec: str | None = None,
+    iterations: int | None = None,
+) -> dict[str, Any]:
+    """`optimise_gear` avec les sources installées : parcours de talents (`path`, comme les tranches), candidats
+    donnés ou choix de GearQuest au niveau, relevés d'attributs de ForeverLogger."""
+    from forever.sims.base_stats import logger_anchors
+    from forever.sims.engines import class_of
+
+    if path not in PATHS:
+        raise InvalidArgumentError(f"Parcours inconnu : « {path} ».", "choisir " + ", ".join(PATHS))
+    presets = wowsims.read_presets(wowsims_dir(deps.cache_dir) / "forever")
+    chosen = next((p for p in presets if p.key == preset), None)
+    if chosen is None:
+        raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir forever_simulate(action='presets')")
+    class_name = class_of(chosen)
+    notes: list[str] = []
+    steps: list[dict[str, Any]] = []
+    if path in ("auto", "plan"):
+        try:
+            steps, label = _plan_steps(deps, class_name, chosen, spec)
+            notes.append(f"talents : plan de leveling {label} tronqué au niveau")
+        except InvalidArgumentError as err:
+            if path == "plan":
+                raise
+            notes.append(f"plan de leveling indisponible ({err.message}) : build populaire à la place")
+            path = "popular"
+    if path == "popular":
+        steps, label = _popular_steps(deps, class_name, chosen)
+        notes.append(f"talents : {label}, ordre de prise légal généré, tronqué au niveau")
+    if candidates is None:
+        from forever.gear import gear_report
+
+        doc = gear_report(deps, "leveling", class_name=class_name, level=level, race=race or "Orc", spec=gear_spec)
+        candidates = list(doc.get("picks") or [])
+        notes.append("candidats : choix de GearQuest au niveau (forever_gear action=leveling)")
+    anchors, _files = logger_anchors(deps, chosen.class_token)
+    out = optimise_gear(deps, preset=preset, race=race, level=level, equipped=equipped, candidates=candidates,
+                        steps=steps, iterations=iterations, anchors=anchors)  # fmt: skip
+    out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
+    return out

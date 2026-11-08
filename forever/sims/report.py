@@ -19,7 +19,7 @@ MAGE_ENGINE_FROZEN = (
     "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
 )
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
-ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets")
+ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets", "gear")
 ENGINES = ("wowsims", "mythicsim", "both")
 
 
@@ -49,6 +49,9 @@ def simulate(
     path: str = "auto",
     gear: str = "gearquest",
     spec: str | None = None,
+    level: int | None = None,
+    equipped: str | None = None,
+    candidates: str | None = None,
 ) -> dict[str, Any]:
     """`action` : `presets` (liste, objets équipés de chacun), `races` (races séparées par des virgules, sur
     `preset`), `weights` (statistiques séparées par des virgules, rapportées à `reference`, `race` du joueur exigée),
@@ -62,6 +65,17 @@ def simulate(
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
     if engine not in ENGINES:
         raise InvalidArgumentError(f"Moteur inconnu : « {engine} ».", "choisir " + ", ".join(ENGINES))
+    if action == "gear":  # SIM2 bloc 8 : optimisation de l'équipement par emplacement au niveau
+        from forever.sims.brackets import optimise_from_sources, parse_equipped
+
+        if not preset or level is None:
+            raise InvalidArgumentError("Préréglage ou niveau manquant.", "donner preset et level")
+        cands = None
+        if candidates:
+            cands = [{"slot": k, "item": v} for k, v in parse_equipped(candidates).items()]
+        return optimise_from_sources(deps, preset=preset, race=race, level=level,
+                                     equipped=parse_equipped(equipped or ""), candidates=cands, path=path, spec=spec,
+                                     iterations=iterations)  # fmt: skip
     if action == "brackets":  # SIM2 : sous le 60, par tranche de niveaux (wowsims corrigé, décision 305)
         from forever.sims.brackets import run_from_sources
 
