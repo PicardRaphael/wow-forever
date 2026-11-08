@@ -27,6 +27,7 @@ SKILLS = (
     "forever-familiers",
     "forever-donjons",
     "forever-routes",
+    "forever-economie",
 )
 AGENTS = ("forever-web-researcher", "forever-sim-runner")
 MCP_PREFIX = "mcp__plugin_forever_forever__"
@@ -185,6 +186,9 @@ def test_skill_descriptions_carry_trigger_words():
         assert word in desc["forever-donjons"], word
     for word in ("feuille de route", "restedxp", "quête", "niveau", "donjon", "retail"):  # RX1
         assert word in desc["forever-routes"], word
+    for word in ("hôtel des ventes", "prix", "métier", "recette", "réputation", "champ", "pnj", "vendeur", "objet"):
+        assert word in desc["forever-economie"], word  # AMI7b
+    assert "retail" in desc["forever-economie"]
 
 
 def test_router_maps_skills_and_uncovered_domains():
@@ -222,6 +226,7 @@ def test_router_describes_what_is_covered_today():
         "forever-familiers",
         "forever-donjons",
         "forever-routes",
+        "forever-economie",
     ],
 )
 def test_domain_skills_use_the_response_format(name):
@@ -381,3 +386,70 @@ def test_familiers_skill_states_its_limits():
     assert 'kind="pets"' in body and "forever_player_profile" in body
     for words in ("zone", "niveau", "SIM2", "Forever Bestiary", "relevés de joueurs"):
         assert words in body, words
+
+
+# --- AMI7b : sources tierces (Everloot) -----------------------------------------------------------------------------
+
+EVERLOOT_TOOLS = (
+    "market_value",
+    "auction_history",
+    "profession_path",
+    "recipe_thresholds",
+    "item_page",
+    "npc_page",
+    "vendor_page",
+    "search_knowledge",
+)
+
+
+def test_router_routes_third_party_domains_to_everloot():
+    """Hôtel des ventes, métiers, réputations, champs de bataille, PNJ, vendeurs, objets : outils forever d'abord,
+    Everloot ensuite (tiers, daté, certitude au mieux `suppose`, ligne « More: » recopiée), « je ne sais pas » sinon."""
+    _, body = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
+    assert "forever-economie" in body and "Everloot" in body
+    for tool in ("market_value", "profession_path", "search_knowledge", "vendor_page", "npc_page"):
+        assert f"mcp__everloot__{tool}" in body, tool
+    third = router_section("## 2c. Sources tierces")
+    for word in ("forever_", "d'abord", "tiers", "suppose", "More:", "je ne sais pas", "ToolSearch"):
+        assert word in third, word
+    for tranche in ("EC1", "MT1", "RP1", "PV2"):  # tranche du projet toujours citée
+        assert re.search(rf"\b{tranche}\b", third), tranche
+
+
+def test_uncovered_table_drops_domains_now_answered_by_everloot():
+    table = router_section("## 3. Domaines non couverts")
+    for row in ("| Réputations |", "| Hôtel des ventes", "| Métiers (au-delà"):
+        assert row not in table, row
+    assert "Everloot" in table  # dit tiers sous la table
+
+
+def test_router_description_no_longer_lists_everloot_domains_as_uncovered():
+    meta, _ = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
+    desc = meta["description"].lower()
+    assert "everloot" in desc and "hôtel des ventes" in desc
+    uncovered = desc.split("ne couvre pas encore", 1)[1]
+    for word in ("hôtel des ventes", "réputations", "métiers"):
+        assert word not in uncovered.split(")", 1)[0], word
+
+
+def test_economie_skill_labels_everloot_and_forbids_other_versions():
+    _, body = frontmatter(PLUGIN / "skills" / "forever-economie" / "SKILL.md")
+    for tool in EVERLOOT_TOOLS:
+        assert f"mcp__everloot__{tool}" in body, tool
+    for word in ("tiers", "suppose", "More:", "je ne sais pas", 'version="forever"', "forever_lookup", "ToolSearch"):
+        assert word in body, word
+    assert 'kind="battlegrounds"' not in body  # aucune lecture des champs de bataille dans le dépôt (PVP5)
+
+
+def test_response_format_has_the_third_party_rule():
+    text = (PLUGIN / "skills" / "forever-router" / "format-reponse.md").read_text(encoding="utf-8")
+    assert "## Sources tierces (Everloot)" in text
+    section = text.split("## Sources tierces (Everloot)", 1)[1].split("\n## ", 1)[0]
+    for word in ("Source : Everloot", "suppose", "More:", "date"):
+        assert word in section, word
+
+
+def test_battlegrounds_gap_is_an_open_question():
+    text = (REPO_ROOT / "docs" / "OPEN_QUESTIONS.md").read_text(encoding="utf-8")
+    pvp5 = text.split("**PVP5", 1)[1].split("\n- **", 1)[0]
+    assert "2026-11-08" in pvp5 and "Everloot" in pvp5
