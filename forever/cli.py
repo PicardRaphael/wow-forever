@@ -551,6 +551,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
     s_brk.add_argument("--conditions", default="solo", choices=["solo", "group", "raid"], help="conditions du combat")
+    s_rbk = sims_sub.add_parser("races-brackets", help="races jouables de la classe comparées par tranche (SIM2)")
+    s_rbk.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
+    s_rbk.add_argument("--brackets", default=None, help="« all » (défaut), tranches ou niveaux, ex. 20-29,60 ou 22")
+    s_rbk.add_argument("--races", default=None, help="races à comparer (défaut : toutes les races jouables)")
+    s_rbk.add_argument(
+        "--path", default="auto", choices=["auto", "plan", "popular", "none"], help="parcours de talents"
+    )
+    s_rbk.add_argument("--gear", default="gearquest", choices=["gearquest", "none"], help="équipement")
+    s_rbk.add_argument("--spec", default=None, help="spécialisation du plan de leveling (nom anglais)")
+    s_rbk.add_argument("--iterations", type=int, default=None, help="combats par race et par tranche")
+    s_rbk.add_argument("--conditions", default="solo", choices=["solo", "group", "raid"], help="conditions du combat")
+    s_rbk.add_argument("--json", action="store_true", help="sortie JSON")
     s_ana = sims_sub.add_parser("analyse", help="analyse complète gardée par spécialisation et tranche (SIM2)")
     s_ana.add_argument("--preset", default=None, help="préréglage (défaut : toutes les spécialisations de dégâts)")
     s_ana.add_argument("--race", default=None, help="race (défaut : race jouable par défaut de la classe)")
@@ -1905,6 +1917,24 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
                     w = row["weights"]
                     lines.append("    priorité : " + " > ".join(f"{s.removeprefix('Stat')} {w['normalised'][s]:.2f}"
                                                                for s in w["priority"] if w["per_point"][s] > 0))  # fmt: skip
+        _emit(doc, lines, doc["provenance"], args.json)
+        return EXIT_OK
+    if args.sims_command == "races-brackets":
+        from forever.sims.report import simulate
+
+        doc = simulate(deps, "race_brackets", preset=args.preset, brackets=args.brackets, races=args.races,
+                       path=args.path, gear=args.gear, spec=args.spec, iterations=args.iterations,
+                       conditions=args.conditions)  # fmt: skip
+        lines = [f"Races par tranche, {doc['preset']} (wowsims corrigé, {doc['conditions']}) :"]
+        for entry in doc["brackets"]:
+            lines.append(f"  {entry['bracket']} (niveau {entry['level']}) :")
+            if entry.get("error"):
+                lines.append(f"    {entry['error']['message']}")
+            for row in entry["ranking"]:
+                lines.append(f"    {row['race'].removeprefix('Race')} : {row['dps']:.1f} DPS ({row['gap_to_best']:+.1f}, "
+                             f"{row['verdict']})")  # fmt: skip
+            for failed in entry.get("errors") or []:
+                lines.append(f"    {failed['race'].removeprefix('Race')} : {failed['error']['message']}")
         _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command in ("compare", "builds"):

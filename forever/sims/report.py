@@ -19,7 +19,7 @@ MAGE_ENGINE_FROZEN = (
     "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
 )
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
-ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets", "gear", "analysis")
+ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets", "race_brackets", "gear", "analysis")
 ENGINES = ("wowsims", "mythicsim", "both")
 
 
@@ -60,7 +60,8 @@ def simulate(
     `own` ; `talents` : « clé=rang,… » en nos clés, légaux au niveau 60 ; `engine` : `wowsims`, `mythicsim` ou
     `both`), `builds` (recherche locale sur `preset` pour `race` ; départs : `talents`, talents du préréglage, builds
     populaires de Talents Forever si `popular` ; `rotation` : rotation du fork de MythicSim). Préréglage sans
-    équipement : refusé. La race vient toujours du joueur, jamais du préréglage."""
+    équipement : refusé. La race vient toujours du joueur, jamais du préréglage ; sauf `race_brackets` : toutes les
+    races jouables de la classe (ou `races`) classées par tranche (`brackets`, `path`, `gear`, `conditions`)."""
 
     if action not in ACTIONS:
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
@@ -91,6 +92,14 @@ def simulate(
         return optimise_from_sources(deps, preset=preset, race=race, level=level,
                                      equipped=parse_equipped(equipped or ""), candidates=cands, path=path, spec=spec,
                                      iterations=iterations)  # fmt: skip
+    if action == "race_brackets":  # SIM2 §9 : toutes les races jouables de la classe, par tranche
+        from forever.sims.races import races_from_sources
+
+        if not preset:
+            raise InvalidArgumentError("Préréglage manquant.", "donner preset (voir action=presets)")
+        asked = [r for r in (races or "").split(",") if r.strip()] or None
+        return races_from_sources(deps, preset=preset, brackets=brackets, races=asked, path=path, gear=gear,
+                                  spec=spec, iterations=iterations, conditions=conditions)  # fmt: skip
     if action == "brackets":  # SIM2 : sous le 60, par tranche de niveaux (wowsims corrigé, décision 305)
         from forever.sims.brackets import run_from_sources
 
