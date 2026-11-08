@@ -47,13 +47,13 @@ def clone(tmp_path):
     root = tmp_path / "third_party" / "wowsims"
     specs = root / "forever" / "ui" / "specs"
     mage = specs / "mage" / "dps"
-    (mage / "apls").mkdir(parents=True)
-    (mage / "gear_sets").mkdir()
+    (mage / "apls").mkdir(parents=True, exist_ok=True)
+    (mage / "gear_sets").mkdir(exist_ok=True)
     (mage / "presets.ts").write_text(PRESETS_TS, encoding="utf-8")
     (mage / "apls" / "fire.apl.json").write_text(json.dumps({"type": "TypeAPL", "priorityList": []}), encoding="utf-8")
     (mage / "gear_sets" / "p1.gear.json").write_text(json.dumps({"items": [{"id": 16686}]}), encoding="utf-8")
     ele = specs / "shaman" / "elemental" / "builds"
-    ele.mkdir(parents=True)
+    ele.mkdir(parents=True, exist_ok=True)
     (ele / "testing.build.json").write_text(json.dumps(BUILD), encoding="utf-8")
     binary = root / "wowsimcli-aaaaaaaaaaaa.exe"
     binary.write_bytes(b"binaire")

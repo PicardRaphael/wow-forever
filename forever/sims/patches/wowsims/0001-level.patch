@@ -1,0 +1,89 @@
+diff --git a/cmd/wowsimcli/cmd/basic_sim.go b/cmd/wowsimcli/cmd/basic_sim.go
+index 8bad128..5bc30b6 100644
+--- a/cmd/wowsimcli/cmd/basic_sim.go
++++ b/cmd/wowsimcli/cmd/basic_sim.go
+@@ -28,6 +28,8 @@ func init() {
+ 	simCmd.Flags().StringVar(&outfile, "outfile", "", "location of output file, defaults to stdout")
+ 	simCmd.Flags().BoolVar(&verbose, "verbose", false, "print information during runtime")
+ 	simCmd.MarkFlagRequired("infile")
++	// forever (SIM2) : lu par sim/core à l'initialisation (forever_level.go) ; déclaré ici pour être accepté.
++	simCmd.Flags().Int32("forever-level", 60, "forever : niveau du personnage simulé (1 à 60)")
+ }
+ 
+ func simMain(cmd *cobra.Command, args []string) {
+diff --git a/sim/core/agent.go b/sim/core/agent.go
+index 27380ad..e133006 100644
+--- a/sim/core/agent.go
++++ b/sim/core/agent.go
+@@ -144,7 +144,7 @@ func ProtoToActionID(protoID *proto.ActionID) ActionID {
+ 
+ 	return ActionID{
+ 		ItemID:  protoID.GetItemId(),
+-		SpellID: protoID.GetSpellId(),
++		SpellID: foreverResolveSpellID(protoID.GetSpellId()), // forever (SIM2) : rang appris
+ 		OtherID: protoID.GetOtherId(),
+ 		Tag:     protoID.Tag,
+ 	}
+diff --git a/sim/core/constants.go b/sim/core/constants.go
+index 8641291..ce6ce8c 100644
+--- a/sim/core/constants.go
++++ b/sim/core/constants.go
+@@ -6,7 +6,8 @@ import (
+ 	"github.com/wowsims/forever/sim/core/proto"
+ )
+ 
+-const CharacterLevel = 60
++// forever (SIM2) : niveau réglable par --forever-level=N (voir forever_level.go), 60 par défaut.
++var CharacterLevel int32 = foreverLevel()
+ const MinIlvl = 60
+ const MaxIlvl = 600
+ 
+diff --git a/sim/core/forever_level.go b/sim/core/forever_level.go
+new file mode 100644
+index 0000000..c399b26
+--- /dev/null
++++ b/sim/core/forever_level.go
+@@ -0,0 +1,43 @@
++package core
++
++// forever (SIM2, décision 305) : niveau du personnage simulé, donné par l'option --forever-level=N
++// (1 à 60) de la ligne de commande ; 60 par défaut, donc le comportement d'origine.
++//
++// Il est lu à l'initialisation du paquet et non dans la requête : les rangs des sorts sont choisis
++// par des variables de paquet (spelldata.Ladder), évaluées avant main().
++
++import (
++	"os"
++	"strconv"
++	"strings"
++)
++
++const ForeverLevelFlag = "--forever-level="
++
++func foreverLevel() int32 {
++	for _, arg := range os.Args[1:] {
++		if value, ok := strings.CutPrefix(arg, ForeverLevelFlag); ok {
++			level, err := strconv.Atoi(value)
++			if err != nil || level < 1 || level > 60 {
++				panic("forever: --forever-level attend un niveau de 1 à 60, reçu " + value)
++			}
++			return int32(level)
++		}
++	}
++	return 60
++}
++
++// Rang appris au niveau du personnage pour chaque rang d'une échelle de sorts (rempli par
++// spelldata.Ranked) : un identifiant de rang cité par l'APL désigne le rang appris ; 0 si aucun rang
++// de l'échelle n'est appris à ce niveau (l'APL ne trouve alors aucun sort et retire l'action).
++var ForeverRankAlias = map[int32]int32{}
++
++func foreverResolveSpellID(id int32) int32 {
++	if alias, ok := ForeverRankAlias[id]; ok {
++		if alias == 0 {
++			return -1
++		}
++		return alias
++	}
++	return id
++}

@@ -1,5 +1,6 @@
-"""wowsims/forever compilé chez nous depuis un commit épinglé, sans aucune modification du code (décisions 293 et 294 ;
-`tasks/plan-simulateurs.md` §6) : le projet ne publie pas de binaire. `forever sims update` (et la veille) copie le dépôt
+"""wowsims/forever compilé chez nous depuis un commit épinglé (décisions 293 et 294 ; `tasks/plan-simulateurs.md` §6),
+avec nos seuls correctifs de `forever/sims/patches/wowsims/` (SIM2, décision 305 : niveau réglable, rangs appris) : le
+projet ne publie pas de binaire. `forever sims update` (et la veille) copie le dépôt
 public en lecture seule (clone superficiel en cache, `<cache>/third_party/wowsims/forever`), le remet sur son dernier
 commit, génère le code protobuf (`protoc` et le greffon `protoc-gen-go` de la version du `go.mod`), compile
 `cmd/wowsimcli` et épingle le binaire (`pin.json` : commit, date, empreinte, versions de Go et de protoc). Un commit
@@ -29,8 +30,13 @@ PATCHES_DIR = Path(__file__).resolve().parents[1] / "sims" / "patches" / "wowsim
 
 
 def patchset(patches_dir: Path) -> dict[str, Any]:
-    """Jeu de correctifs (SIM2) : noms dans l'ordre d'application et empreinte."""
-    raise NotImplementedError
+    """Jeu de correctifs (SIM2, décision 305) : noms dans l'ordre d'application (ordre du nom) et empreinte des noms
+    et des octets de chaque fichier."""
+    files = sorted(patches_dir.glob("*.patch"), key=lambda p: p.name) if patches_dir.is_dir() else []
+    digest = hashlib.sha256()
+    for path in files:
+        digest.update(path.name.encode("utf-8") + b"\0" + path.read_bytes() + b"\0")
+    return {"sha256": digest.hexdigest(), "files": [p.name for p in files]}
 
 
 def wowsims_dir(cache_dir: Path) -> Path:
@@ -51,10 +57,16 @@ def _out(runner: gitops.Runner, args: list[str], cwd: Path) -> str:
 
 
 def update_wowsims(
-    cache_dir: Path, *, runner: gitops.Runner | None = None, now: datetime | None = None
+    cache_dir: Path,
+    *,
+    runner: gitops.Runner | None = None,
+    now: datetime | None = None,
+    patches_dir: Path = PATCHES_DIR,
 ) -> dict[str, Any]:
-    """Clone ou remise à jour, puis compilation si le commit a changé ; rend l'épinglage (`status` : « compilé » ou
-    « à jour »). GitOpsError si une commande échoue (l'épinglage précédent reste)."""
+    """Clone ou remise à jour, correctifs de forever appliqués (`patches_dir`, ordre du nom, `git apply`), puis
+    compilation si le commit ou le jeu de correctifs a changé ; rend l'épinglage (`status` : « compilé » ou « à
+    jour »). GitOpsError si une commande échoue, correctif qui ne s'applique plus compris (l'épinglage précédent
+    reste)."""
     run = runner or gitops.subprocess_runner
     root = wowsims_dir(cache_dir)
     clone = root / "forever"
@@ -65,8 +77,16 @@ def update_wowsims(
         _out(run, ["git", "fetch", "--depth", "1", "origin"], clone)
         _out(run, ["git", "reset", "--hard", "FETCH_HEAD"], clone)
     commit = _out(run, ["git", "rev-parse", "HEAD"], clone)
+    patches = patchset(patches_dir)
+    for name in patches["files"]:
+        _out(run, ["git", "apply", "--whitespace=nowarn", str(patches_dir / name)], clone)
     previous = pinned(cache_dir)
-    if previous and previous.get("commit") == commit and (root / str(previous.get("binary"))).is_file():
+    if (
+        previous
+        and previous.get("commit") == commit
+        and previous.get("patches") == patches
+        and (root / str(previous.get("binary"))).is_file()
+    ):
         return {**previous, "status": "à jour"}
     committed_at = _out(run, ["git", "log", "-1", "--format=%cI"], clone)
     m = _PROTOBUF.search((clone / "go.mod").read_text(encoding="utf-8"))
@@ -90,7 +110,7 @@ def update_wowsims(
         ],
         clone,
     )
-    binary = f"wowsimcli-{commit[:12]}.exe"
+    binary = f"wowsimcli-{commit[:12]}-{patches['sha256'][:8]}.exe"
     _out(run, ["go", "build", "-o", str(root / binary), "--tags=with_db", "-ldflags=-s -w", "./cmd/wowsimcli"], clone)
     go = _out(run, ["go", "version"], clone).split()
     protoc = _out(run, ["protoc", "--version"], clone).split()
@@ -102,6 +122,7 @@ def update_wowsims(
         "sha256": hashlib.sha256((root / binary).read_bytes()).hexdigest(),
         "go": go[2] if len(go) > 2 else " ".join(go),
         "protoc": protoc[-1] if protoc else "",
+        "patches": patches,
         "built_at": (now or datetime.now(UTC)).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": "compilé",
     }

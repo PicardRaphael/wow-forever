@@ -2414,3 +2414,18 @@ mechanics:
       - tests/unit/test_pets_guide.py::test_tameable_now_or_level_where_it_becomes_tameable
     tolerance: null
     note: "0 niveau par le texte officiel, sans mesure : probable (docs/DATA_SOURCES.md, décision 162) ; remplace le relevé de joueurs de Forever Bestiary (+2, 18 au 22 septembre 2026) ; règle du serveur, absente du client ; à mesurer en jeu (bête d'un niveau au-dessus du Chasseur refusée, puis une de son niveau acceptée) pour passer à certain"
+  - id: L14
+    categorie: simulateurs
+    description: "Rang de sort appris au niveau du personnage dans le simulateur de la communauté (wowsims/forever corrigé)"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "wowsims/forever (MIT), sim/core/spelldata/ladder.go : échelles de rangs générées des fichiers du client (SpellLevels.SpellLevel par rang)"
+      - "forever/sims/patches/wowsims/0001-level.patch (niveau réglable, --forever-level=L) et 0002-ranks.patch (plus haut rang dont SpellLevel <= L ; l'APL cite le rang appris ; sort sans rang appris retiré de l'APL)"
+    tests:
+      - tests/unit/test_wowsims_patches.py::test_repository_patches_name_their_reason
+      - tests/unit/test_wowsims_patches.py::test_level_is_passed_to_the_patched_binary_and_named_in_the_source
+      - tests/unit/test_wowsims_patches.py::test_a_patch_that_no_longer_applies_keeps_the_previous_binary
+    tolerance: null
+    note: "SIM2 bloc 2 (décision 305) : rang appris = règle du client (niveau d'apprentissage lu dans ses tables par wowsims), probable faute d'essai en jeu à chaque tranche ; vérifié sur le Mage Givre au niveau 60 (dégâts identiques au binaire sans correctif) et aux niveaux 45, 25 et 12 (Frostbolt rangs 8, 4 et 2 ; Cone of Cold absent sous 26). Restent au niveau 60 dans le simulateur, à corriger par les blocs suivants : statistiques de base (base_stats.go), familier, équipement, talents et buffs des préréglages (réglages de la requête) ; un sort sans rang appris reste enregistré au rang 1 (seule l'APL l'ignore) ; la baisse de déclenchement d'un rang très bas (B20) n'est pas modélisée (sans effet : le rang le plus haut appris est toujours pris)"

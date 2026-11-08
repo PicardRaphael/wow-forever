@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from forever.errors import ForeverError
+from forever.errors import ForeverError, InvalidArgumentError
 from forever.pipeline import gitops
 from forever.pipeline.wowsims_build import pinned, wowsims_dir
 
@@ -338,9 +338,18 @@ def race_enum(name: str) -> str:
 
 
 def source_note(pin: dict[str, Any]) -> str:
-    """Hypothèse de provenance d'un résultat de wowsims : commit et empreinte du binaire épinglé."""
-    return (f"calcul de wowsims/forever, commit {pin['commit'][:12]} du {pin.get('committed_at')}, binaire compilé "
-            f"tel quel (empreinte {pin['sha256'][:12]}), niveau 60 seulement ; simulateur tiers, certitude suppose")  # fmt: skip
+    """Hypothèse de provenance d'un résultat de wowsims : commit, correctifs de forever et empreinte du binaire."""
+    patches = (pin.get("patches") or {}).get("sha256")
+    if not patches:
+        return (f"calcul de wowsims/forever, commit {pin['commit'][:12]} du {pin.get('committed_at')}, binaire compilé "
+                f"tel quel (empreinte {pin['sha256'][:12]}), niveau 60 seulement ; simulateur tiers, certitude suppose")  # fmt: skip
+    return (f"calcul de wowsims/forever, commit {pin['commit'][:12]} du {pin.get('committed_at')} + correctifs forever "
+            f"{patches[:12]} (niveau réglable, rangs appris au niveau ; décision 305), binaire d'empreinte "
+            f"{pin['sha256'][:12]} ; simulateur tiers, certitude suppose")  # fmt: skip
+
+
+MIN_LEVEL, MAX_LEVEL = 1, 60  # bornes du réglage de niveau du correctif 0001-level (niveau maximal de Forever)
+LEVEL_FLAG = "--forever-level="  # option lue par le correctif 0001-level à l'initialisation du simulateur
 
 
 def reference_encounter(presets: Sequence[Preset]) -> dict[str, Any] | None:
@@ -397,9 +406,20 @@ def _binary(cache_dir: Path) -> tuple[Path, dict[str, Any]]:
     return binary, pin
 
 
-def run_sim(cache_dir: Path, request: dict[str, Any], *, runner: gitops.Runner | None = None) -> dict[str, Any]:
-    """Un combat simulé par le binaire épinglé : dégâts par seconde (moyenne, écart type), combats faits, source."""
+def run_sim(
+    cache_dir: Path, request: dict[str, Any], *, runner: gitops.Runner | None = None, level: int | None = None
+) -> dict[str, Any]:
+    """Un combat simulé par le binaire épinglé : dégâts par seconde (moyenne, écart type), combats faits, source.
+    `level` (SIM2) : niveau du personnage, passé au binaire corrigé (`--forever-level=L`) ; None : 60, comme avant."""
+    if level is not None and not MIN_LEVEL <= level <= MAX_LEVEL:
+        raise InvalidArgumentError(f"niveau {level} hors de {MIN_LEVEL} à {MAX_LEVEL}.", "donner un niveau de 1 à 60")
     binary, pin = _binary(cache_dir)
+    patches = (pin.get("patches") or {}).get("sha256")
+    if level is not None and not patches:
+        raise WowsimsError(
+            "le binaire épinglé de wowsims n'a pas les correctifs forever : il ne calcule qu'au niveau 60.",
+            "lancer `uv run forever sims update` (recompilation avec les correctifs)",
+        )
     runs = wowsims_dir(cache_dir) / "runs"
     runs.mkdir(parents=True, exist_ok=True)
     name = uuid.uuid4().hex[:12]
@@ -408,7 +428,15 @@ def run_sim(cache_dir: Path, request: dict[str, Any], *, runner: gitops.Runner |
     try:
         gitops._run(
             runner or gitops.subprocess_runner,
-            [str(binary), "sim", "--infile", str(infile), "--outfile", str(outfile)],
+            [
+                str(binary),
+                "sim",
+                "--infile",
+                str(infile),
+                "--outfile",
+                str(outfile),
+                *([f"{LEVEL_FLAG}{level}"] if level is not None else []),
+            ],
             runs,
             timeout=TIMEOUT_S,
         )
@@ -432,6 +460,8 @@ def run_sim(cache_dir: Path, request: dict[str, Any], *, runner: gitops.Runner |
             "commit": pin["commit"],
             "committed_at": pin.get("committed_at"),
             "sha256": pin["sha256"],
+            "patches": patches,
+            "level": level if level is not None else MAX_LEVEL,
             "certainty": "suppose",
         },
     }

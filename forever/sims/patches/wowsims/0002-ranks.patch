@@ -1,0 +1,109 @@
+diff --git a/sim/core/aura.go b/sim/core/aura.go
+index 404c4a4..44860a0 100644
+--- a/sim/core/aura.go
++++ b/sim/core/aura.go
+@@ -513,7 +513,11 @@ func (at *auraTracker) registerAura(unit *Unit, aura Aura) *Aura {
+ 	if aura.Label == "" {
+ 		panic("Aura label is required!")
+ 	}
+-	if at.GetAura(aura.Label) != nil {
++	if existing := at.GetAura(aura.Label); existing != nil {
++		// forever (SIM2) : sous le niveau 60, un rang ramené au rang appris peut réenregistrer son aura.
++		if CharacterLevel < 60 && existing.ActionID == aura.ActionID {
++			return existing
++		}
+ 		panic(fmt.Sprintf("Aura %s already registered!", aura.Label))
+ 	}
+ 	if len(at.auras) > 200 {
+diff --git a/sim/core/spell.go b/sim/core/spell.go
+index 9f0d50e..d05ca36 100644
+--- a/sim/core/spell.go
++++ b/sim/core/spell.go
+@@ -227,6 +227,15 @@ func (unit *Unit) OnSpellRegistered(handler SpellRegisteredHandler) {
+ 
+ // Registers a new spell to the unit. Returns the newly created spell.
+ func (unit *Unit) RegisterSpell(config SpellConfig) *Spell {
++	// forever (SIM2) : sous le niveau 60, deux rangs d'origine (entraîneur et livre) ramenés au même rang
++	// appris ne l'enregistrent qu'une fois.
++	if CharacterLevel < 60 {
++		for _, existing := range unit.Spellbook {
++			if existing.ActionID == config.ActionID {
++				return existing
++			}
++		}
++	}
+ 	if len(unit.Spellbook) > 1000 {
+ 		panic(fmt.Sprintf("Over 1000 registered spells when registering %s! There is probably a spell being registered every iteration.", config.ActionID))
+ 	}
+diff --git a/sim/core/spelldata/ladder.go b/sim/core/spelldata/ladder.go
+index c0903b6..fcd8e88 100644
+--- a/sim/core/spelldata/ladder.go
++++ b/sim/core/spelldata/ladder.go
+@@ -21,7 +21,48 @@ func Ranked(ids ...int32) Ladder {
+ 	for i, id := range ids {
+ 		ranks[i] = MustFind(id)
+ 	}
+-	return Ladder{ranks: ranks}
++	l := Ladder{ranks: ranks}
++	l.foreverAlias()
++	return l
++}
++
++// forever (SIM2) : rang appris au niveau du personnage, le plus haut dont SpellLevel <= niveau ; nil si
++// aucun. Un rang sans SpellLevel (0 : sort déclenché, objet) compte comme appris.
++func (l Ladder) foreverLearned() *Spell {
++	var best *Spell
++	for _, s := range l.ranks {
++		if int32(s.SpellLevel) <= core.CharacterLevel {
++			best = s
++		}
++	}
++	return best
++}
++
++// forever (SIM2) : chaque rang de l'échelle désigne, pour l'APL, le rang appris (0 : aucun appris).
++func (l Ladder) foreverAlias() {
++	if core.CharacterLevel >= 60 {
++		return
++	}
++	learned := l.foreverLearned()
++	for _, s := range l.ranks {
++		if learned == nil {
++			core.ForeverRankAlias[s.ID] = 0
++		} else {
++			core.ForeverRankAlias[s.ID] = learned.ID
++		}
++	}
++}
++
++// forever (SIM2) : rang retenu au lieu d'un rang pas encore appris ; le premier rang si aucun ne l'est
++// (le sort reste enregistré, mais l'APL ne le trouve plus : foreverAlias).
++func (l Ladder) foreverCap(s *Spell) *Spell {
++	if int32(s.SpellLevel) <= core.CharacterLevel {
++		return s
++	}
++	if learned := l.foreverLearned(); learned != nil {
++		return learned
++	}
++	return l.ranks[0]
+ }
+ 
+ // A ladder of a trait-tree talent, which is one spell whose per-rank numbers live in a curve. Each
+@@ -69,7 +110,7 @@ func (l Ladder) Highest() *Spell {
+ 	if len(l.ranks) == 0 {
+ 		return Nil
+ 	}
+-	return l.ranks[len(l.ranks)-1]
++	return l.foreverCap(l.ranks[len(l.ranks)-1]) // forever (SIM2) : rang appris au niveau du personnage
+ }
+ 
+ // The rank with this spell id. Panics on an id the ladder does not carry, the way MustFind does on a
+@@ -77,7 +118,7 @@ func (l Ladder) Highest() *Spell {
+ func (l Ladder) ByID(id int32) *Spell {
+ 	for _, s := range l.ranks {
+ 		if s.ID == id {
+-			return s
++			return l.foreverCap(s) // forever (SIM2) : rang appris au niveau du personnage
+ 		}
+ 	}
+ 	panic(fmt.Sprintf("spelldata: spell %d is not one of the %d ranks of this ladder", id, len(l.ranks)))
