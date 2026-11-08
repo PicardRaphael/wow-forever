@@ -544,3 +544,8 @@ def optimise_from_sources(
                         steps=steps, iterations=iterations, anchors=anchors)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out
+
+
+def gearquest_spec(preset_key: str, lead_tree: str) -> str:
+    """Squelette (SIM2)."""
+    raise NotImplementedError

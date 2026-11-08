@@ -291,13 +291,15 @@ def read_gearquest_picks(addons: Path, class_token: str) -> list[GearPick]:
 
 
 def read_gearquest_facts(addons: Path, class_token: str) -> dict[int, dict[str, Any]]:
-    """Fiches d'objets de GearQuest Forever (`GQ.Data.<classe>ItemFacts`) : nom, zone, sorte de source, consigne."""
+    """Fiches d'objets de GearQuest Forever (`GQ.Data.<classe>ItemFacts`, ou `GQ.Data.itemFacts` dans le dossier de
+    la classe, nom du module Paladin) : nom, zone, sorte de source, consigne."""
     folder = addons / f"{GEARQUEST_PREFIX}{class_token.upper()}"
-    marker = f"GQ.Data.{class_token.lower()}ItemFacts = "
+    markers = (f"GQ.Data.{class_token.lower()}ItemFacts = ", "GQ.Data.itemFacts = ")
     out: dict[int, dict[str, Any]] = {}
     for path in sorted(folder.glob("*.lua")) if folder.is_dir() else []:
         text = _read(path) or ""
-        if marker not in text:
+        marker = next((m for m in markers if m in text), None)
+        if marker is None:
             continue
         facts = _value_after(text, marker)
         for item, row in (facts or {}).items() if isinstance(facts, dict) else ():
