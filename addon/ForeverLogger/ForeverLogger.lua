@@ -13,6 +13,9 @@
 -- ramassé (objet, quantité, PNJ source par GetLootSourceInfo) dans loot.
 -- LN1 (0.7.0) : chaque instantané note le client (version, build, interface de GetBuildInfo), comparé hors du jeu
 -- aux .toc par forever doctor.
+-- SIM2 (0.8.0) : attributs du personnage (les quatre retours de UnitStat : valeur, effectif, bonus, malus) dans
+-- chaque instantané, et gains de la montée de niveau transmis par PLAYER_LEVEL_UP (gains) : statistiques de base
+-- par niveau pour les simulateurs, calculées hors du jeu.
 --
 -- Règles (docs/ADDON.md) :
 -- * ForeverLoggerDB est initialisée dans ADDON_LOADED, jamais d'alias local au niveau du fichier ;
@@ -356,6 +359,41 @@ local function updateRun()
   end
 end
 
+-- Attributs dans l'ordre des indices de UnitStat (1 à 5).
+local ATTRIBUTES = { "strength", "agility", "stamina", "intellect", "spirit" }
+
+-- { [attribut] = { stat, effective, pos, neg } } ; nil si UnitStat manque, échoue ou rend une valeur secrète.
+local function readAttributes()
+  local out = {}
+  for index, name in ipairs(ATTRIBUTES) do
+    local info = returns(UnitStat, "player", index)
+    if not info then
+      return nil
+    end
+    for i = 1, 4 do
+      if type(info[i]) ~= "number" or isSecret(info[i]) then
+        return nil
+      end
+    end
+    out[name] = { stat = info[1], effective = info[2], pos = info[3], neg = info[4] }
+  end
+  return out
+end
+
+-- Gains de PLAYER_LEVEL_UP (PV, ressource, puis les cinq attributs) ; champs non numériques omis.
+local function levelGains(health, power, strength, agility, stamina, intellect, spirit)
+  local out, any = {}, false
+  local fields = { health = health, power = power, strength = strength, agility = agility, stamina = stamina,
+    intellect = intellect, spirit = spirit }
+  for key, value in pairs(fields) do
+    if type(value) == "number" and not isSecret(value) then
+      out[key] = value
+      any = true
+    end
+  end
+  return any and out or nil
+end
+
 local function readClient()
   local info = returns(GetBuildInfo)
   if not info then
@@ -364,7 +402,7 @@ local function readClient()
   return { version = info[1], build = info[2], interface = info[4] }
 end
 
-local function snapshot(reason, level)
+local function snapshot(reason, level, gains)
   local entry = character()
   if not entry then
     return
@@ -379,6 +417,8 @@ local function snapshot(reason, level)
     state = readState(),
     resting = safe(IsResting),
     client = readClient(),
+    attributes = readAttributes(),
+    gains = gains,
   }))
 end
 
@@ -681,8 +721,10 @@ function handlers.LOOT_OPENED()
   }))
 end
 
-function handlers.PLAYER_LEVEL_UP(level)
-  snapshot("niveau", level) -- UnitLevel peut encore renvoyer l'ancien niveau
+-- PLAYER_LEVEL_UP : (niveau, PV, ressource, talents, talents JcJ, Force, Agilité, Endurance, Intelligence, Esprit).
+function handlers.PLAYER_LEVEL_UP(level, health, power, _, _, strength, agility, stamina, intellect, spirit)
+  -- UnitLevel peut encore renvoyer l'ancien niveau
+  snapshot("niveau", level, levelGains(health, power, strength, agility, stamina, intellect, spirit))
   pushState("niveau", level)
 end
 

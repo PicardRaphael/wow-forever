@@ -223,3 +223,5 @@ niveau accepté) ; aucune PR publique chez wowsims.
   - Plugin inchangé tant que les attributs de base sont ceux du 60 (chiffres surestimés sous le 60).
 - **Bloqué** : attributs de base par niveau (Force, Agilité, Endurance, Intelligence, Esprit) absents du client, de
   wowsims et de nos données ; mana de base et critique par point du client disponibles (`character_scaling.json`).
+- **Bloc 4 fait** : correctif `0003-base-stats` (mana de base et critique par point du client au niveau ; relevés d'attributs interpolés avec les tables du 60 de wowsims, écart de race retiré) ; `forever sims update` nettoie les fichiers laissés par les correctifs précédents (`git clean -fd`).
+- **Bloc 5 fait** : ForeverLogger 0.8.0 relève attributs (`UnitStat`) et gains de niveau ; relevés de toutes les SavedVariables lus comme points d'appui. Choix de l'utilisateur (2026-11-08) : ForeverLogger + interpolation.

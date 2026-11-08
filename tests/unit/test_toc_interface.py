@@ -104,7 +104,7 @@ def test_logger_snapshot_notes_the_client_build():
 
 def test_logger_version_is_0_7_0():
     lines = (REPO_ROOT / "addon" / "ForeverLogger" / "ForeverLogger.toc").read_text(encoding="utf-8").splitlines()
-    assert "## Version: 0.7.0" in lines
+    assert "## Version: 0.8.0" in lines
 
 
 LOGGER_SV = """ForeverLoggerDB = {

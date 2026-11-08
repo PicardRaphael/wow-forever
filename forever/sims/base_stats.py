@@ -55,9 +55,48 @@ def anchor_note(anchors: Sequence[Mapping[str, Any]], level: int) -> str:
     )
 
 
+ATTRIBUTES = ("strength", "agility", "stamina", "intellect", "spirit")
+RACE_FILES = {"Scourge": "Undead"}  # nom de fichier de race du client -> nom du proto de wowsims, s'ils diffèrent
+LOGGER_GLOB = "WTF/Account/*/SavedVariables/ForeverLogger.lua"
+
+
 def anchors_from_logger(db: Any, class_token: str) -> list[dict[str, Any]]:
-    raise NotImplementedError
+    """Relevés complets des personnages de la classe (`ClassMage` <- `MAGE`) : valeur sans équipement de chaque
+    attribut (effectif - bonus - malus de UnitStat), un point par race et niveau (le plus récent), triés par niveau."""
+    from forever.sims.wowsims import race_enum
+
+    wanted = class_token.removeprefix("Class").upper()
+    best: dict[tuple[int, str], tuple[int, dict[str, Any]]] = {}
+    for character in db.characters.values():
+        if (character.class_ or "").upper() != wanted or not character.race:
+            continue
+        race = race_enum(RACE_FILES.get(character.race, character.race))
+        for snap in character.snapshots:
+            attrs = snap.attributes or {}
+            if snap.level is None or any(
+                not {"effective", "pos", "neg"} <= set(attrs.get(a) or {}) for a in ATTRIBUTES
+            ):
+                continue
+            point = {"level": snap.level, "race": race}
+            for a in ATTRIBUTES:
+                v = attrs[a]
+                point[a] = v["effective"] - v["pos"] - v["neg"]
+            key, when = (snap.level, race), snap.time or 0
+            if key not in best or when >= best[key][0]:
+                best[key] = (when, point)
+    return [p for _, p in sorted(best.values(), key=lambda wp: (wp[1]["level"], wp[1]["race"]))]
 
 
 def logger_anchors(deps: Deps, class_token: str) -> tuple[list[dict[str, Any]], list[Any]]:
-    raise NotImplementedError
+    """Points d'appui lus dans toutes les SavedVariables de ForeverLogger du dossier du jeu (lecture sur disque) ;
+    ([], []) sans dossier du jeu."""
+    from forever.pipeline.addon_sv import read_logger_db
+
+    if deps.wow_dir is None:
+        return [], []
+    files = sorted(deps.wow_dir.glob(LOGGER_GLOB))
+    merged: dict[tuple[int, str], dict[str, Any]] = {}
+    for path in files:
+        for point in anchors_from_logger(read_logger_db(path), class_token):
+            merged[(point["level"], point["race"])] = point
+    return [merged[k] for k in sorted(merged)], files

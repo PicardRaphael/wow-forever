@@ -329,7 +329,12 @@ def run_from_sources(
         notes.append("équipement : choix de GearQuest au niveau de chaque tranche (forever_gear action=leveling)")
     else:
         notes.append("équipement : aucun (nu)")
+    from forever.sims.base_stats import logger_anchors
+
+    anchors, files = logger_anchors(deps, chosen.class_token)
+    notes.append(f"relevés d'attributs de ForeverLogger : {len(anchors)} point(s) de la classe dans {len(files)} "
+                 "fichier(s) de SavedVariables (connexion et montée de niveau, ForeverLogger 0.8.0)")  # fmt: skip
     out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
-                       iterations=iterations)  # fmt: skip
+                       iterations=iterations, anchors=anchors)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out

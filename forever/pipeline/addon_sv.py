@@ -38,6 +38,9 @@ class Snapshot(NamedTuple):
     state: dict[str, Any] = {}  # noqa: RUF012 : xp, max, rested, rest_state (0.4.0)
     resting: bool | None = None
     client: dict[str, Any] | None = None  # LN1 (0.7.0) : version, build, interface de GetBuildInfo
+    # SIM2 (0.8.0) : attributs (stat, effective, pos, neg de UnitStat) et gains de la montée de niveau
+    attributes: dict[str, dict[str, float]] | None = None
+    gains: dict[str, float] | None = None
 
 
 class ParsedXp(NamedTuple):
@@ -266,6 +269,14 @@ def _plain(value: Any) -> Any:
     return value
 
 
+def _attributes(value: Any) -> dict[str, dict[str, float]] | None:
+    """Attributs d'un instantané (0.8.0) : { attribut : { stat, effective, pos, neg } } ; None si absents."""
+    if not isinstance(value, dict):
+        return None
+    out = {str(k): _numbers(v) for k, v in value.items() if isinstance(v, dict)}
+    return out or None
+
+
 def _table(value: Any) -> dict[str, Any]:
     plain = _plain(value)
     return plain if isinstance(plain, dict) else {}
@@ -475,6 +486,8 @@ def read_logger_db(path: Path) -> LoggerDB:
                     state=_table(s.get("state")),
                     resting=_bool(s.get("resting")),
                     client=_table(s.get("client")) or None,
+                    attributes=_attributes(s.get("attributes")),
+                    gains=_numbers(s.get("gains")) or None,
                 )
             )
         xp = [_xp_gain(x, path) for x in _list(c.get("xp")) if isinstance(x, dict)]

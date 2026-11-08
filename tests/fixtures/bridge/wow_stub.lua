@@ -228,9 +228,18 @@ end
 UnitName = api("UnitName", function(unit) if unit == "player" then return Stub.player.name end end)
 GetRealmName = api("GetRealmName", function() return Stub.player.realm end)
 -- UnitStat simulé : Stub.player.stats[indice] = { valeur, effectif, bonus, malus } (valeurs synthétiques).
+-- Les tests Python peuvent donner un dict et des listes Python : lus par python.as_itemgetter (listes à partir de 0).
+local function pyItem(t, k)
+	if type(t) == "table" then return t[k] end
+	return python.as_itemgetter(t)[k]
+end
 UnitStat = api("UnitStat", function(unit, index)
-	local s = unit == "player" and Stub.player.stats and Stub.player.stats[index]
-	if s then return s[1], s[2], s[3], s[4] end
+	local stats = unit == "player" and Stub.player.stats
+	if not stats then return nil end
+	local s = pyItem(stats, index)
+	if s == nil then return nil end
+	if type(s) == "table" then return s[1], s[2], s[3], s[4] end
+	return pyItem(s, 0), pyItem(s, 1), pyItem(s, 2), pyItem(s, 3)
 end)
 UnitLevel = api("UnitLevel", function(unit)
 	if unit == "player" then return Stub.player.level end

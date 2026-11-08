@@ -2430,3 +2430,20 @@ mechanics:
       - tests/unit/test_sims_brackets.py::test_each_bracket_is_simulated_at_its_level_with_its_talents_and_gear
     tolerance: null
     note: "SIM2 bloc 2 (décision 305) : rang appris = règle du client (niveau d'apprentissage lu dans ses tables par wowsims), probable faute d'essai en jeu à chaque tranche ; vérifié sur le Mage Givre au niveau 60 (dégâts identiques au binaire sans correctif) et aux niveaux 45, 25 et 12 (Frostbolt rangs 8, 4 et 2 ; Cone of Cold absent sous 26). Restent au niveau 60 dans le simulateur, à corriger par les blocs suivants : statistiques de base (base_stats.go), familier, équipement, talents et buffs des préréglages (réglages de la requête) ; un sort sans rang appris reste enregistré au rang 1 (seule l'APL l'ignore) ; la baisse de déclenchement d'un rang très bas (B20) n'est pas modélisée (sans effet : le rang le plus haut appris est toujours pris) ; bloc 3 : calcul par tranche (forever sims brackets, forever_simulate action=brackets) : talents du parcours tronqués et contrôlés au niveau, équipement de GearQuest (objets absents de la base de wowsims écartés et nommés), solo, cible au niveau"
+  - id: L15
+    categorie: simulateurs
+    description: "Statistiques de base au niveau du personnage dans le simulateur de la communauté (wowsims/forever corrigé)"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/<version>/character_scaling.json (PlayerExpectedStat du client) : mana de base et critique par point d'Intelligence ou d'Agilité au niveau"
+      - "ForeverLogger 0.8.0 : attributs relevés (UnitStat, effectif - bonus - malus) à la connexion et à chaque montée de niveau, gains de PLAYER_LEVEL_UP"
+      - "forever/sims/patches/wowsims/0003-base-stats.patch : écart de race de wowsims retiré, interpolation linéaire entre relevés et tables du niveau 60 de wowsims"
+    tests:
+      - tests/unit/test_sims_base_stats.py::test_client_values_at_the_level_in_wowsims_units
+      - tests/unit/test_sims_base_stats.py::test_brackets_pass_client_values_and_anchors_when_the_patch_is_pinned
+      - tests/unit/test_sims_anchors.py::test_naked_values_for_the_simulated_class_only
+      - tests/unit/test_addon_logger_attributes.py::test_level_up_keeps_attributes_and_gains
+    tolerance: null
+    note: "SIM2 blocs 4 et 5 (décision 305) : mana et critique par point du client (certain pour la table, probable pour son usage par wowsims) ; attributs sans équipement : suppose tant que la lecture effectif - bonus - malus n'est pas vérifiée en jeu nu, et entre deux relevés (interpolation linéaire) ; sans relevé au niveau ou en dessous, attributs du niveau 60 (dégâts surestimés, dit ligne par ligne) ; PV de base du niveau 60 (sans effet sur les dégâts) ; multiplicateurs raciaux d'attribut (Esprit humain) supposés compris dans le relevé"
