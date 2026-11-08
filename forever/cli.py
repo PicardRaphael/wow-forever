@@ -534,6 +534,17 @@ def build_parser() -> argparse.ArgumentParser:
     s_bld.add_argument("--max-steps", type=int, default=None, help="plafond d'échanges par départ")
     s_bld.add_argument("--no-popular", action="store_true", help="sans les builds populaires de Talents Forever")
     s_bld.add_argument("--json", action="store_true", help="sortie JSON")
+    s_brk = sims_sub.add_parser("brackets", help="dégâts par tranche de niveaux (SIM2, wowsims corrigé)")
+    s_brk.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
+    s_brk.add_argument("--race", required=True, help="race du joueur, ex. Human")
+    s_brk.add_argument("--brackets", default=None, help="« all » (défaut), tranches ou niveaux, ex. 20-29,60 ou 22")
+    s_brk.add_argument(
+        "--path", default="auto", choices=["auto", "plan", "popular", "none"], help="parcours de talents"
+    )
+    s_brk.add_argument("--gear", default="gearquest", choices=["gearquest", "none"], help="équipement")
+    s_brk.add_argument("--spec", default=None, help="spécialisation du plan de leveling (nom anglais)")
+    s_brk.add_argument("--iterations", type=int, default=None, help="combats par tranche (défaut de l'outil)")
+    s_brk.add_argument("--json", action="store_true", help="sortie JSON")
     r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
     r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
     r_cov.add_argument("--json", action="store_true", help="sortie JSON")
@@ -1814,6 +1825,20 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
                 )
         provenance = local_provenance(deps, certainty="suppose", assumptions=notes)
         _emit({**data, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.sims_command == "brackets":
+        from forever.sims.report import simulate
+
+        doc = simulate(deps, "brackets", preset=args.preset, race=args.race, brackets=args.brackets, path=args.path,
+                       gear=args.gear, spec=args.spec, iterations=args.iterations)  # fmt: skip
+        lines = [f"Dégâts par tranche, {doc['preset']} ({doc['race']}, wowsims corrigé, solo) :"]
+        for row in doc["rows"]:
+            if "error" in row:
+                lines.append(f"  {row['bracket']} (niveau {row['level']}) : {row['error']['message']}")
+            else:
+                lines.append(f"  {row['bracket']} (niveau {row['level']}) : {row['dps']:.1f} DPS (écart type "
+                             f"{row['stdev']:.1f}), équipement {row['equipment']}")  # fmt: skip
+        _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command in ("compare", "builds"):
         from forever.sims.report import simulate

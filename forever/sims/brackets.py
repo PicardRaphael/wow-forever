@@ -1,36 +1,150 @@
-"""Dégâts par tranche de niveaux (SIM2, décision 305) : squelette."""
+"""Dégâts par tranche de niveaux (SIM2, décision 305), calculés par wowsims/forever compilé avec nos correctifs
+(niveau réglable, rang appris au niveau) : aucun calcul de jeu ici, seulement la requête de chaque tranche.
+
+Pour chaque tranche (un niveau représentatif, ou un niveau donné), un combat au niveau L :
+- talents : le parcours dans l'ordre (étapes « niveau, clé, rang » de `forever_lookup(kind="leveling_plan")`) tronqué
+  au niveau L, contrôlé légal au niveau L sur les arbres du client (un build illégal n'est pas simulé : erreur dans
+  sa ligne), converti vers la chaîne de wowsims par identifiant de sort ;
+- équipement : choix par emplacement (GearQuest, `forever_gear(action="leveling")`) placés dans l'ordre `ItemSlot` de
+  wowsims, ou nu ;
+- solo : aucun buff, affaiblissement ni consommable ; cible : celle de la rencontre de référence, au niveau L ;
+- rotation et options de la spécialisation : celles du préréglage ; un sort pas encore appris est retiré de la
+  rotation par le correctif des rangs."""
 
 from __future__ import annotations
 
+import copy
+import dataclasses
+import json
+import re
 from collections.abc import Callable, Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 from forever.config import Deps
+from forever.errors import ForeverError, InvalidArgumentError
 from forever.pipeline import gitops
+from forever.pipeline.wowsims_build import pinned, wowsims_dir
+from forever.provenance import local_provenance
+from forever.sims import wowsims
 from forever.sims.wowsims import Preset
 
-BRACKETS: dict[str, int] = {}
-SLOT_NAMES: tuple[str, ...] = ()
+# Tranches demandées par l'utilisateur (2026-11-08) et niveau représentatif de chacune (réglage de l'outil, décision 305).
+BRACKETS: dict[str, int] = {"10-19": 15, "20-29": 25, "30-39": 35, "40-49": 45, "50-59": 55, "60": 60}
+# Ordre des emplacements de `EquipmentSpec.items` (enum `ItemSlot` de `proto/common.proto` de wowsims).
+SLOT_NAMES: tuple[str, ...] = (
+    "Head", "Neck", "Shoulder", "Back", "Chest", "Wrist", "Hands", "Waist", "Legs", "Feet",
+    "Finger1", "Finger2", "Trinket1", "Trinket2", "MainHand", "OffHand", "Ranged",
+)  # fmt: skip
+# Emplacement de GearQuest -> emplacements de wowsims possibles, dans l'ordre de remplissage.
+_SLOT_ALIASES: dict[str, tuple[str, ...]] = {
+    "Finger": ("Finger1", "Finger2"),
+    "Trinket": ("Trinket1", "Trinket2"),
+    "SecondaryHand": ("OffHand",),
+    "OffHand": ("OffHand",),
+}
+_SINGLE = re.compile(r"^\d+$")
+
+NOTES = (
+    (
+        "solo : aucun buff, affaiblissement ni consommable ; cible de la rencontre de référence de wowsims mise au "
+        "niveau du personnage (armure et PV de cette cible, durée fixe du combat : pas de temps pour tuer un monstre "
+        "normal)"
+    ),
+    (
+        "attributs de base (Force, Agilité, Endurance, Intelligence, Esprit), mana de base et critique par point "
+        "d'Intelligence ou d'Agilité : encore ceux du niveau 60 dans wowsims (correctif base-stats à venir) : dégâts "
+        "surestimés sous le 60"
+    ),
+)
 
 
 def parse_brackets(text: str | None) -> list[tuple[str, int]]:
-    raise NotImplementedError
+    """« all » ou rien : les six tranches ; sinon des tranches (« 20-29 ») ou des niveaux (« 22 ») séparés par des
+    virgules."""
+    if text is None or text.strip().lower() in ("", "all"):
+        return list(BRACKETS.items())
+    out: list[tuple[str, int]] = []
+    for item in (part.strip() for part in text.split(",")):
+        if item in BRACKETS:
+            out.append((item, BRACKETS[item]))
+        elif _SINGLE.match(item) and wowsims.MIN_LEVEL <= int(item) <= wowsims.MAX_LEVEL:
+            out.append((item, int(item)))
+        else:
+            raise InvalidArgumentError(
+                f"Tranche illisible : « {item} ».",
+                f"donner des tranches ({', '.join(BRACKETS)}) ou des niveaux de 1 à 60, séparés par des virgules",
+            )
+    return out
 
 
 def talents_at(steps: Sequence[Mapping[str, Any]], level: int) -> dict[str, int]:
-    raise NotImplementedError
+    """Talents pris jusqu'au niveau `level` inclus : rang le plus haut atteint par clé."""
+    out: dict[str, int] = {}
+    for step in steps:
+        if step.get("key") and int(step["level"]) <= level:
+            out[str(step["key"])] = max(out.get(str(step["key"]), 0), int(step["rank"]))
+    return out
 
 
 def equipment_from_picks(picks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    raise NotImplementedError
+    """Choix par emplacement -> `EquipmentSpec` de wowsims (17 emplacements, vides s'il n'y a rien)."""
+    items: list[dict[str, Any]] = [{} for _ in SLOT_NAMES]
+    for pick in picks:
+        slot = str(pick.get("slot"))
+        targets = _SLOT_ALIASES.get(slot, (slot,) if slot in SLOT_NAMES else ())
+        if not targets:
+            raise InvalidArgumentError(f"Emplacement inconnu de wowsims : « {slot} ».", "vérifier les choix d'objets")
+        free = next((t for t in targets if not items[SLOT_NAMES.index(t)]), None)
+        if free is not None:
+            items[SLOT_NAMES.index(free)] = {"id": int(pick["item"])}
+    return {"items": items}
+
+
+DATABASE = ("assets", "database")  # base d'objets de wowsims (db.json et leftover_db.json, chargées par son binaire)
+
+
+def known_items(clone: Path) -> set[int] | None:
+    """Objets de la base de wowsims (les deux fichiers que son binaire charge) ; None si le clone n'en a pas."""
+    folder = clone.joinpath(*DATABASE)
+    files = [folder / name for name in ("db.json", "leftover_db.json") if (folder / name).is_file()]
+    if not files:
+        return None
+    key = tuple((str(f), f.stat().st_mtime_ns) for f in files)
+    if key not in _KNOWN:
+        _KNOWN.clear()
+        _KNOWN[key] = {int(i["id"]) for f in files for i in json.loads(f.read_text(encoding="utf-8"))["items"]}
+    return _KNOWN[key]
+
+
+_KNOWN: dict[tuple[tuple[str, int], ...], set[int]] = {}
 
 
 def solo_preset(preset: Preset, *, talents: str, equipment: dict[str, Any]) -> Preset:
-    raise NotImplementedError
+    """Préréglage joué seul : talents et équipement donnés, sans buff, affaiblissement ni consommable."""
+    return dataclasses.replace(preset, talents=talents, equipment=equipment, raid_buffs={}, party_buffs={},
+                               individual_buffs={}, debuffs={}, consumables={})  # fmt: skip
 
 
 def encounter_at(encounter: dict[str, Any] | None, level: int) -> dict[str, Any]:
-    raise NotImplementedError
+    """Copie de la rencontre dont chaque cible est au niveau `level` (sans coups écrasants)."""
+    out = copy.deepcopy(encounter) if encounter else {"targets": [{}]}
+    for target in out.get("targets") or []:
+        target["level"] = level
+        target["canCrush"] = False
+    return out
+
+
+def _legality(deps: Deps, class_name: str) -> tuple[Any, Callable[[dict[str, int], int], list[str]]]:
+    from forever.engine.talents import check_class_build
+    from forever.sims.engines import ClassTalents
+
+    conv = ClassTalents(deps, class_name)
+
+    def errors(keys: dict[str, int], level: int) -> list[str]:
+        return list(check_class_build(conv.knowledge, conv.gd.constants.talents, keys, level))
+
+    return conv, errors
 
 
 def run_brackets(
@@ -44,4 +158,164 @@ def run_brackets(
     iterations: int | None = None,
     runner: gitops.Runner | None = None,
 ) -> dict[str, Any]:
-    raise NotImplementedError
+    """Un combat par tranche (voir le module) ; une ligne par tranche : niveau, talents, équipement, dégâts par
+    seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche."""
+    from forever.sims.engines import class_of
+
+    wanted = parse_brackets(brackets)
+    if not race:
+        raise InvalidArgumentError("Race manquante.", "demander la race au joueur (question ou profil), puis race=…")
+    pin = pinned(deps.cache_dir)
+    if pin is None:
+        raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")
+    presets = wowsims.read_presets(wowsims_dir(deps.cache_dir) / "forever")
+    chosen = next((p for p in presets if p.key == preset), None)
+    if chosen is None:
+        raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir forever_simulate(action='presets')")
+    conv, errors = _legality(deps, class_of(chosen))
+    encounter = wowsims.reference_encounter(presets)
+    race_token = wowsims.race_enum(race)
+    rows: list[dict[str, Any]] = []
+    for label, level in wanted:
+        keys = talents_at(steps, level)
+        row: dict[str, Any] = {"bracket": label, "level": level, "talents": keys}
+        problems = errors(keys, level)
+        if problems:
+            err = InvalidArgumentError(f"Talents illégaux au niveau {level} : {' ; '.join(problems)}.",
+                                       "corriger le parcours de talents")  # fmt: skip
+            rows.append({**row, "error": {"code": err.code, "message": err.message, "action": err.action}})
+            continue
+        try:
+            picks = list(picks_at(level)) if picks_at else []
+            known = known_items(wowsims_dir(deps.cache_dir) / "forever")
+            unknown = sorted({int(p["item"]) for p in picks if known is not None and int(p["item"]) not in known})
+            if unknown:  # objet absent de la base de wowsims : écarté et nommé, jamais remplacé (dégâts sous-estimés)
+                row["unknown_items"] = unknown
+                picks = [p for p in picks if int(p["item"]) not in unknown]
+            case = solo_preset(chosen, talents=conv.wowsims.encode(keys), equipment=equipment_from_picks(picks))
+            request = wowsims.request_for(case, race=race_token, encounter=encounter_at(encounter, level),
+                                          iterations=iterations or wowsims.DEFAULT_ITERATIONS)  # fmt: skip
+            out = wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level)
+        except ForeverError as err:
+            rows.append({**row, "error": {"code": err.code, "message": err.message, "action": err.action}})
+            continue
+        rows.append({**row, "talents_string": case.talents, "equipment": [p["item"] for p in picks] if picks else "nu",
+                     **out})  # fmt: skip
+    notes = [wowsims.source_note(pin), *NOTES]
+    if any(r.get("unknown_items") for r in rows):
+        notes.append("objets choisis absents de la base de wowsims (unknown_items) : emplacement laissé vide, dégâts "
+                     "sous-estimés")  # fmt: skip
+    return {"preset": chosen.key, "race": race_token, "rows": rows,
+            "provenance": local_provenance(deps, certainty="suppose", assumptions=notes)}  # fmt: skip
+
+
+# parcours de talents : plan de leveling (Polestar et Talents Forever), build populaire de Talents Forever de l'arbre du
+# préréglage dans un ordre légal généré, ou aucun talent ; « auto » : le plan, sinon le build populaire
+PATHS = ("auto", "plan", "popular", "none")
+GEARS = ("gearquest", "none")  # équipement : choix de GearQuest au niveau L, ou nu
+
+
+def _plan_steps(deps: Deps, class_name: str, preset: Preset, spec: str | None) -> tuple[list[dict[str, Any]], str]:
+    """Étapes du plan de leveling de la spécialisation : `spec` (nom anglais), sinon celle dont l'arbre est le plus
+    pris par les talents du préréglage."""
+    from forever.leveling_plan import leveling_plan
+    from forever.sims.engines import ClassTalents
+
+    plan = leveling_plan(deps, class_name, spec)
+    specs = plan.get("specs") or []
+    if spec is None and len(specs) > 1:
+        conv = ClassTalents(deps, class_name)
+        tree = conv.lead_tree(conv.wowsims.decode(preset.talents))
+        specs = [s for s in specs if s.get("tree") == tree] or specs
+    if not specs:
+        raise InvalidArgumentError(f"Aucun plan de leveling pour {class_name}.", "donner spec=<nom anglais>")
+    chosen = specs[0]
+    return list(chosen.get("steps") or []), str(chosen.get("spec") or chosen.get("key"))
+
+
+def _popular_steps(deps: Deps, class_name: str, preset: Preset) -> tuple[list[dict[str, Any]], str]:
+    """Build populaire de Talents Forever le plus joué, légal, de l'arbre le plus pris par le préréglage, dans un
+    ordre de prise légal généré (`legal_order` : pas un ordre optimisé) ; un point par niveau dès le premier."""
+    from forever.engine.talents import legal_order
+    from forever.sims.engines import ClassTalents
+    from forever.talents_forever import load_addon, popular_builds
+
+    addon = load_addon(deps)
+    if addon is None or not addon.popular:
+        raise InvalidArgumentError("Builds populaires de Talents Forever introuvables.",
+                                   "installer l'addon Talents Forever, ou path=none")  # fmt: skip
+    conv = ClassTalents(deps, class_name)
+    tree = conv.lead_tree(conv.wowsims.decode(preset.talents))
+    top = (popular_builds(addon, deps, class_name)["classes"].get(class_name) or {}).get("top") or []
+    chosen = next((b for b in top if b.get("legality") == "légal" and b.get("tree") == tree), None)
+    if chosen is None:
+        raise InvalidArgumentError(f"Aucun build populaire légal de l'arbre {tree} pour {class_name}.",
+                                   "donner path=plan ou path=none")  # fmt: skip
+    rules = conv.gd.constants.talents
+    order = legal_order(conv.knowledge, rules, dict(chosen["talents"]))
+    steps, ranks = [], {}  # type: ignore[var-annotated]
+    for i, key in enumerate(order):
+        ranks[key] = ranks.get(key, 0) + 1
+        steps.append({"level": rules.first_level + i, "key": key, "rank": ranks[key]})
+    return steps, f"build populaire n° {chosen.get('rank')} {tree} de Talents Forever ({chosen.get('link')})"
+
+
+def run_from_sources(
+    deps: Deps,
+    *,
+    preset: str,
+    race: str | None,
+    brackets: str | None,
+    path: str = "auto",
+    gear: str = "gearquest",
+    spec: str | None = None,
+    gear_spec: str | None = None,
+    iterations: int | None = None,
+) -> dict[str, Any]:
+    """`run_brackets` avec les sources installées : parcours `path` (plan de leveling ou aucun) et équipement `gear`
+    (choix de GearQuest au niveau de chaque tranche, ou nu)."""
+    from forever.sims.engines import class_of
+
+    if path not in PATHS:
+        raise InvalidArgumentError(f"Parcours inconnu : « {path} ».", "choisir " + ", ".join(PATHS))
+    if gear not in GEARS:
+        raise InvalidArgumentError(f"Équipement inconnu : « {gear} ».", "choisir " + ", ".join(GEARS))
+    presets = wowsims.read_presets(wowsims_dir(deps.cache_dir) / "forever")
+    chosen = next((p for p in presets if p.key == preset), None)
+    if chosen is None:
+        raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir forever_simulate(action='presets')")
+    class_name = class_of(chosen)
+    steps: list[dict[str, Any]] = []
+    notes: list[str] = []
+    if path in ("auto", "plan"):
+        try:
+            steps, plan_spec = _plan_steps(deps, class_name, chosen, spec)
+            notes.append(
+                f"talents : plan de leveling {plan_spec} (forever_lookup kind=leveling_plan) tronqué au niveau"
+            )
+        except InvalidArgumentError as err:
+            if path == "plan":
+                raise
+            notes.append(f"plan de leveling indisponible ({err.message}) : build populaire à la place")
+            path = "popular"
+    if path == "popular":
+        steps, label = _popular_steps(deps, class_name, chosen)
+        notes.append(f"talents : {label}, ordre de prise légal généré (pas un ordre optimisé), tronqué au niveau")
+    elif path == "none":
+        notes.append("talents : aucun")
+    picks_at: Callable[[int], Sequence[Mapping[str, Any]]] | None = None
+    if gear == "gearquest":
+        from forever.gear import gear_report
+
+        def picks_at(level: int) -> Sequence[Mapping[str, Any]]:
+            doc = gear_report(deps, "leveling", class_name=class_name, level=level, race=race or "Orc",
+                              spec=gear_spec)  # fmt: skip
+            return list(doc.get("picks") or [])
+
+        notes.append("équipement : choix de GearQuest au niveau de chaque tranche (forever_gear action=leveling)")
+    else:
+        notes.append("équipement : aucun (nu)")
+    out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
+                       iterations=iterations)  # fmt: skip
+    out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
+    return out

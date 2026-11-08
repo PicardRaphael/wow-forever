@@ -216,3 +216,10 @@ niveau accepté) ; aucune PR publique chez wowsims.
 - **Reporté** : carte de veille quand une classe convertie au passage précédent ne l'est plus (`skipped` de
   `replay_reference`) ; statistiques de base par niveau (étape 4, données dans `forever/data/`, jamais dans un patch) ;
   action `brackets` (talents tronqués, solo, cible de niveau L) ; Chasseur et familier ; MythicSim sous le 60.
+- **Bloc 3 fait** : `forever sims brackets` et `forever_simulate(action="brackets")`, Mage d'abord (code commun aux classes).
+  - Parcours `auto` : plan de leveling (Polestar), sinon build populaire de Talents Forever de l'arbre du préréglage
+    dans un ordre légal généré (Polestar n'est pas installé en jeu sur ce poste).
+  - Objets de GearQuest absents de la base de wowsims : écartés et nommés (`unknown_items`), jamais remplacés.
+  - Plugin inchangé tant que les attributs de base sont ceux du 60 (chiffres surestimés sous le 60).
+- **Bloqué** : attributs de base par niveau (Force, Agilité, Endurance, Intelligence, Esprit) absents du client, de
+  wowsims et de nos données ; mana de base et critique par point du client disponibles (`character_scaling.json`).

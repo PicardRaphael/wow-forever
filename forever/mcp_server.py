@@ -467,6 +467,10 @@ def build_server(deps: Deps) -> MCPServer:
         rotation: str | None = None,
         max_steps: int | None = None,
         popular: bool = True,
+        brackets: str | None = None,
+        path: str = "auto",
+        gear: str = "gearquest",
+        spec: str | None = None,
     ) -> dict[str, Any]:
         """Calculs de wowsims/forever (et de MythicSim, MS1) au niveau 60 seulement, toutes classes (décisions 293 et 294 : simulateur
         maintenu par d'autres, compilé tel quel, épinglé) : `action="presets"` préréglages du dépôt (`key` :
@@ -484,13 +488,19 @@ def build_server(deps: Deps) -> MCPServer:
         `action="builds"` recherche de builds sur `preset` pour `race` (échange d'un point, confirmation sur 10 000
         combats, verdict « meilleur » ou « non départagé » ; départs : `talents`, préréglage, builds populaires de
         Talents Forever si `popular` ; `max_steps` plafond d'échanges ; `rotation` rotation du fork de MythicSim).
-        Sous le niveau 60 : rien ici (le moteur du Mage gelé répond, en le disant)."""
+        SIM2 (décision 305) : `action="brackets"` dégâts par tranche de niveaux sur `preset` pour `race` (wowsims
+        compilé avec les correctifs forever : niveau réglable, rang appris au niveau) ; `brackets` : « all » (défaut :
+        10-19, 20-29, 30-39, 40-49, 50-59 et 60, un niveau représentatif chacune), des tranches ou des niveaux séparés
+        par des virgules ; `path` : `auto` (défaut : plan, sinon build populaire), `plan` (plan de leveling de `spec`), `popular` (build populaire de Talents Forever de l'arbre du préréglage, ordre légal généré) ou `none` ; `gear` :
+        `gearquest` (choix au niveau de chaque tranche) ou `none` (nu) ; solo (aucun buff ni consommable). Les
+        hypothèses de la provenance disent ce qui reste au niveau 60 (attributs de base) : les citer."""
         from forever.sims.report import simulate
 
         try:
             return simulate(deps, action, preset=preset, races=races, race=race, stats=stats, reference=reference,
                             iterations=iterations, cases=cases, consumables=consumables, talents=talents,
-                            engine=engine, rotation=rotation, max_steps=max_steps, popular=popular)  # fmt: skip
+                            engine=engine, rotation=rotation, max_steps=max_steps, popular=popular, brackets=brackets,
+                            path=path, gear=gear, spec=spec)  # fmt: skip
         except ForeverError as err:
             return cast(dict[str, Any], _error_result(deps, err))
 

@@ -449,7 +449,9 @@ def run_sim(
         infile.unlink(missing_ok=True)
         outfile.unlink(missing_ok=True)
     if result.get("error"):
-        raise WowsimsError(f"wowsims : {result['error']}", "vérifier la requête (préréglage, race, combat)")
+        err = result["error"]
+        message = str(err.get("message", err) if isinstance(err, dict) else err).split("\nStack Trace", 1)[0]
+        raise WowsimsError(f"wowsims : {message.strip()}", "vérifier la requête (préréglage, race, combat)")
     dps = result["raidMetrics"]["parties"][0]["players"][0]["dps"]
     return {
         "dps": float(dps.get("avg", 0.0)),

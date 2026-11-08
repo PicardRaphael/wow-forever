@@ -19,7 +19,7 @@ MAGE_ENGINE_FROZEN = (
     "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
 )
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
-ACTIONS = ("presets", "races", "weights", "compare", "builds")
+ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets")
 ENGINES = ("wowsims", "mythicsim", "both")
 
 
@@ -45,6 +45,10 @@ def simulate(
     rotation: str | None = None,
     max_steps: int | None = None,
     popular: bool = True,
+    brackets: str | None = None,
+    path: str = "auto",
+    gear: str = "gearquest",
+    spec: str | None = None,
 ) -> dict[str, Any]:
     """`action` : `presets` (liste, objets équipés de chacun), `races` (races séparées par des virgules, sur
     `preset`), `weights` (statistiques séparées par des virgules, rapportées à `reference`, `race` du joueur exigée),
@@ -58,6 +62,13 @@ def simulate(
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
     if engine not in ENGINES:
         raise InvalidArgumentError(f"Moteur inconnu : « {engine} ».", "choisir " + ", ".join(ENGINES))
+    if action == "brackets":  # SIM2 : sous le 60, par tranche de niveaux (wowsims corrigé, décision 305)
+        from forever.sims.brackets import run_from_sources
+
+        if not preset:
+            raise InvalidArgumentError("Préréglage manquant.", "donner preset (voir action=presets)")
+        return run_from_sources(deps, preset=preset, race=race, brackets=brackets, path=path, gear=gear, spec=spec,
+                                iterations=iterations)  # fmt: skip
     pin = pinned(deps.cache_dir)
     if pin is None:
         raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")
