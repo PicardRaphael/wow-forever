@@ -1863,6 +1863,16 @@ def _step_addons(run: _Run) -> Step:
         "remeasured": remeasured,
     }
     review = sum(1 for p in run.pending if p["kind"] == "addon_data")
+    # AMI1 : profil des personnages tenu depuis ForeverLogger à chaque passage (lecture locale, sans saisie)
+    try:
+        from forever.profile_sync import sync_from_logger
+
+        synced = sync_from_logger(run.deps) if not run.options.dry_run else []
+    except (OSError, ForeverError) as exc:
+        synced = []
+        data["profile_error"] = [str(exc)]
+    if synced:
+        data["profile"] = synced
     if changed or proposals:
         detail = f"{len(changed)} addon(s) changé(s), {len(proposals)} à inventorier"
         if remeasured:

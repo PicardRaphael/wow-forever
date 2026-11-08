@@ -268,6 +268,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     profile = sub.add_parser("profile", help="profil joueur hors du dépôt (FOREVER_PROFILE, ~/.forever)")
     psub = profile.add_subparsers(dest="profile_cmd", required=True)
+    p_sync = psub.add_parser("sync", help="profil rempli depuis ForeverLogger (classe, race, niveau, talents ; AMI1)")
+    p_sync.add_argument("--json", action="store_true", help="sortie JSON")
     show = psub.add_parser("show", help="personnage actif (ou nommé)")
     show.add_argument("name", nargs="?", help="nom du personnage (défaut : actif)")
     show.add_argument("--json", action="store_true", help="sortie JSON")
@@ -2814,6 +2816,17 @@ def _cmd_pvp(deps: Deps, args: argparse.Namespace) -> int:
 
 def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
     cmd = args.profile_cmd
+    if cmd == "sync":
+        from forever.profile_sync import sync_from_logger
+
+        done = sync_from_logger(deps)
+        provenance = local_provenance(
+            deps, certainty="certain", assumptions=["relevés de ForeverLogger lus sur disque"]
+        )
+        lines = [f"Profil synchronisé depuis ForeverLogger : {len(done)} personnage(s)"]
+        lines += [f"  {c['name']} : {c['class']} niveau {c['level']}" for c in done]
+        _emit({"characters": done, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
     if cmd == "import":
         return _cmd_profile_import(deps, args)
     if cmd == "archive":
