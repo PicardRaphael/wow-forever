@@ -587,7 +587,9 @@ def run_from_sources(
                        conditions=conditions, candidates_at=candidates_at,
                        targets=targets)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
-    return out
+    from forever.sims.leveling_rates import add_rates
+
+    return add_rates(deps, out)  # temps pour tuer et XP par heure, toujours (plan 3c)
 
 
 ITEMS_PATCH = "0004-items.patch"

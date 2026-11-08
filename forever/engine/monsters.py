@@ -139,3 +139,25 @@ def mob_expected_hit(gd: GameData, hit: float) -> float:
     Registre : I6"""
     mm = gd.mob_model
     return hit * (1 + mm.crit * (mm.crit_mult - 1))
+
+
+def time_to_kill(hp: float, dps: float) -> float:
+    """Temps pour tuer un monstre de `hp` PV à `dps` dégâts par seconde constants (combat seul, sans soin ni fuite).
+
+    Registre : I6"""
+    if dps <= 0:
+        raise ValueError(f"dégâts par seconde nuls ou négatifs ({dps:g})")
+    return hp / dps
+
+
+def grind_xp_per_hour(xp_per_kill: float, kill_s: float, between_s: float) -> float:
+    """XP par heure de monstres enchaînés : XP d'un monstre sur le temps d'un monstre (combat, puis temps hors combat
+    `between_s`), même forme que l'XP par heure du moteur du Mage.
+
+    Registre : I6"""
+    from forever.engine.dungeon import SECONDS_PER_HOUR
+
+    total = kill_s + between_s
+    if total <= 0:
+        raise ValueError(f"temps par monstre nul ou négatif ({total:g} s)")
+    return xp_per_kill * SECONDS_PER_HOUR / total

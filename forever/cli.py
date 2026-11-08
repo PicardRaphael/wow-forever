@@ -1913,6 +1913,11 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
                     if "chosen" in wp:
                         text += f", {wp['chosen']} : {wp['delta']:+.1f} DPS contre {wp['proposed']}"
                     lines.append(text + (f" ; {wp['note']}" if wp.get("note") else "") + ")")
+                if row.get("ttk_s") is not None:
+                    xph = f", {row['xp_per_hour']:.0f} XP/h (sans repos)" if row.get("xp_per_hour") is not None else ""
+                    lines.append(f"    monstre normal : {row['ttk_s']:.1f} s pour tuer{xph}")
+                if row.get("rates_missing"):
+                    lines.append(f"    {row['rates_missing']}")
                 if row.get("weights"):
                     w = row["weights"]
                     lines.append("    priorité : " + " > ".join(f"{s.removeprefix('Stat')} {w['normalised'][s]:.2f}"
