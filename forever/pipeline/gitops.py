@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import time
 from collections.abc import Callable, Sequence
@@ -90,8 +91,12 @@ def subprocess_runner(args: Sequence[str], cwd: Path, timeout: float | None = No
         "GIT_ASKPASS": "",
         "SSH_ASKPASS": "",
     }
+    # Windows cherche le programme dans le PATH du processus parent : chemin complet résolu avec le PATH complété
+    command = list(args)
+    if command:
+        command[0] = shutil.which(command[0], path=env["PATH"]) or command[0]
     return subprocess.run(
-        list(args),
+        command,
         cwd=cwd,
         capture_output=True,
         text=True,
