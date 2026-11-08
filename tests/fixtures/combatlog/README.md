@@ -26,3 +26,9 @@ Cas limites écrits pour les tests (pas des journaux réels) :
 - `synthetic/hunter_pet.txt` (T04d, bloc E) : Chasseur `Player-0000-00000000` et son familier (drapeaux « à moi ») :
   un monstre frappé d'abord par le familier puis tué en 12 s, un second tué en 10 s par le joueur seul, un monstre
   tué par un autre joueur (écarté) et un combat sans mort (écarté). Lignes calquées sur le journal réel anonymisé.
+- `synthetic/validate_hunter.txt` (SIM2, mesuré contre simulé) : Chasseur `Player-0000-00000000` et son familier,
+  lignes calquées sur le journal réel (chaque coup au contact écrit deux fois, `SWING_DAMAGE` puis
+  `SWING_DAMAGE_LANDED` à la même heure, comme dans `WoWCombatLog-092726_150346`). Avant 10:30 (niveau 15) : cinq
+  monstres tués en 10 s pour 300 (familier 100 et joueur 200), 320, 280, 300 et 300 points de dégâts ; un monstre tué
+  par un autre joueur (écarté). Après (niveau 22) : deux monstres tués en 10 s pour 500 et 600 points. Montants
+  choisis, pas des chiffres de jeu.

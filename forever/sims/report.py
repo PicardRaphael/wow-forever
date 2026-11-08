@@ -19,7 +19,18 @@ MAGE_ENGINE_FROZEN = (
     "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
 )
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
-ACTIONS = ("presets", "races", "weights", "compare", "builds", "brackets", "race_brackets", "gear", "analysis")
+ACTIONS = (
+    "presets",
+    "races",
+    "weights",
+    "compare",
+    "builds",
+    "brackets",
+    "race_brackets",
+    "gear",
+    "analysis",
+    "validate",
+)
 ENGINES = ("wowsims", "mythicsim", "both")
 
 
@@ -54,6 +65,10 @@ def simulate(
     candidates: str | None = None,
     conditions: str = "solo",
     targets: int = 1,
+    character: str | None = None,
+    log: str | None = None,
+    sv: str | None = None,
+    group: str = "bracket",
 ) -> dict[str, Any]:
     """`action` : `presets` (liste, objets équipés de chacun), `races` (races séparées par des virgules, sur
     `preset`), `weights` (statistiques séparées par des virgules, rapportées à `reference`, `race` du joueur exigée),
@@ -68,6 +83,8 @@ def simulate(
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
     if engine not in ENGINES:
         raise InvalidArgumentError(f"Moteur inconnu : « {engine} ».", "choisir " + ", ".join(ENGINES))
+    if action == "validate":  # SIM2 3e : journaux de combat comparés au calcul par tranche
+        return validate_from_disk(deps, character=character, log=log, sv=sv, preset=preset, group=group)
     if action == "analysis":  # SIM2 bloc 15 : analyse gardée (forever sims analyse), jamais recalculée ici
         from forever.sims.analysis import dps_presets, read_analysis
 
@@ -190,3 +207,42 @@ def simulate(
         **kwargs,
     )
     return {"level": LEVEL, "preset": chosen.key, **out, "provenance": provenance}
+
+
+def validate_from_disk(
+    deps: Deps,
+    *,
+    character: str | None,
+    log: str | None = None,
+    sv: str | None = None,
+    preset: str | None = None,
+    group: str = "bracket",
+) -> dict[str, Any]:
+    """`validate` avec les sources lues sur disque : journal `log` (fichier ou dossier ; défaut : `<jeu>/Logs`) et
+    ForeverLogger `sv` (fichier ; défaut : SavedVariables de chaque compte)."""
+    from pathlib import Path
+
+    from forever.kill_time import local_sources
+    from forever.pipeline.addon_sv import read_logger_db
+    from forever.pipeline.combatlog import log_files
+    from forever.sims.validate import validate_character
+
+    if not character:
+        raise InvalidArgumentError("Personnage manquant.", "donner character (nom ou GUID relevé par ForeverLogger)")
+    logs, loggers = local_sources(deps)
+    if log:
+        path = Path(log)
+        if not path.exists():
+            raise InvalidArgumentError(f"Journal introuvable : « {log} ».", "donner un fichier WoWCombatLog-*.txt")
+        logs = log_files(path) if path.is_dir() else [path]
+    if sv:
+        path = Path(sv)
+        if not path.is_file():
+            raise InvalidArgumentError(f"SavedVariables introuvable : « {sv} ».", "donner le fichier ForeverLogger.lua")
+        loggers = [read_logger_db(path)]
+    if not logs:
+        raise InvalidArgumentError(
+            "Aucun journal de combat.",
+            "activer le journal de combat avancé en jeu (/combatlog), ou donner log=<fichier>",
+        )
+    return validate_character(deps, character, logs=logs, loggers=loggers, preset=preset, group=group)

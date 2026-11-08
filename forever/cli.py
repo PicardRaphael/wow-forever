@@ -581,6 +581,13 @@ def build_parser() -> argparse.ArgumentParser:
     s_gear.add_argument("--iterations", type=int, default=None, help="combats par essai")
     s_gear.add_argument("--json", action="store_true", help="sortie JSON")
     s_brk.add_argument("--json", action="store_true", help="sortie JSON")
+    s_val = sims_sub.add_parser("validate", help="DPS mesuré dans les journaux de combat contre le calcul par tranche")
+    s_val.add_argument("--character", required=True, help="personnage : nom ou GUID relevé par ForeverLogger")
+    s_val.add_argument("--log", default=None, help="journal WoWCombatLog-*.txt ou dossier (défaut : <jeu>/Logs)")
+    s_val.add_argument("--sv", default=None, help="fichier ForeverLogger.lua (défaut : SavedVariables des comptes)")
+    s_val.add_argument("--preset", default=None, help="préréglage de wowsims (défaut : déduit de la classe)")
+    s_val.add_argument("--group", default="bracket", choices=["bracket", "level"], help="par tranche ou par niveau")
+    s_val.add_argument("--json", action="store_true", help="sortie JSON")
     r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
     r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
     r_cov.add_argument("--json", action="store_true", help="sortie JSON")
@@ -1826,6 +1833,26 @@ def _sims_lines(doc: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _validate_lines(doc: dict[str, Any]) -> list[str]:
+    """Texte de `forever sims validate` : chiffres recopiés de la mesure et du calcul."""
+    who = doc["character"]
+    lines = [f"Mesuré contre calculé, {who['name']} ({who['class']} {who['race']}, {doc['logs']} journal(aux)) :"]
+    for row in doc["rows"]:
+        m = row["measured"]
+        head = f"tranche {row['bracket']}" if "bracket" in row else f"niveau {row['level']}"
+        spread = f"écart type {m['stdev']:.1f}" if m["stdev"] is not None else "écart type inconnu"
+        lines.append(f"  {head} : mesuré {m['dps']:.1f} DPS ({spread}, {m['fights']} combat(s), {m['seconds']:.0f} s)")
+        sim = row["simulated"]
+        if "error" in sim:
+            lines.append(f"    calcul au niveau {row['sim_level']} : {sim['error']['message']}")
+            continue
+        gap = row["gap"]
+        rel = f"{gap['relative']:+.1%}" if gap["relative"] is not None else "?"
+        lines.append(f"    calcul au niveau {row['sim_level']} : {float(sim['dps']):.1f} DPS ; écart {rel} "
+                     f"({gap['verdict']}) ; certitude {row['certainty']}")  # fmt: skip
+    return lines
+
+
 def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
     from forever.pipeline import wowsims_build
     from forever.sims import wowsims
@@ -1902,6 +1929,13 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
         for row in doc["skipped"]:
             lines.append(f"  écarté : {row['item']} ({row['slot']}) : {row['reason']}")
         _emit(doc, lines, doc["provenance"], args.json)
+        return EXIT_OK
+    if args.sims_command == "validate":
+        from forever.sims.report import simulate
+
+        doc = simulate(deps, "validate", character=args.character, log=args.log, sv=args.sv, preset=args.preset,
+                       group=args.group)  # fmt: skip
+        _emit(doc, _validate_lines(doc), doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command == "brackets":
         from forever.sims.report import simulate
