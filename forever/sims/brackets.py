@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import functools
 import json
 import re
 from collections.abc import Callable, Mapping, Sequence
@@ -120,6 +121,100 @@ def known_items(clone: Path) -> set[int] | None:
 _KNOWN: dict[tuple[tuple[str, int], ...], set[int]] = {}
 
 
+WEAPON_CHOICES = ("proposée", "type du préréglage")  # ensemble gardé : armes proposées, ou du type du préréglage
+_HANDS = {"MainHand": (1, 2, 4), "OffHand": (2, 3)}  # `HandType` de wowsims permis par emplacement (proto)
+_TWO_HAND = 4  # HandTypeTwoHand
+_WEAPON_ENUM = re.compile(r"enum WeaponType \{(.*?)\}", re.DOTALL)
+
+
+def weapon_type_names(clone: Path) -> dict[int, str]:
+    """Noms des types d'arme du proto épinglé (`enum WeaponType` de `proto/common.proto`, sans le préfixe) ; vide
+    sans proto."""
+    path = clone / "proto" / "common.proto"
+    m = _WEAPON_ENUM.search(path.read_text(encoding="utf-8")) if path.is_file() else None
+    if m is None:
+        return {}
+    return {int(n): name for name, n in re.findall(r"^\s*WeaponType(\w+)\s*=\s*(\d+);", m.group(1), re.MULTILINE)}
+
+
+def match_weapons(
+    run: Callable[[list[dict[str, Any]]], dict[str, Any]],
+    items: list[dict[str, Any]],
+    proposed_out: dict[str, Any],
+    reference: Mapping[str, Any],
+    db: Mapping[int, Mapping[str, Any]],
+    pool: Callable[[], Sequence[Mapping[str, Any]]],
+    level: int,
+    names: Mapping[int, str],
+) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None]:
+    """Armes du type de celles du préréglage (`reference`, équipement de wowsims), aucune règle de jeu codée : pour
+    chaque main dont l'arme proposée n'a pas le `weaponType` de l'arme du préréglage, chaque arme de ce type de la
+    réserve `pool` (niveau requis au plus `level`, main permise par son `handType`, jamais l'objet de l'autre main)
+    est essayée par `run` (même graine), main droite puis main gauche sur la meilleure main droite ; l'ensemble qui
+    fait le plus de dégâts est gardé. Rend (objets gardés, résultat gardé, ligne `weapon` ou None si les types
+    concordent)."""
+
+    def kind(entry: Mapping[str, Any] | None) -> int | None:
+        row = db.get(int(entry["id"])) if entry and entry.get("id") else None
+        return int(row["weaponType"]) if row and row.get("weaponType") else None
+
+    ref = list(reference.get("items") or [])
+    wanted: dict[str, int] = {}
+    for slot in ("MainHand", "OffHand"):
+        i = SLOT_NAMES.index(slot)
+        want = kind(ref[i] if len(ref) > i else None)
+        if want is not None and kind(items[i]) != want:
+            wanted[slot] = want
+    if not wanted:
+        return items, proposed_out, None
+    label = {s: names.get(t, f"type {t}") for s, t in wanted.items()}
+    info: dict[str, Any] = {
+        "reference_type": label,
+        "proposed": {s: items[SLOT_NAMES.index(s)].get("id") for s in wanted},
+        "proposed_dps": proposed_out["dps"],
+    }
+    offers = list(pool())
+    best, best_out = list(items), None
+    missing: list[str] = []
+    for slot, want in wanted.items():
+        i = SLOT_NAMES.index(slot)
+        other = best[SLOT_NAMES.index("OffHand" if slot == "MainHand" else "MainHand")].get("id")
+        if slot == "OffHand" and int((db.get(int(other or 0)) or {}).get("handType") or 0) == _TWO_HAND:
+            missing.append(slot)  # arme à deux mains gardée en main droite : rien en main gauche
+            continue
+        seen: set[int] = set()
+        trials: list[tuple[list[dict[str, Any]], dict[str, Any]]] = []
+        for offer in offers:
+            item = int(offer["item"])
+            row = db.get(item) or {}
+            if item in seen or item == other or int(row.get("weaponType") or 0) != want:
+                continue
+            if int(row.get("reqLvl") or 0) > level or int(row.get("handType") or 0) not in _HANDS[slot]:
+                continue
+            seen.add(item)
+            trial = list(best)
+            trial[i] = {"id": item}
+            if int(row.get("handType") or 0) == _TWO_HAND:
+                trial[SLOT_NAMES.index("OffHand")] = {}
+            trials.append((trial, run(trial)))
+        if not trials:
+            missing.append(slot)
+            continue
+        best, best_out = max(trials, key=lambda t: float(t[1]["dps"]))
+    if missing:
+        info["note"] = "aucune arme de type " + ", ".join(f"{label[s]} ({s})" for s in missing) + (
+            f" au niveau {level} dans la réserve de candidats")  # fmt: skip
+    if best_out is None or float(best_out["dps"]) <= float(proposed_out["dps"]):
+        info["choice"] = WEAPON_CHOICES[0]
+        if best_out is not None:
+            info.update(chosen={s: best[SLOT_NAMES.index(s)].get("id") for s in wanted}, chosen_dps=best_out["dps"],
+                        delta=float(best_out["dps"]) - float(proposed_out["dps"]))  # fmt: skip
+        return items, proposed_out, info
+    info.update(choice=WEAPON_CHOICES[1], chosen={s: best[SLOT_NAMES.index(s)].get("id") for s in wanted},
+                chosen_dps=best_out["dps"], delta=float(best_out["dps"]) - float(proposed_out["dps"]))  # fmt: skip
+    return best, best_out, info
+
+
 def solo_preset(preset: Preset, *, talents: str, equipment: dict[str, Any]) -> Preset:
     """Préréglage joué seul : talents et équipement donnés, sans buff, affaiblissement ni consommable."""
     return dataclasses.replace(preset, talents=talents, equipment=equipment, raid_buffs={}, party_buffs={},
@@ -191,9 +286,13 @@ def run_brackets(
     reference: str | None = None,
     conditions: str = "solo",
     rotation: str = "best",
+    candidates_at: Callable[[int], Sequence[Mapping[str, Any]]] | None = None,
+    targets: int = 1,
 ) -> dict[str, Any]:
     """Un combat par tranche (voir le module) ; une ligne par tranche : niveau, talents, équipement, dégâts par
-    seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche."""
+    seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche. `candidates_at` : réserve
+    de candidats au niveau, où chercher une arme du type de celle du préréglage (voir `match_weapons`) ; `targets` :
+    nombre de cibles identiques de la rencontre (zone au-delà de 1)."""
     from forever.sims.engines import class_of
 
     wanted = parse_brackets(brackets)
@@ -229,6 +328,8 @@ def run_brackets(
     )
     encounter = wowsims.reference_encounter(presets)
     race_token = wowsims.race_enum(race)
+    db: dict[int, dict[str, Any]] | None = None  # base d'objets des simulateurs, lue au premier besoin
+    names: dict[int, str] | None = None
     rows: list[dict[str, Any]] = []
     for label, level in wanted:
         keys = talents_at(steps, level)
@@ -275,6 +376,28 @@ def run_brackets(
             row["rotation"] = best_name
             if len(tried) > 1:
                 row["rotations"] = [{"rotation": n, "dps": o["dps"], "stdev": o["stdev"]} for n, _, o in tried]
+            if candidates_at is not None:
+                if db is None:
+                    db = item_database(deps.cache_dir)
+                    names = weapon_type_names(wowsims_dir(deps.cache_dir) / "forever")
+
+                def run_items(items: list[dict[str, Any]], won: Preset = case, fight: dict[str, Any] = fight,
+                              level: int = level, doc: Any = doc) -> dict[str, Any]:  # fmt: skip
+                    # même rencontre, même rotation (la retenue), même graine : seules les armes changent
+                    trial = dataclasses.replace(won, equipment={"items": items})
+                    req = wowsims.request_for(trial, race=race_token, encounter=fight,
+                                              iterations=iterations or wowsims.DEFAULT_ITERATIONS)  # fmt: skip
+                    return wowsims.run_sim(deps.cache_dir, req, runner=runner, level=level, base_stats=doc,
+                                           items=items_path)  # fmt: skip
+
+                items, out, weapon = match_weapons(run_items, list(case.equipment["items"]), out, chosen.equipment,
+                                                   db, functools.partial(candidates_at, level), level,
+                                                   names or {})  # fmt: skip
+                if weapon is not None:
+                    row["weapon"] = weapon
+                    if weapon["choice"] == WEAPON_CHOICES[1]:
+                        case = dataclasses.replace(case, equipment={"items": items})
+                        picks = [{"item": i["id"]} for i in items if i]
             if stats:
                 try:
                     w = wowsims.stat_weights(
@@ -305,6 +428,11 @@ def run_brackets(
     if stats:
         notes.append(f"poids des statistiques par tranche : tirages appariés (même graine, +{wowsims.STAT_DELTA:g} "
                      "points par statistique) dans les conditions de la tranche ; gain de dégâts par seconde par point")  # fmt: skip
+    if any(r.get("weapon") for r in rows):
+        notes.append("type d'arme : quand l'arme proposée n'est pas du type de celle du préréglage de wowsims "
+                     "(weaponType de la base des simulateurs), la meilleure arme de ce type de la réserve de candidats "
+                     "au niveau est essayée (main droite puis main gauche, rotation retenue, même graine) ; l'ensemble "
+                     "qui fait le plus de dégâts est gardé (weapon : choix et écart)")  # fmt: skip
     if any(r.get("unknown_items") for r in rows):
         notes.append("objets choisis absents de la base de wowsims (unknown_items) : emplacement laissé vide, dégâts "
                      "sous-estimés")  # fmt: skip
@@ -410,6 +538,7 @@ def run_from_sources(
     elif path == "none":
         notes.append("talents : aucun")
     picks_at: Callable[[int], Sequence[Mapping[str, Any]]] | None = None
+    candidates_at: Callable[[int], Sequence[Mapping[str, Any]]] | None = None
     if gear == "gearquest":
         from forever.gear import gear_report
         from forever.sims.engines import ClassTalents
@@ -423,6 +552,10 @@ def run_from_sources(
                               spec=gear_spec)  # fmt: skip
             return list(doc.get("picks") or [])
 
+        def candidates_at(level: int) -> Sequence[Mapping[str, Any]]:
+            # réserve où chercher une arme du type de celle du préréglage (GearQuest, Naowh, Forever Companion)
+            return pool_from_sources(deps, class_name, str(gear_spec), level, race or "Orc")[0]
+
         notes.append(f"équipement : choix de GearQuest ({gear_spec}) au niveau de chaque tranche "
                      "(forever_gear action=leveling)")  # fmt: skip
     else:
@@ -434,7 +567,7 @@ def run_from_sources(
                  "fichier(s) de SavedVariables (connexion et montée de niveau, ForeverLogger 0.8.0)")  # fmt: skip
     out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
                        iterations=iterations, anchors=anchors, stats=stats, reference=reference,
-                       conditions=conditions)  # fmt: skip
+                       conditions=conditions, candidates_at=candidates_at)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out
 

@@ -1901,6 +1901,12 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
             else:
                 lines.append(f"  {row['bracket']} (niveau {row['level']}) : {row['dps']:.1f} DPS (écart type "
                              f"{row['stdev']:.1f}), équipement {row['equipment']}")  # fmt: skip
+                if row.get("weapon"):
+                    wp = row["weapon"]
+                    text = f"    arme : {wp['choice']} (type du préréglage : {wp['reference_type']}"
+                    if "chosen" in wp:
+                        text += f", {wp['chosen']} : {wp['delta']:+.1f} DPS contre {wp['proposed']}"
+                    lines.append(text + (f" ; {wp['note']}" if wp.get("note") else "") + ")")
                 if row.get("weights"):
                     w = row["weights"]
                     lines.append("    priorité : " + " > ".join(f"{s.removeprefix('Stat')} {w['normalised'][s]:.2f}"
