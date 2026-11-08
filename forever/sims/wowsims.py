@@ -413,6 +413,9 @@ BASE_STATS_FLAG = "--forever-base-stats="  # fichier lu par le correctif 0003-ba
 BASE_STATS_PATCH = "0003-base-stats.patch"
 ITEMS_FLAG = "--forever-items="  # fichier d'objets ajoutés, lu par le correctif 0004-items
 ITEMS_PATCH = "0004-items.patch"
+PET_STATS_FLAG = "--forever-pet-stats="  # valeurs de créature au niveau pour les familiers, lues par le correctif 0006-pets
+PETS_PATCH = "0006-pets.patch"
+PETS_KEY = "pets"  # clé du document des statistiques de base passée à part (forever.sims.base_stats.base_stats_doc)
 
 
 def reference_encounter(presets: Sequence[Preset]) -> dict[str, Any] | None:
@@ -499,6 +502,14 @@ def run_sim(
             f"le binaire épinglé de wowsims n'a pas le correctif {BASE_STATS_PATCH} (statistiques de base au niveau).",
             "lancer `uv run forever sims update` (recompilation avec les correctifs)",
         )
+    pets = (base_stats or {}).get(PETS_KEY)
+    if pets is not None:
+        if PETS_PATCH not in ((pin.get("patches") or {}).get("files") or []):
+            raise WowsimsError(
+                f"le binaire épinglé de wowsims n'a pas le correctif {PETS_PATCH} (familiers au niveau).",
+                "lancer `uv run forever sims update` (recompilation avec les correctifs)",
+            )
+        base_stats = {k: v for k, v in (base_stats or {}).items() if k != PETS_KEY}
     runs = wowsims_dir(cache_dir) / "runs"
     runs.mkdir(parents=True, exist_ok=True)
     name = uuid.uuid4().hex[:12]
@@ -511,6 +522,10 @@ def run_sim(
         extra.append(f"{BASE_STATS_FLAG}{statsfile}")
     if items is not None:
         extra.append(f"{ITEMS_FLAG}{items}")
+    petsfile = runs / f"{name}.pets.json"
+    if pets is not None:
+        petsfile.write_text(json.dumps(pets), encoding="utf-8")
+        extra.append(f"{PET_STATS_FLAG}{petsfile}")
     try:
         gitops._run(
             runner or gitops.subprocess_runner,
@@ -535,6 +550,7 @@ def run_sim(
         infile.unlink(missing_ok=True)
         outfile.unlink(missing_ok=True)
         statsfile.unlink(missing_ok=True)
+        petsfile.unlink(missing_ok=True)
     if result.get("error"):
         err = result["error"]
         message = str(err.get("message", err) if isinstance(err, dict) else err).split("\nStack Trace", 1)[0]
@@ -553,6 +569,7 @@ def run_sim(
             "level": level if level is not None else MAX_LEVEL,
             "base_stats": base_stats is not None,
             "extra_items": items is not None,
+            "pet_stats": pets is not None,
             "certainty": "suppose",
         },
     }

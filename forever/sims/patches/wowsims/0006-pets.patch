@@ -1,0 +1,178 @@
+diff --git a/cmd/wowsimcli/cmd/basic_sim.go b/cmd/wowsimcli/cmd/basic_sim.go
+index cc3f1b3..da47dfc 100644
+--- a/cmd/wowsimcli/cmd/basic_sim.go
++++ b/cmd/wowsimcli/cmd/basic_sim.go
+@@ -32,6 +32,7 @@ func init() {
+ 	simCmd.Flags().Int32("forever-level", 60, "forever : niveau du personnage simulé (1 à 60)")
+ 	simCmd.Flags().String("forever-base-stats", "", "forever : fichier des statistiques de base au niveau (lu par sim/core)")
+ 	simCmd.Flags().String("forever-items", "", "forever : fichier d'objets ajoutés à la base (lu par sim/core)")
++	simCmd.Flags().String("forever-pet-stats", "", "forever : fichier des valeurs de créature au niveau, pour les familiers (lu par sim/core)")
+ }
+ 
+ func simMain(cmd *cobra.Command, args []string) {
+diff --git a/sim/core/forever_pet_stats.go b/sim/core/forever_pet_stats.go
+new file mode 100644
+index 0000000..2324053
+--- /dev/null
++++ b/sim/core/forever_pet_stats.go
+@@ -0,0 +1,56 @@
++package core
++
++// forever (SIM2, décision 305) : valeurs de créature (ExpectedStat du client) au niveau du personnage, d'où les
++// familiers tirent leurs PV, leur armure, leur puissance d'attaque et leurs dégâts, lues dans le fichier donné par
++// --forever-pet-stats=<fichier.json> (écrit par forever depuis ses données du client). Sans l'option, les valeurs
++// du niveau 60 (CreatureHealthMaxLevel, etc.) restent, donc le comportement d'origine. Le fichier ne porte que des
++// valeurs ; ce code n'en contient aucune.
++//
++// Clés : creature_health, creature_armor, creature_auto_attack_dps (ligne d'ExpectedStat au niveau du personnage).
++
++import (
++	"encoding/json"
++	"os"
++	"strings"
++)
++
++const ForeverPetStatsFlag = "--forever-pet-stats="
++
++// Valeurs de créature lues par les familiers (Chasseur, faucons, démons) : celles du niveau 60 sans l'option.
++var (
++	ForeverCreatureHealth        float64 = CreatureHealthMaxLevel
++	ForeverCreatureArmor         float64 = CreatureArmorMaxLevel
++	ForeverCreatureAutoAttackDps float64 = CreatureAutoAttackDpsMaxLevel
++)
++
++type foreverPetStats struct {
++	CreatureHealth        *float64 `json:"creature_health"`
++	CreatureArmor         *float64 `json:"creature_armor"`
++	CreatureAutoAttackDps *float64 `json:"creature_auto_attack_dps"`
++}
++
++func init() {
++	path := ""
++	for _, arg := range os.Args[1:] {
++		if value, ok := strings.CutPrefix(arg, ForeverPetStatsFlag); ok {
++			path = value
++		}
++	}
++	if path == "" {
++		return
++	}
++	raw, err := os.ReadFile(path)
++	if err != nil {
++		panic("forever: --forever-pet-stats illisible : " + err.Error())
++	}
++	var doc foreverPetStats
++	if err := json.Unmarshal(raw, &doc); err != nil {
++		panic("forever: --forever-pet-stats invalide : " + err.Error())
++	}
++	if doc.CreatureHealth == nil || doc.CreatureArmor == nil || doc.CreatureAutoAttackDps == nil {
++		panic("forever: --forever-pet-stats attend creature_health, creature_armor et creature_auto_attack_dps")
++	}
++	ForeverCreatureHealth = *doc.CreatureHealth
++	ForeverCreatureArmor = *doc.CreatureArmor
++	ForeverCreatureAutoAttackDps = *doc.CreatureAutoAttackDps
++}
+diff --git a/sim/hunter/pets.go b/sim/hunter/pets.go
+index aff2314..4df16e9 100644
+--- a/sim/hunter/pets.go
++++ b/sim/hunter/pets.go
+@@ -38,12 +38,12 @@ var petAttackSpeeds = map[proto.HunterOptions_PetAttackSpeed]spelldata.Ladder{
+ // fits with ~1.1 health a point of the owner's Stamina, and half of it with the warlock's 7.5. The creature
+ // health is kept until a second reading at another Stamina.
+ var petBaseStats = stats.Stats{
+-	stats.Health:      core.CreatureHealthMaxLevel,
+-	stats.Armor:       core.CreatureArmorMaxLevel,
++	stats.Health:      core.ForeverCreatureHealth, // forever (SIM2) : valeurs de créature au niveau
++	stats.Armor:       core.ForeverCreatureArmor,
+ 	stats.AttackPower: petAttackPower,
+ }
+ 
+-const petAttackPower = 0.3 * 14 * core.CreatureAutoAttackDpsMaxLevel
++var petAttackPower = 0.3 * 14 * core.ForeverCreatureAutoAttackDps // forever (SIM2) : valeur de créature au niveau
+ 
+ // The creature dps is the pet's auto attack damage with its own attack power in it, so the swing before
+ // attack power is the creature dps less that attack power over 14, over the 2.0 s, spanning 20% either side:
+@@ -51,7 +51,7 @@ const petAttackPower = 0.3 * 14 * core.CreatureAutoAttackDpsMaxLevel
+ // with Unleashed Fury 5/5, are this swing plus attack power over 14, over the swing as sped up, with the Cat's
+ // +10% and happiness. The pet sheet shows the whole creature dps as the weapon and leaves happiness out, so
+ // its damage range is not the damage the pet deals.
+-const petSwingAverage = (core.CreatureAutoAttackDpsMaxLevel - petAttackPower/14) * 2
++var petSwingAverage = (core.ForeverCreatureAutoAttackDps - petAttackPower/14) * 2
+ 
+ var petSwing = core.Weapon{
+ 	BaseDamageMin: petSwingAverage * (1 - 0.2),
+diff --git a/sim/hunter/summon_hawk.go b/sim/hunter/summon_hawk.go
+index 8106d47..b575019 100644
+--- a/sim/hunter/summon_hawk.go
++++ b/sim/hunter/summon_hawk.go
+@@ -37,7 +37,7 @@ func (hawk *HawkPet) ExecuteCustomRotation(sim *core.Simulation) {
+ // ranged attack power and 30% of the owner's armor on top. The row that scales a hawk, Hunter Guardian
+ // Hawk Pet Scaling 01 (1293586), is not in the store, so the swing below is fitted to those logs.
+ var hawkBaseStats = stats.Stats{
+-	stats.Health: 0.05 * core.CreatureHealthMaxLevel,
++	stats.Health: 0.05 * core.ForeverCreatureHealth, // forever (SIM2) : valeur de créature au niveau
+ }
+ 
+ // A swing before armor read 0.0815 of the creature dps over the 2.5 s, spanning a third either side, plus
+@@ -45,7 +45,7 @@ var hawkBaseStats = stats.Stats{
+ // are fitted (3.3-6.7 plus 0.0179 × ranged attack power at level 30), not stated in the game files, and
+ // were read with Unleashed Fury 5/5, which reaches the hawks, so the swing here is before it.
+ var hawkLogDamageMultiplier = spellData.UnleashedFury.MultiplierAt(5)
+-var hawkSwingAverage = 0.0815 * core.CreatureAutoAttackDpsMaxLevel * 2.5 / hawkLogDamageMultiplier
++var hawkSwingAverage = 0.0815 * core.ForeverCreatureAutoAttackDps * 2.5 / hawkLogDamageMultiplier
+ 
+ var hawkSwing = core.Weapon{
+ 	BaseDamageMin:     hawkSwingAverage * (1 - 1.0/3),
+diff --git a/sim/warlock/pets.go b/sim/warlock/pets.go
+index 9264ce3..e25fe12 100644
+--- a/sim/warlock/pets.go
++++ b/sim/warlock/pets.go
+@@ -49,12 +49,13 @@ type petModel struct {
+ //
+ // The Sayaad's average swing before attack power: 0.698 of the creature dps at 2.0 s. Its sheet's damage range
+ // spans 22.8% either side of the average at level 20 and 20.7% at 30, so 21.5%.
+-const sayaadSwingAverage = 0.698 * core.CreatureAutoAttackDpsMaxLevel * 2
++// forever (SIM2) : valeurs de créature au niveau du personnage (core.ForeverCreature*, forever_pet_stats.go).
++var sayaadSwingAverage = 0.698 * core.ForeverCreatureAutoAttackDps * 2
+ 
+ // The Voidwalker's average swing before attack power and before its melee is halved: 0.494 of the creature dps
+ // at 2.0 s, spanning 26.4% either side. The best fit to three level 30 sheets at attack power 96, 108 and 116
+ // (16-22, 17-23 and 17-24).
+-const voidwalkerSwingAverage = 0.494 * core.CreatureAutoAttackDpsMaxLevel * 2
++var voidwalkerSwingAverage = 0.494 * core.ForeverCreatureAutoAttackDps * 2
+ 
+ // The sheet gives no crit from Agility or Intellect, and a demon's own stats give no regen. A demon has
+ // no crit of its own: its crit is the warlock's (see petStatInheritance). The Imp's, Voidwalker's and Sayaad's
+@@ -69,8 +70,8 @@ var petModels = map[proto.WarlockOptions_Summon]petModel{
+ 			stats.Intellect: 264,
+ 			stats.Spirit:    260,
+ 
+-			stats.Health: 0.359 * core.CreatureHealthMaxLevel,
+-			stats.Armor:  0.325 * core.CreatureArmorMaxLevel,
++			stats.Health: 0.359 * core.ForeverCreatureHealth,
++			stats.Armor:  0.325 * core.ForeverCreatureArmor,
+ 			stats.Mana:   576,
+ 		},
+ 		healthPerStamina:     0,
+@@ -80,8 +81,8 @@ var petModels = map[proto.WarlockOptions_Summon]petModel{
+ 		damageMod:            1,
+ 	},
+ 	proto.WarlockOptions_Voidwalker: {
+-		baseStats: meleeDemonStats(1.400 * core.CreatureHealthMaxLevel).Add(stats.Stats{
+-			stats.Armor: 1.352 * core.CreatureArmorMaxLevel,
++		baseStats: meleeDemonStats(1.400 * core.ForeverCreatureHealth).Add(stats.Stats{
++			stats.Armor: 1.352 * core.ForeverCreatureArmor,
+ 			// TODO: 3 × level + 6 as the Sayaad's, read at level 30 only.
+ 			stats.AttackPower: 186,
+ 		}),
+@@ -96,8 +97,8 @@ var petModels = map[proto.WarlockOptions_Summon]petModel{
+ 		damageMod: 0.5,
+ 	},
+ 	proto.WarlockOptions_Succubus: {
+-		baseStats: meleeDemonStats(0.699 * core.CreatureHealthMaxLevel).Add(stats.Stats{
+-			stats.Armor: 0.630 * core.CreatureArmorMaxLevel,
++		baseStats: meleeDemonStats(0.699 * core.ForeverCreatureHealth).Add(stats.Stats{
++			stats.Armor: 0.630 * core.ForeverCreatureArmor,
+ 			// TODO: 3 × level + 6, a line through levels 20 and 30, not yet read at 60.
+ 			stats.AttackPower: 186,
+ 		}),

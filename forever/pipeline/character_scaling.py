@@ -24,6 +24,8 @@ CHARACTER_FILE = "character_scaling.json"
 CHARACTER_FILES = (CHARACTER_FILE,)
 SCHEMA_VERSION = 1
 PLAYER_KEYS = ("base_mana", "spell_crit_per_intellect", "crit_per_agility", "hp_per_stamina")
+# Valeurs de créature d'ExpectedStat par niveau (clé de `creature` -> colonne), lues par le correctif 0006-pets.
+CREATURE_COLUMNS = {"health": "CreatureHealth", "armor": "CreatureArmor", "auto_attack_dps": "CreatureAutoAttackDps"}
 
 GameTable = list[dict[str, float]]
 
@@ -182,6 +184,10 @@ def decode_character_scaling(
             for r in sorted(tables["Exhaustion"], key=lambda r: int(r["ID"]))
         ],
         "armor_constant": [float(armor_rows[lv]["ArmorConstant"]) for lv in range(1, cap + 1)],
+        # SIM2 (correctif 0006-pets) : valeurs de créature par niveau, d'où wowsims tire PV, armure et dégâts des familiers
+        "creature": {
+            key: [float(armor_rows[lv][column]) for lv in range(1, cap + 1)] for key, column in CREATURE_COLUMNS.items()
+        },
         "kill_xp": _kill_xp(spec.get("kill_xp"), gametables, cap),
         "notes": [
             (
@@ -189,6 +195,7 @@ def decode_character_scaling(
                 "recoupé par la GameTable hppersta) ; non utilisée par le moteur (PV de base absents du client)"
             ),
             "armor_constant : table lue par le serveur inconnue (probable) ; armormitigationbylvl en écart",
+            "creature : PV, armure et DPS d'attaque d'une créature par niveau (ExpectedStat), familiers de wowsims (0006-pets)",
             "hp_regen : courbes de régénération de PV par l'Esprit ; formule qui les combine au serveur, non utilisée",
             "rested : paliers du repos (D7), lus par le modèle d'XP (forever/engine/xp.py)",
             "kill_xp : XP d'un monstre normal de même niveau (GameTable xp, colonne PerKill) ; None sans la GameTable",

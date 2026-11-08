@@ -222,6 +222,7 @@ def run_brackets(
                 seen.add(mark)
                 rotations.append((other.key, other.rotation))
     with_patch = bs.PATCH in ((pin.get("patches") or {}).get("files") or [])
+    with_pets = wowsims.PETS_PATCH in ((pin.get("patches") or {}).get("files") or [])
     items_path, items_ids, items_note = (
         extra_items(deps.cache_dir)
         if ITEMS_PATCH in ((pin.get("patches") or {}).get("files") or [])
@@ -255,11 +256,13 @@ def run_brackets(
                                equipment=equipment_from_picks(picks))  # fmt: skip
             fight = encounter_at(encounter, target_level(encounter, level, conditions), crush=conditions == "raid")
             if with_patch:
+                pets = bs.client_pet_stats(deps, level) if with_pets and level < wowsims.MAX_LEVEL else None
                 doc = bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level),
-                                        anchors or [])  # fmt: skip
+                                        anchors or [], pets=pets)  # fmt: skip
                 row["base_stats"] = "mana de base et critique par point du client au niveau ; " + bs.anchor_note(
                     anchors or [], level
                 )
+                row["pets"] = bs.pet_note(pets, level, pinned=with_pets)
             else:
                 doc = None
                 row["base_stats"] = (f"statistiques de base du niveau 60 : binaire sans le correctif {bs.PATCH} "
@@ -516,8 +519,9 @@ def optimise_gear(
         raise InvalidArgumentError(f"Talents illégaux au niveau {level} : {' ; '.join(problems)}.",
                                    "corriger le parcours de talents")  # fmt: skip
     files = (pin.get("patches") or {}).get("files") or []
-    doc = (bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level), anchors or [])
-           if bs.PATCH in files else None)  # fmt: skip
+    pets = bs.client_pet_stats(deps, level) if wowsims.PETS_PATCH in files and level < wowsims.MAX_LEVEL else None
+    doc = (bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level), anchors or [],
+                             pets=pets) if bs.PATCH in files else None)  # fmt: skip
     items_path, items_ids, items_note = extra_items(deps.cache_dir) if ITEMS_PATCH in files else (None, set(), None)
     known = known_items(wowsims_dir(deps.cache_dir) / "forever")
     known = None if known is None else known | items_ids

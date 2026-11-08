@@ -2447,3 +2447,20 @@ mechanics:
       - tests/unit/test_addon_logger_attributes.py::test_level_up_keeps_attributes_and_gains
     tolerance: null
     note: "SIM2 blocs 4 et 5 (décision 305) : mana et critique par point du client (certain pour la table, probable pour son usage par wowsims) ; attributs sans équipement : suppose tant que la lecture effectif - bonus - malus n'est pas vérifiée en jeu nu, et entre deux relevés (interpolation linéaire) ; sans relevé au niveau ou en dessous, attributs du niveau 60 (dégâts surestimés, dit ligne par ligne) ; PV de base du niveau 60 (sans effet sur les dégâts) ; multiplicateurs raciaux d'attribut (Esprit humain) supposés compris dans le relevé"
+  - id: L16
+    categorie: simulateurs
+    description: "Familiers (Chasseur, faucons, démons du Démoniste) au niveau du personnage dans le simulateur de la communauté (wowsims/forever corrigé)"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "Client, table ExpectedStat (ExpansionID -2, ContentSetID 0) : CreatureHealth, CreatureArmor, CreatureAutoAttackDps par niveau, rangées par forever decode dans character_scaling.json (bloc creature)"
+      - "wowsims/forever (MIT), sim/hunter/pets.go, summon_hawk.go, sim/warlock/pets.go : PV, armure, puissance d'attaque et frappe des familiers tirés des valeurs de créature du niveau (constantes du 60 dans base_stats_auto_gen.go)"
+      - "forever/sims/patches/wowsims/0006-pets.patch : valeurs de créature lues dans --forever-pet-stats=<fichier> (aucune valeur de jeu dans le correctif) ; sans l'option, celles du 60"
+    tests:
+      - tests/unit/test_sims_pet_stats.py::test_repository_patch_reads_creature_values_from_a_file
+      - tests/unit/test_sims_pet_stats.py::test_creature_values_are_decoded_per_level_from_expected_stat
+      - tests/unit/test_sims_pet_stats.py::test_pet_stats_file_is_passed_apart_then_removed
+      - tests/unit/test_sims_pet_stats.py::test_brackets_say_pets_keep_level_60_values_without_client_data
+    tolerance: null
+    note: "SIM2 (décision 305) : table du client certaine, son usage par wowsims probable (parts mesurées par wowsims aux niveaux 11 à 30). Le bloc creature n'est dans les données qu'après le prochain forever decode/update : d'ici là familiers aux valeurs du 60 (surestimés, dit ligne par ligne). Non corrigé : attributs fixes des démons (Force, Intelligence, puissance d'attaque du Voidwalker et de la Succube, mana du Diablotin) saisis par wowsims au 60 ; PV par Endurance du maître non relevés"
