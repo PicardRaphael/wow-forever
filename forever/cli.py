@@ -546,6 +546,7 @@ def build_parser() -> argparse.ArgumentParser:
     s_brk.add_argument("--iterations", type=int, default=None, help="combats par tranche (défaut de l'outil)")
     s_brk.add_argument("--stats", default=None, help="poids de ces statistiques par tranche, ex. Intellect,SpellDamage")
     s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
+    s_brk.add_argument("--conditions", default="solo", choices=["solo", "group", "raid"], help="conditions du combat")
     s_gear = sims_sub.add_parser("gear", help="optimisation de l'équipement par emplacement au niveau (SIM2)")
     s_gear.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
     s_gear.add_argument("--race", required=True, help="race du joueur")
@@ -1855,8 +1856,8 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
 
         doc = simulate(deps, "brackets", preset=args.preset, race=args.race, brackets=args.brackets, path=args.path,
                        gear=args.gear, spec=args.spec, iterations=args.iterations, stats=args.stats,
-                       reference=args.reference)  # fmt: skip
-        lines = [f"Dégâts par tranche, {doc['preset']} ({doc['race']}, wowsims corrigé, solo) :"]
+                       reference=args.reference, conditions=args.conditions)  # fmt: skip
+        lines = [f"Dégâts par tranche, {doc['preset']} ({doc['race']}, wowsims corrigé, {doc['conditions']}) :"]
         for row in doc["rows"]:
             if "error" in row:
                 lines.append(f"  {row['bracket']} (niveau {row['level']}) : {row['error']['message']}")

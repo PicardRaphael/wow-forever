@@ -474,6 +474,7 @@ def build_server(deps: Deps) -> MCPServer:
         level: int | None = None,
         equipped: str | None = None,
         candidates: str | None = None,
+        conditions: str = "solo",
     ) -> dict[str, Any]:
         """Calculs de wowsims/forever (et de MythicSim, MS1) au niveau 60 seulement, toutes classes (décisions 293 et 294 : simulateur
         maintenu par d'autres, compilé tel quel, épinglé) : `action="presets"` préréglages du dépôt (`key` :
@@ -499,7 +500,9 @@ def build_server(deps: Deps) -> MCPServer:
         (séparées par des virgules) et `reference` : poids des statistiques de chaque tranche (tirages appariés).
         `action="gear"` : optimisation de l'équipement au niveau `level` sur `preset` pour `race` : `equipped`
         (« Emplacement:objet,… », emplacements de wowsims), `candidates` (même forme ; défaut : choix de GearQuest au
-        niveau) ; chaque candidat essayé à sa place, gain, seuil de bruit, verdict « meilleur » ou « non départagé ». Les
+        niveau) ; chaque candidat essayé à sa place, gain, seuil de bruit, verdict « meilleur » ou « non départagé ».
+        `conditions` (brackets) : `solo` (leveling, défaut), `group` (buffs du préréglage), `raid` (buffs,
+        consommables, boss au-dessus : comparable aux classements de MythicSim). Les
         hypothèses de la provenance disent ce qui reste au niveau 60 (attributs de base) : les citer."""
         from forever.sims.report import simulate
 
@@ -508,7 +511,7 @@ def build_server(deps: Deps) -> MCPServer:
                             iterations=iterations, cases=cases, consumables=consumables, talents=talents,
                             engine=engine, rotation=rotation, max_steps=max_steps, popular=popular, brackets=brackets,
                             path=path, gear=gear, spec=spec, level=level, equipped=equipped,
-                            candidates=candidates)  # fmt: skip
+                            candidates=candidates, conditions=conditions)  # fmt: skip
         except ForeverError as err:
             return cast(dict[str, Any], _error_result(deps, err))
 

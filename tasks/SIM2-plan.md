@@ -251,3 +251,4 @@ Chaque calcul par tranche (10-19 … 60, ou un niveau) doit couvrir, et pouvoir 
   MythicSim et ses classements, ex. Mage Givre 741 contre 744,5 chez nous).
 - **Sortie de synthèse** : par tranche, le meilleur choix (spé, race, rotation, équipement, cible) et l'écart avec le
   suivant, provenance complète.
+- **Bloc 11 fait** : conditions solo (défaut), groupe, raid.

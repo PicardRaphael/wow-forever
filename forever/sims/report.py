@@ -52,6 +52,7 @@ def simulate(
     level: int | None = None,
     equipped: str | None = None,
     candidates: str | None = None,
+    conditions: str = "solo",
 ) -> dict[str, Any]:
     """`action` : `presets` (liste, objets équipés de chacun), `races` (races séparées par des virgules, sur
     `preset`), `weights` (statistiques séparées par des virgules, rapportées à `reference`, `race` du joueur exigée),
@@ -87,7 +88,8 @@ def simulate(
             raise InvalidArgumentError(f"reference « {reference} » absente de stats.",
                                        "donner reference parmi stats (ex. SpellDamage)")  # fmt: skip
         return run_from_sources(deps, preset=preset, race=race, brackets=brackets, path=path, gear=gear, spec=spec,
-                                iterations=iterations, stats=wanted or None, reference=ref)  # fmt: skip
+                                iterations=iterations, stats=wanted or None, reference=ref,
+                                conditions=conditions)  # fmt: skip
     pin = pinned(deps.cache_dir)
     if pin is None:
         raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")
@@ -106,10 +108,10 @@ def simulate(
             pairs.append((by_key[key], wowsims.race_enum(race_name)))
         kw: dict[str, Any] = {"iterations": iterations} if iterations else {}
         if engine == "wowsims" and not talents:  # comparaison d'avant MS1, inchangée
-            rows, conditions = wowsims.compare_presets(
+            rows, fight_conditions = wowsims.compare_presets(
                 deps.cache_dir, pairs, wowsims.reference_encounter(presets), consumables=consumables, **kw
             )
-            return {"level": LEVEL, "engine": engine, "rows": rows, "conditions": conditions, "provenance": provenance}
+            return {"level": LEVEL, "engine": engine, "rows": rows, "conditions": fight_conditions, "provenance": provenance}
         return engines.compare(deps, pairs, presets, engine=engine, talents=talents, consumables=consumables,
                                rotation=rotation, ws_note=wowsims.source_note(pin), **kw)  # fmt: skip
     if action == "builds":

@@ -126,13 +126,42 @@ def solo_preset(preset: Preset, *, talents: str, equipment: dict[str, Any]) -> P
                                individual_buffs={}, debuffs={}, consumables={})  # fmt: skip
 
 
-def encounter_at(encounter: dict[str, Any] | None, level: int) -> dict[str, Any]:
-    """Copie de la rencontre dont chaque cible est au niveau `level` (sans coups écrasants)."""
+def encounter_at(encounter: dict[str, Any] | None, level: int, *, crush: bool = False) -> dict[str, Any]:
+    """Copie de la rencontre dont chaque cible est au niveau `level` (coups écrasants seulement si `crush`)."""
     out = copy.deepcopy(encounter) if encounter else {"targets": [{}]}
     for target in out.get("targets") or []:
         target["level"] = level
-        target["canCrush"] = False
+        target["canCrush"] = crush
     return out
+
+
+CONDITIONS = ("solo", "group", "raid")  # leveling seul (défaut), groupe de donjon, raid
+CONDITION_NOTES = {
+    "solo": "conditions solo : aucun buff, affaiblissement ni consommable ; cible du niveau du personnage",
+    "group": ("conditions groupe : buffs et affaiblissements du préréglage de wowsims (rangs au niveau), aucun "
+              "consommable ; cible du niveau du personnage"),
+    "raid": ("conditions raid : buffs, affaiblissements et consommables du préréglage de wowsims (consommables du "
+             "préréglage, même sous leur niveau requis) ; boss au-dessus du personnage, écart de la rencontre de "
+             "référence de wowsims, coups écrasants permis"),
+}  # fmt: skip
+
+
+def conditioned(preset: Preset, conditions: str, *, talents: str, equipment: dict[str, Any]) -> Preset:
+    """Préréglage aux conditions voulues (voir CONDITIONS) avec les talents et l'équipement donnés."""
+    if conditions == "solo":
+        return solo_preset(preset, talents=talents, equipment=equipment)
+    if conditions == "group":
+        return dataclasses.replace(preset, talents=talents, equipment=equipment, consumables={})
+    return dataclasses.replace(preset, talents=talents, equipment=equipment)
+
+
+def target_level(encounter: dict[str, Any] | None, level: int, conditions: str) -> int:
+    """Niveau de la cible : celui du personnage, ou en raid celui du boss de la rencontre de référence de wowsims
+    rapporté au personnage (même écart au niveau maximal, jamais au-dessus du boss de référence)."""
+    if conditions != "raid":
+        return level
+    ref = max((int(t.get("level") or 0) for t in (encounter or {}).get("targets") or []), default=level)
+    return min(level + max(0, ref - wowsims.MAX_LEVEL), ref)
 
 
 def _legality(deps: Deps, class_name: str) -> tuple[Any, Callable[[dict[str, int], int], list[str]]]:
@@ -160,12 +189,15 @@ def run_brackets(
     anchors: Sequence[Mapping[str, Any]] | None = None,
     stats: Sequence[str] | None = None,
     reference: str | None = None,
+    conditions: str = "solo",
 ) -> dict[str, Any]:
     """Un combat par tranche (voir le module) ; une ligne par tranche : niveau, talents, équipement, dégâts par
     seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche."""
     from forever.sims.engines import class_of
 
     wanted = parse_brackets(brackets)
+    if conditions not in CONDITIONS:
+        raise InvalidArgumentError(f"conditions inconnues : « {conditions} ».", "choisir " + ", ".join(CONDITIONS))
     if not race:
         raise InvalidArgumentError("Race manquante.", "demander la race au joueur (question ou profil), puis race=…")
     pin = pinned(deps.cache_dir)
@@ -208,8 +240,10 @@ def run_brackets(
             if unknown:  # objet absent de la base de wowsims : écarté et nommé, jamais remplacé (dégâts sous-estimés)
                 row["unknown_items"] = unknown
                 picks = [p for p in picks if int(p["item"]) not in unknown]
-            case = solo_preset(chosen, talents=conv.wowsims.encode(keys), equipment=equipment_from_picks(picks))
-            request = wowsims.request_for(case, race=race_token, encounter=encounter_at(encounter, level),
+            case = conditioned(chosen, conditions, talents=conv.wowsims.encode(keys),
+                               equipment=equipment_from_picks(picks))  # fmt: skip
+            fight = encounter_at(encounter, target_level(encounter, level, conditions), crush=conditions == "raid")
+            request = wowsims.request_for(case, race=race_token, encounter=fight,
                                           iterations=iterations or wowsims.DEFAULT_ITERATIONS)  # fmt: skip
             if with_patch:
                 doc = bs.base_stats_doc(chosen.class_token, bs.client_scaling(deps, class_of(chosen), level),
@@ -227,7 +261,7 @@ def run_brackets(
                 try:
                     w = wowsims.stat_weights(
                         deps.cache_dir, case, list(stats), reference=reference or stats[0], race=race_token,
-                        encounter=encounter_at(encounter, level), iterations=iterations or wowsims.DEFAULT_ITERATIONS,
+                        encounter=fight, iterations=iterations or wowsims.DEFAULT_ITERATIONS,
                         runner=runner, level=level, base_stats=doc, items=items_path,
                     )  # fmt: skip
                     row["weights"] = {k: w[k] for k in ("per_point", "normalised", "reference", "delta", "base_dps")}
@@ -238,14 +272,14 @@ def run_brackets(
             continue
         rows.append({**row, "talents_string": case.talents, "equipment": [p["item"] for p in picks] if picks else "nu",
                      **out})  # fmt: skip
-    notes = [wowsims.source_note(pin), *NOTES, *([items_note] if items_note else [])]
+    notes = [wowsims.source_note(pin), CONDITION_NOTES[conditions], *NOTES[1:], *([items_note] if items_note else [])]
     if stats:
         notes.append(f"poids des statistiques par tranche : tirages appariés (même graine, +{wowsims.STAT_DELTA:g} "
                      "points par statistique) dans les conditions de la tranche ; gain de dégâts par seconde par point")  # fmt: skip
     if any(r.get("unknown_items") for r in rows):
         notes.append("objets choisis absents de la base de wowsims (unknown_items) : emplacement laissé vide, dégâts "
                      "sous-estimés")  # fmt: skip
-    return {"preset": chosen.key, "race": race_token, "rows": rows,
+    return {"preset": chosen.key, "race": race_token, "conditions": conditions, "rows": rows,
             "provenance": local_provenance(deps, certainty="suppose", assumptions=notes)}  # fmt: skip
 
 
@@ -313,6 +347,7 @@ def run_from_sources(
     iterations: int | None = None,
     stats: Sequence[str] | None = None,
     reference: str | None = None,
+    conditions: str = "solo",
 ) -> dict[str, Any]:
     """`run_brackets` avec les sources installées : parcours `path` (plan de leveling ou aucun) et équipement `gear`
     (choix de GearQuest au niveau de chaque tranche, ou nu)."""
@@ -369,7 +404,8 @@ def run_from_sources(
     notes.append(f"relevés d'attributs de ForeverLogger : {len(anchors)} point(s) de la classe dans {len(files)} "
                  "fichier(s) de SavedVariables (connexion et montée de niveau, ForeverLogger 0.8.0)")  # fmt: skip
     out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
-                       iterations=iterations, anchors=anchors, stats=stats, reference=reference)  # fmt: skip
+                       iterations=iterations, anchors=anchors, stats=stats, reference=reference,
+                       conditions=conditions)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out
 
