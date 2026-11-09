@@ -1565,13 +1565,13 @@
         "/classes/Priest/spells/holyFire"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70862, frFR, sha256 b54bfd866db1…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 112833",
+      "source": "DBCache.bin du client (build 70862, enUS, sha256 a0cd64e5eda0…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 112833",
       "certainty": "certain",
       "pushes": [
         112833
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-09T06:26:01Z"
+      "dbcache_date": "2026-11-09T07:49:58Z"
     },
     {
       "file": "classes.json",
@@ -1583,13 +1583,13 @@
         "/classes/Paladin/trees/1/talents/13"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70862, frFR, sha256 b54bfd866db1…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113139",
+      "source": "DBCache.bin du client (build 70862, enUS, sha256 a0cd64e5eda0…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113139",
       "certainty": "certain",
       "pushes": [
         113139
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-09T06:26:01Z"
+      "dbcache_date": "2026-11-09T07:49:58Z"
     },
     {
       "file": "classes.json",
@@ -1598,13 +1598,13 @@
         "/classes/Shaman/trees/2/talents/15"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70862, frFR, sha256 b54bfd866db1…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113282",
+      "source": "DBCache.bin du client (build 70862, enUS, sha256 a0cd64e5eda0…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113282",
       "certainty": "certain",
       "pushes": [
         113282
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-09T06:26:01Z"
+      "dbcache_date": "2026-11-09T07:49:58Z"
     },
     {
       "file": "classes.json",
@@ -1616,13 +1616,13 @@
         "/classes/Shaman/spells/lightningBolt"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70862, frFR, sha256 b54bfd866db1…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113380",
+      "source": "DBCache.bin du client (build 70862, enUS, sha256 a0cd64e5eda0…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113380",
       "certainty": "certain",
       "pushes": [
         113380
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-09T06:26:01Z"
+      "dbcache_date": "2026-11-09T07:49:58Z"
     },
     {
       "file": "classes.json",
@@ -1631,13 +1631,13 @@
         "/classes/Druid/spells/starfire"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70862, frFR, sha256 b54bfd866db1…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113403",
+      "source": "DBCache.bin du client (build 70862, enUS, sha256 a0cd64e5eda0…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113403",
       "certainty": "certain",
       "pushes": [
         113403
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-09T06:26:01Z"
+      "dbcache_date": "2026-11-09T07:49:58Z"
     },
     {
       "file": "classes.json",
@@ -1646,13 +1646,27 @@
         "/classes/Warlock/trees/0/talents/16"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70862, frFR, sha256 b54bfd866db1…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113527",
+      "source": "DBCache.bin du client (build 70862, enUS, sha256 a0cd64e5eda0…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113527",
       "certainty": "certain",
       "pushes": [
         113527
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-09T06:26:01Z"
+      "dbcache_date": "2026-11-09T07:49:58Z"
+    },
+    {
+      "file": "races.json",
+      "paths": [
+        "/races/Tauren/racials/2"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin du client (build 70862, enUS, sha256 a0cd64e5eda0…), dispositions WoWDBDefs fb58b5b8ea8c ; poussée(s) 113791",
+      "certainty": "certain",
+      "pushes": [
+        113791
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-11-09T07:49:58Z"
     }
   ],
   "pending": [],
