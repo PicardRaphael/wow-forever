@@ -10245,7 +10245,7 @@
          "SpellEffect 1367620"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-08T16:18:49Z"
+        "dbcache_date": "2026-11-09T06:26:01Z"
        },
        "former_names": [
         "Oath of Light",
@@ -10609,7 +10609,7 @@
          "SpellEffect 698886"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-08T16:18:49Z"
+        "dbcache_date": "2026-11-09T06:26:01Z"
        }
       },
       {
@@ -11843,7 +11843,7 @@
        "SpellEffect 688696"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "hammerOfJustice": {
@@ -19065,7 +19065,7 @@
        "SpellEffect 1237445"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "hammerOfWrath": {
@@ -20524,7 +20524,7 @@
        "SpellEffect 1367620"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     }
    },
@@ -21402,7 +21402,7 @@
     {
      "node_id": 105003,
      "kept_node": null,
-     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.19.20261106 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45) à la rangée 4, colonne 4 ; absent de l'arbre en jeu : relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Chasseur, arbre Marksmanship : Improved Stings affiché, Improved Serpent Sting absent)"
+     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.20.20261108 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45) à la rangée 4, colonne 4 ; absent de l'arbre en jeu : relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Chasseur, arbre Marksmanship : Improved Stings affiché, Improved Serpent Sting absent)"
     }
    ],
    "dropped_edges": [
@@ -21423,11 +21423,11 @@
      "pos_y": 39300,
      "tier": 4,
      "col": 4,
-     "talents_forever": "Talents Forever 0.38.19.20261106 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45)",
+     "talents_forever": "Talents Forever 0.38.20.20261108 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45)",
      "status": "garé",
      "answered": "relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Chasseur, arbre Marksmanship : Improved Stings affiché, Improved Serpent Sting absent)",
-     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.19.20261106 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45) à la rangée 4, colonne 4 : question ouverte à créer",
-     "question": "Hunter : Improved Serpent Sting (improvedSerpentSting, nœud 105003) est-il dans l'arbre en jeu ? Le client le garde hors du canevas (PosY 39300, dix fois la grille ; rangée 4, colonne 4 une fois corrigé) et Talents Forever 0.38.19.20261106 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45) ne le confirme pas. Test : arbre de la classe en jeu ; réponse dans decode_rules.json (observed_absent ou observed_positions)."
+     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.20.20261108 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45) à la rangée 4, colonne 4 : question ouverte à créer",
+     "question": "Hunter : Improved Serpent Sting (improvedSerpentSting, nœud 105003) est-il dans l'arbre en jeu ? Le client le garde hors du canevas (PosY 39300, dix fois la grille ; rangée 4, colonne 4 une fois corrigé) et Talents Forever 0.38.20.20261108 (Data.lua build 1.60.1.70755, généré le 2026-11-05, empreinte fecfe730eb45) ne le confirme pas. Test : arbre de la classe en jeu ; réponse dans decode_rules.json (observed_absent ou observed_positions)."
     }
    ],
    "tree_checks": [
@@ -56042,7 +56042,7 @@
        "SpellEffect 693006"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "sort15008": {
@@ -61778,7 +61778,7 @@
          "SpellEffect 1072707"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-08T16:18:49Z"
+        "dbcache_date": "2026-11-09T06:26:01Z"
        }
       }
      ]
@@ -62740,7 +62740,7 @@
        "SpellEffect 691780"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "chainLightning": {
@@ -62859,7 +62859,7 @@
        "SpellEffect 688920"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "curePoison": {
@@ -64747,7 +64747,7 @@
        "SpellEffect 688559"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "flameShock": {
@@ -64919,7 +64919,7 @@
        "SpellEffect 704946"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "frostShock": {
@@ -65052,7 +65052,7 @@
        "SpellEffect 688813"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "stoneskinTotem": {
@@ -71624,7 +71624,7 @@
        "SpellEffect 1236796"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "rageOfTheFarseer": {
@@ -83432,7 +83432,7 @@
          "SpellEffect 1349556"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-08T16:18:49Z"
+        "dbcache_date": "2026-11-09T06:26:01Z"
        }
       }
      ]
@@ -94215,7 +94215,7 @@
        "SpellEffect 1349556"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     }
    },
@@ -99724,7 +99724,7 @@
        "SpellEffect 702704"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "catFormPassive": {
@@ -107046,7 +107046,7 @@
        "SpellEffect 1367722"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
+      "dbcache_date": "2026-11-09T06:26:01Z"
      }
     },
     "sort22571": {

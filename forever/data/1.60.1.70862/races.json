@@ -751,18 +751,7 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70862",
-     "hotfix": {
-      "pushes": [
-       113791
-      ],
-      "rows": [
-       "SpellCooldowns 96714",
-       "SpellCooldowns 102519"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-11-08T16:18:49Z"
-     }
+     "certainty": "FC-1.60.1.70862"
     },
     {
      "spell_id": 1259918,
