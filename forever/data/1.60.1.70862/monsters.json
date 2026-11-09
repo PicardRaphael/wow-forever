@@ -29,6 +29,9 @@
   "WoWCombatLog-110626_125830.txt",
   "WoWCombatLog-110626_180748.txt",
   "WoWCombatLog-110626_182926.txt",
+  "WoWCombatLog-110726_084816.txt",
+  "WoWCombatLog-110726_103443.txt",
+  "WoWCombatLog-110726_103623.txt",
   "WoWCombatLog-110726_115127.txt",
   "WoWCombatLog-110826_083108.txt",
   "WoWCombatLog-110826_102624.txt",
@@ -71,7 +74,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 120,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -85,14 +88,28 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 19 individu(s))",
      "questie_hp": 176,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 198,
-     "fought": true
+     "fought": null
+    }
+   }
+  },
+  "68": {
+   "name": "Guet de Hurlevent",
+   "zone_id": 1519,
+   "rank": 0,
+   "levels": {
+    "55": {
+     "max_hp": 10806,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 5228,
+     "fought": false
     }
    }
   },
@@ -106,7 +123,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -141,14 +158,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": null
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 120,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -204,14 +221,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 13 individu(s))",
      "questie_hp": 176,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 198,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -225,7 +242,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 328,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -239,14 +256,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 386,
-     "fought": false
+     "fought": null
     },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 417,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -260,14 +277,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 328,
-     "fought": false
+     "fought": null
     },
     "16": {
      "max_hp": 427,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 356,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -302,14 +319,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 377,
-     "fought": false
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 404,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -323,7 +340,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 356,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -379,14 +396,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 449,
-     "fought": false
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 484,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -400,7 +417,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 42,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -414,7 +431,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 581,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -428,14 +445,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 417,
-     "fought": false
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 449,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -449,14 +466,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 328,
-     "fought": false
+     "fought": null
     },
     "16": {
      "max_hp": 427,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 356,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -470,7 +487,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 354,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -484,14 +501,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 328,
-     "fought": false
+     "fought": null
     },
     "16": {
      "max_hp": 427,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 356,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -505,7 +522,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 666,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -519,7 +536,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 386,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -540,7 +557,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -575,7 +592,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 329,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -589,14 +606,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": null
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 120,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -673,14 +690,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 494,
-     "fought": false
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 531,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -771,14 +788,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 351,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 377,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -792,14 +809,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 137,
-     "fought": true
+     "fought": null
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 156,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -813,14 +830,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": null
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 120,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -841,7 +858,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -855,14 +872,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 300,
-     "fought": true
+     "fought": null
     },
     "15": {
      "max_hp": 385,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 328,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -876,7 +893,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 484,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -890,14 +907,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 65 individu(s))",
      "questie_hp": 263,
-     "fought": true
+     "fought": null
     },
     "15": {
      "max_hp": 385,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 58 individu(s))",
      "questie_hp": 285,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -911,14 +928,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 60 individu(s))",
      "questie_hp": 273,
-     "fought": true
+     "fought": null
     },
     "14": {
      "max_hp": 345,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 66 individu(s))",
      "questie_hp": 300,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -932,14 +949,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 984,
-     "fought": false
+     "fought": null
     },
     "16": {
      "max_hp": 1281,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1068,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -953,14 +970,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 15 individu(s))",
      "questie_hp": null,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 22 individu(s))",
      "questie_hp": 417,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -974,14 +991,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 855,
-     "fought": false
+     "fought": null
     },
     "16": {
      "max_hp": 1281,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 921,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1009,14 +1026,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 1251,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 1716,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 1347,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1030,14 +1047,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 1158,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 1563,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 1251,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1051,14 +1068,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 1158,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 1563,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 1251,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1072,14 +1089,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 1158,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 1563,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 1251,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1093,7 +1110,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 1452,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1107,14 +1124,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 1158,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 1563,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 1251,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1128,7 +1145,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 1347,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1142,7 +1159,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 4168,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1156,14 +1173,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 1251,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 1716,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 1347,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1177,7 +1194,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 3872,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1191,7 +1208,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 4490,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1205,7 +1222,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 2904,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1219,7 +1236,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 3872,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1233,7 +1250,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 2904,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1247,14 +1264,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 15 individu(s))",
      "questie_hp": 1347,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 1886,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 1452,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1352,19 +1369,19 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 328,
-     "fought": false
+     "fought": null
     }
    }
   },
   "721": {
-   "name": "Rabbit",
+   "name": "Lapin",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "1": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1,
      "fought": null
     }
@@ -1394,14 +1411,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 176,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 13 individu(s))",
      "questie_hp": 198,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1429,14 +1446,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 195,
-     "fought": true
+     "fought": null
     },
     "9": {
      "max_hp": 225,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_153517.txt, WoWCombatLog-110826_172854.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 220,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1450,14 +1467,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 16 individu(s))",
      "questie_hp": 328,
-     "fought": true
+     "fought": null
     },
     "16": {
      "max_hp": 427,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 17 individu(s))",
      "questie_hp": 356,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1520,7 +1537,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1562,7 +1579,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 273,
-     "fought": true
+     "fought": null
     },
     "14": {
      "max_hp": 345,
@@ -1581,16 +1598,16 @@
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_102624.txt, WoWCombatLog-110826_102944.txt, WoWCombatLog-110826_103236.txt (bloc avancé, 42 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 13 individu(s))",
      "questie_hp": 156,
-     "fought": true
+     "fought": null
     },
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_102624.txt, WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 48 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 16 individu(s))",
      "questie_hp": 176,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1602,58 +1619,58 @@
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_102944.txt, WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 62 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 176,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_102624.txt, WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 52 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 198,
-     "fought": true
+     "fought": null
     }
    }
   },
   "1117": {
-   "name": "Rockjaw Bonesnapper",
+   "name": "Briseur d’os Mâcheroc",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "9": {
      "max_hp": 180,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 61 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 176,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_102624.txt, WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 70 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 198,
-     "fought": true
+     "fought": null
     }
    }
   },
   "1118": {
-   "name": "Rockjaw Backbreaker",
+   "name": "Brise-dos Mâcheroc",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "11": {
      "max_hp": 239,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 222,
-     "fought": false
+     "fought": null
     },
     "12": {
      "max_hp": 272,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_102624.txt, WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 247,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2052,7 +2069,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 296,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2087,14 +2104,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 198,
-     "fought": true
+     "fought": null
     },
     "11": {
      "max_hp": 239,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 222,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2150,7 +2167,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 137,
-     "fought": true
+     "fought": null
     },
     "8": {
      "max_hp": 156,
@@ -2220,14 +2237,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 386,
-     "fought": false
+     "fought": null
     },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 417,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2270,6 +2287,20 @@
      "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 666,
      "fought": null
+    }
+   }
+  },
+  "1289": {
+   "name": "Gunther Weller",
+   "zone_id": 1519,
+   "rank": 0,
+   "levels": {
+    "30": {
+     "max_hp": 1304,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 1002,
+     "fought": false
     }
    }
   },
@@ -2386,9 +2417,9 @@
     "25": {
      "max_hp": 927,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2402,7 +2433,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt, WoWCombatLog-110826_153517.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 176,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 208,
@@ -2437,14 +2468,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 1158,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 1563,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": null,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2458,7 +2489,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 990,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2472,14 +2503,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 356,
-     "fought": true
+     "fought": null
     },
     "17": {
      "max_hp": 473,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 15 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2493,14 +2524,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 990,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 1563,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1062,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2514,14 +2545,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 1251,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 1716,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 1347,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2535,14 +2566,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 1137,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 1886,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 1215,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2556,7 +2587,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 2904,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2612,14 +2643,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 137,
-     "fought": true
+     "fought": null
     },
     "8": {
      "max_hp": 156,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 156,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2633,7 +2664,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 14,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2668,7 +2699,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_153517.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 222,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2682,14 +2713,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 590,
-     "fought": false
+     "fought": null
     },
     "26": {
      "max_hp": 1024,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 627,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2710,7 +2741,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 328,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2745,14 +2776,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 484,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2766,14 +2797,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 354,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 486,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 382,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2787,14 +2818,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 382,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 535,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 411,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2808,14 +2839,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 417,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2829,7 +2860,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2843,7 +2874,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 441,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2899,14 +2930,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 445,
-     "fought": true
+     "fought": null
     },
     "17": {
      "max_hp": 591,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 482,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2941,14 +2972,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 356,
-     "fought": true
+     "fought": null
     },
     "17": {
      "max_hp": 473,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2962,14 +2993,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 350,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 377,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2983,7 +3014,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 404,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2997,14 +3028,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 404,
-     "fought": false
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 433,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3193,7 +3224,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 387,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3270,14 +3301,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 247,
-     "fought": true
+     "fought": null
     },
     "13": {
      "max_hp": 307,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 273,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3291,14 +3322,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 253,
-     "fought": true
+     "fought": null
     },
     "14": {
      "max_hp": 345,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 276,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3333,14 +3364,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 328,
-     "fought": true
+     "fought": null
     },
     "16": {
      "max_hp": 427,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 356,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3354,14 +3385,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 356,
-     "fought": true
+     "fought": null
     },
     "17": {
      "max_hp": 473,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3375,14 +3406,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 377,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 404,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3396,14 +3427,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 404,
-     "fought": false
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 433,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3459,7 +3490,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3473,14 +3504,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 451,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 484,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3543,14 +3574,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 494,
-     "fought": true
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 531,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3641,21 +3672,21 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 418,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3704,14 +3735,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 32 individu(s))",
      "questie_hp": 356,
-     "fought": true
+     "fought": null
     },
     "17": {
      "max_hp": 473,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 24 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3725,14 +3756,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 30 individu(s))",
      "questie_hp": 325,
-     "fought": true
+     "fought": null
     },
     "17": {
      "max_hp": 473,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 36 individu(s))",
      "questie_hp": 350,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3746,14 +3777,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt (bloc avancé, 40 individu(s))",
      "questie_hp": 386,
-     "fought": true
+     "fought": null
     },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 39 individu(s))",
      "questie_hp": 417,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -3809,7 +3840,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3851,7 +3882,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 356,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4556,9 +4587,9 @@
     "50": {
      "max_hp": 23272,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_103443.txt, WoWCombatLog-110726_103623.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 17720,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4586,7 +4617,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1347,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4600,7 +4631,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 792,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4635,7 +4666,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 531,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4649,14 +4680,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 404,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 433,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4670,14 +4701,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 14 individu(s))",
      "questie_hp": 417,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 27 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4691,14 +4722,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 404,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 433,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4712,14 +4743,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 18 individu(s))",
      "questie_hp": 354,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 25 individu(s))",
      "questie_hp": 379,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4733,7 +4764,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 448,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
@@ -4761,7 +4792,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 22 individu(s))",
      "questie_hp": 379,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4775,14 +4806,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 494,
-     "fought": true
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 20 individu(s))",
      "questie_hp": 531,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4796,14 +4827,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 27 individu(s))",
      "questie_hp": 354,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 23 individu(s))",
      "questie_hp": 379,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4817,14 +4848,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 18 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 15 individu(s))",
      "questie_hp": 484,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4894,14 +4925,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 14 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 484,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4915,14 +4946,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 484,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4936,14 +4967,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 14 individu(s))",
      "questie_hp": 494,
-     "fought": true
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 531,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4957,14 +4988,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 442,
-     "fought": true
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 473,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -4978,14 +5009,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 544,
-     "fought": true
+     "fought": null
     },
     "24": {
      "max_hp": 863,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 582,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5006,7 +5037,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 617,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5020,7 +5051,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 544,
-     "fought": true
+     "fought": null
     },
     "24": {
      "max_hp": 863,
@@ -5062,7 +5093,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 662,
-     "fought": true
+     "fought": null
     },
     "22": {
      "max_hp": 928,
@@ -5104,14 +5135,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 494,
-     "fought": false
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 531,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5146,7 +5177,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 573,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -5160,14 +5191,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-110826_083108.txt, WoWCombatLog-110826_103236.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 494,
-     "fought": true
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 531,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5216,14 +5247,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 617,
-     "fought": false
+     "fought": null
     },
     "24": {
      "max_hp": 863,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 664,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -5237,7 +5268,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 731,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5272,14 +5303,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 1347,
-     "fought": true
+     "fought": null
     },
     "20": {
      "max_hp": 1886,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 1452,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5305,9 +5336,9 @@
     "1": {
      "max_hp": 8,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 12 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 8,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5319,7 +5350,7 @@
     "32": {
      "max_hp": 1511,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110526_183049.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1162,
      "fought": null
     }
@@ -5349,14 +5380,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 13 individu(s))",
      "questie_hp": 417,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 13 individu(s))",
      "questie_hp": 449,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5370,7 +5401,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 1251,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5384,14 +5415,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 1062,
-     "fought": true
+     "fought": null
     },
     "19": {
      "max_hp": 1716,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1137,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5489,7 +5520,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1752,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -5517,14 +5548,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 61 individu(s))",
      "questie_hp": 198,
-     "fought": true
+     "fought": null
     },
     "11": {
      "max_hp": 239,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 63 individu(s))",
      "questie_hp": null,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5643,7 +5674,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 968,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5678,7 +5709,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 561,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5692,7 +5723,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 220,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 260,
@@ -5727,7 +5758,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 3048,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -5797,7 +5828,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 516,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5811,7 +5842,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 404,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5895,7 +5926,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 484,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -6210,7 +6241,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 301,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -6238,7 +6269,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 5568,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -6285,14 +6316,14 @@
    }
   },
   "13076": {
-   "name": "Dun Morogh Mountaineer",
+   "name": "Montagnard de Dun Morogh",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "30": {
      "max_hp": 2484,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110726_103623.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 1910,
      "fought": null
     }
@@ -6322,6 +6353,146 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "250483": {
+   "name": "Croc-Flétri",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "17": {
+     "max_hp": 3310,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250484": {
+   "name": "Araignée",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 924,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "16": {
+     "max_hp": 1025,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250488": {
+   "name": "Tarentule",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "17": {
+     "max_hp": 661,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250618": {
+   "name": "Squelette",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 655,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "16": {
+     "max_hp": 726,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250619": {
+   "name": "Veuve de couvée",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 885,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "16": {
+     "max_hp": 982,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250620": {
+   "name": "Banshee hurlante",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 1452,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250622": {
+   "name": "Goule décharnée",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 1328,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 10 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "16": {
+     "max_hp": 1473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 12 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250623": {
+   "name": "Cadavre mutilé",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 1281,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": null,
      "fought": true
     }
    }
@@ -6334,16 +6505,331 @@
     "16": {
      "max_hp": 1196,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 7 individu(s))",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 6 individu(s))",
      "questie_hp": null,
-     "fought": null
+     "fought": true
     },
     "17": {
      "max_hp": 1323,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 5 individu(s))",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 12 individu(s))",
      "questie_hp": null,
-     "fought": null
+     "fought": true
+    }
+   }
+  },
+  "250625": {
+   "name": "Rejeton",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "14": {
+     "max_hp": 483,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 15 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250626": {
+   "name": "Soldat squelette",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 1193,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 17 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250627": {
+   "name": "Goule",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 982,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250630": {
+   "name": "Goule pestilentielle",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 1281,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250631": {
+   "name": "L'Abandonné",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "18": {
+     "max_hp": 3126,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250649": {
+   "name": "Mort-vivant décérébré",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 897,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250650": {
+   "name": "Banshee gémissante",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 1452,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250651": {
+   "name": "Citoyen vengeur",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "14": {
+     "max_hp": 431,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "15": {
+     "max_hp": 481,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250654": {
+   "name": "Citoyen fantomatique",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "14": {
+     "max_hp": 552,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "15": {
+     "max_hp": 616,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250656": {
+   "name": "Berserker déchu",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 1537,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250657": {
+   "name": "Rath'mael",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "20": {
+     "max_hp": 4402,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250660": {
+   "name": "Le baron",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "17": {
+     "max_hp": 4256,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250689": {
+   "name": "Monstruosité vivante",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 1708,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "17": {
+     "max_hp": 1891,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "250735": {
+   "name": "Rôdeuse venimeuse",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "16": {
+     "max_hp": 1366,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "255109": {
+   "name": "Golem de chair",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 1578,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "16": {
+     "max_hp": 1751,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "255964": {
+   "name": "Nécromancien déchu",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 1078,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "16": {
+     "max_hp": 1196,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "17": {
+     "max_hp": 1323,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "256035": {
+   "name": "Viktor le Vil",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "19": {
+     "max_hp": 4576,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "256040": {
+   "name": "Veuve des profondeurs",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "15": {
+     "max_hp": 963,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "16": {
+     "max_hp": 1068,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "256097": {
+   "name": "Bjork",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "19": {
+     "max_hp": 4404,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110726_084816.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": true
     }
    }
   },
@@ -6371,14 +6857,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 24 individu(s))",
      "questie_hp": null,
-     "fought": true
+     "fought": null
     },
     "10": {
      "max_hp": 208,
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 21 individu(s))",
      "questie_hp": null,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -6784,7 +7270,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   }
@@ -6877,14 +7363,14 @@
   "15": {
    "value": 385,
    "certainty": "probable",
-   "source": "journaux : médiane de [346, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385] des PNJ normaux observés",
-   "n_npcs": 13
+   "source": "journaux : médiane de [346, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 655, 885, 924, 963, 1193, 1328, 1578] des PNJ normaux observés",
+   "n_npcs": 20
   },
   "16": {
-   "value": 427,
-   "certainty": "certain",
-   "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 9
+   "value": 982,
+   "certainty": "probable",
+   "source": "journaux : médiane de [427, 427, 427, 427, 427, 427, 427, 427, 427, 726, 897, 982, 982, 1025, 1068, 1281, 1281, 1366, 1452, 1452, 1473, 1537, 1751] des PNJ normaux observés",
+   "n_npcs": 23
   },
   "17": {
    "value": 473,
@@ -7270,6 +7756,12 @@
    "level": 10,
    "measured": 208,
    "questie": 198
+  },
+  {
+   "npc_id": 68,
+   "level": 55,
+   "measured": 10806,
+   "questie": 5228
   },
   {
    "npc_id": 95,
@@ -8140,6 +8632,12 @@
    "level": 11,
    "measured": 717,
    "questie": 666
+  },
+  {
+   "npc_id": 1289,
+   "level": 30,
+   "measured": 1304,
+   "questie": 1002
   },
   {
    "npc_id": 1329,
@@ -10232,6 +10730,12 @@
     "ratio": 1.0505050505050506
    },
    {
+    "npc_id": 68,
+    "name": "Guet de Hurlevent",
+    "level": 55,
+    "ratio": 2.066947207345065
+   },
+   {
     "npc_id": 94,
     "name": "Vide-gousset défias",
     "level": 5,
@@ -10509,7 +11013,7 @@
    },
    {
     "npc_id": 721,
-    "name": "Rabbit",
+    "name": "Lapin",
     "level": 1,
     "ratio": 1.0
    },
@@ -10539,13 +11043,13 @@
    },
    {
     "npc_id": 1118,
-    "name": "Rockjaw Backbreaker",
+    "name": "Brise-dos Mâcheroc",
     "level": 11,
     "ratio": 1.0765765765765767
    },
    {
     "npc_id": 1118,
-    "name": "Rockjaw Backbreaker",
+    "name": "Brise-dos Mâcheroc",
     "level": 12,
     "ratio": 1.1012145748987854
    },
@@ -10722,6 +11226,12 @@
     "name": "Tundra MacGrann",
     "level": 20,
     "ratio": 1.2995867768595042
+   },
+   {
+    "npc_id": 1289,
+    "name": "Gunther Weller",
+    "level": 30,
+    "ratio": 1.3013972055888223
    },
    {
     "npc_id": 1329,
@@ -11373,7 +11883,7 @@
    },
    {
     "npc_id": 13076,
-    "name": "Dun Morogh Mountaineer",
+    "name": "Montagnard de Dun Morogh",
     "level": 30,
     "ratio": 1.300523560209424
    },
@@ -11386,6 +11896,12 @@
   ]
  },
  "inversions": [
+  {
+   "level": 17,
+   "value": 473,
+   "previous_level": 16,
+   "previous": 982
+  },
   {
    "level": 26,
    "value": 1140,
@@ -11431,6 +11947,14 @@
     10
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 68,
+   "name": "Guet de Hurlevent",
+   "levels": [
+    55
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 94,
@@ -11836,7 +12360,7 @@
   },
   {
    "npc_id": 721,
-   "name": "Rabbit",
+   "name": "Lapin",
    "levels": [
     1
    ],
@@ -11877,7 +12401,7 @@
   },
   {
    "npc_id": 1118,
-   "name": "Rockjaw Backbreaker",
+   "name": "Brise-dos Mâcheroc",
    "levels": [
     11,
     12
@@ -12034,6 +12558,14 @@
     11
    ],
    "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 1289,
+   "name": "Gunther Weller",
+   "levels": [
+    30
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 1329,
@@ -13002,7 +13534,7 @@
   },
   {
    "npc_id": 13076,
-   "name": "Dun Morogh Mountaineer",
+   "name": "Montagnard de Dun Morogh",
    "levels": [
     30
    ],
@@ -13025,6 +13557,22 @@
    "reason": "hors norme : 717 PV au niveau 11, +200,0 % de la médiane des autres PNJ du niveau (239) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
+   "npc_id": 250483,
+   "name": "Croc-Flétri",
+   "levels": [
+    17
+   ],
+   "reason": "hors norme : 3310 PV au niveau 17, +599,8 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250488,
+   "name": "Tarentule",
+   "levels": [
+    17
+   ],
+   "reason": "hors norme : 661 PV au niveau 17, +39,7 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
    "npc_id": 250624,
    "name": "Mage squelette",
    "levels": [
@@ -13032,6 +13580,91 @@
     17
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 250625,
+   "name": "Rejeton",
+   "levels": [
+    14
+   ],
+   "reason": "hors norme : 483 PV au niveau 14, +40,0 % de la médiane des autres PNJ du niveau (345) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250631,
+   "name": "L'Abandonné",
+   "levels": [
+    18
+   ],
+   "reason": "hors norme : 3126 PV au niveau 18, +500,0 % de la médiane des autres PNJ du niveau (521) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250651,
+   "name": "Citoyen vengeur",
+   "levels": [
+    14,
+    15
+   ],
+   "reason": "hors norme : 431 PV au niveau 14, +24,9 % de la médiane des autres PNJ du niveau (345) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250654,
+   "name": "Citoyen fantomatique",
+   "levels": [
+    14,
+    15
+   ],
+   "reason": "hors norme : 552 PV au niveau 14, +60,0 % de la médiane des autres PNJ du niveau (345) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250657,
+   "name": "Rath'mael",
+   "levels": [
+    20
+   ],
+   "reason": "hors norme : 4402 PV au niveau 20, +599,8 % de la médiane des autres PNJ du niveau (629) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250660,
+   "name": "Le baron",
+   "levels": [
+    17
+   ],
+   "reason": "hors norme : 4256 PV au niveau 17, +799,8 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250689,
+   "name": "Monstruosité vivante",
+   "levels": [
+    16,
+    17
+   ],
+   "reason": "hors norme : 1891 PV au niveau 17, +299,8 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 255964,
+   "name": "Nécromancien déchu",
+   "levels": [
+    15,
+    16,
+    17
+   ],
+   "reason": "hors norme : 1323 PV au niveau 17, +179,7 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 256035,
+   "name": "Viktor le Vil",
+   "levels": [
+    19
+   ],
+   "reason": "hors norme : 4576 PV au niveau 19, +700,0 % de la médiane des autres PNJ du niveau (572) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 256097,
+   "name": "Bjork",
+   "levels": [
+    19
+   ],
+   "reason": "hors norme : 4404 PV au niveau 19, +669,9 % de la médiane des autres PNJ du niveau (572) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
    "npc_id": 257446,

@@ -5083,6 +5083,36 @@
      "pvp_dr": false
     }
    }
+  },
+  {
+   "revision": 5,
+   "date": "2026-11-09",
+   "motif": "mesure des journaux de combat (table des monstres, forever update)",
+   "command": "forever update --auto",
+   "sources": {
+    "logs": {
+     "WoWCombatLog-110726_084816.txt": "e002cc8892f46b06bb9eda041b6818f4e86aa9f7e38257cc492788a76f8f298b",
+     "WoWCombatLog-110726_103443.txt": "a22384fba32f28b625c5b874ec73adab4b7e2f1d1e71777ac48e503308d3b777",
+     "WoWCombatLog-110726_103623.txt": "abb33d626a9068473503750f747f864fbcbe772c286f7600ad128c65c79ea650"
+    }
+   },
+   "changes": [
+    {
+     "file": "monsters.json",
+     "rule": "measure"
+    }
+   ],
+   "automated": true,
+   "rule": {
+    "clauses": {
+     "inputs": false
+    },
+    "carry": {},
+    "inputs": {
+     "mage_leveling": false,
+     "pvp_dr": true
+    }
+   }
   }
  ]
 }
