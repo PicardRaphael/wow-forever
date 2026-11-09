@@ -387,8 +387,8 @@
     },
     "1.60.1.70862": {
       "collected_at": "2026-11-08",
-      "data_sha": "7578cd804daa",
-      "data_sha256": "7578cd804daa2d23046a3152755e3cbf11e8e128585134f754b6c9f5cc326e25",
+      "data_sha": "8ce8ae7390ae",
+      "data_sha256": "8ce8ae7390ae8c2b1e87806f5ff2b77a4edd509671eaf3499a25dd79fba3e73b",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -402,7 +402,7 @@
         "leveling.json": "7920664c2c2a5bff06f53d627bec71e9406281be9fd4cc6285fbbf47c8e45c99",
         "mechanics.json": "af825e222486ca2f29654e88c1d403dc7011a35e04f2e4f844f18ee2eac128ff",
         "meta.json": "50ac0922d58be16aa389767f5e805d7b1100d1bedc584b21c8a778bc5ea419dd",
-        "monsters.json": "58e1061d09fc58a5ca33fb66e54ea6056e33757497c3ba940612d0ee5d84a732",
+        "monsters.json": "398036fcc8bb9e5d7358263c138263c8814ae543985f9263f1b611d1b1c6d804",
         "origins.json": "b06b864bf033c9451856884828da09dd33e5dedbd1c84819530d0e6c6b90e244",
         "overrides.json": "c38b0d6af20938dce0e090341d413e72bf4844d6f293c385540a6e85cd1ccd7c",
         "pet_rules.json": "7446f755640eacf9fe238945b7ef9cfffe1ddd2faa437853488d739fdf1b6ce1",
@@ -412,8 +412,8 @@
         "quest_rewards.json": "ba316efaa4a83848216b0059e73b968393c83bc863a5cc7796b36edba6c35af2",
         "races.json": "4f4653ee7bb9bf7c4a467efce166215ac2e20213b5220a0d6c1bcd82847bd5ec",
         "respec.json": "5186ffaa3c4f89efbef206109143ba99dd492a1e7013acabc29e09801e35622b",
-        "revisions.json": "69140e1a2bf1ed7afff39fa806eaa84f712a628ae060d4c3f54ed242b472ca3b",
-        "sources.json": "fe42246d2dc962730e4bd13a4ea77acd1708ce0f797e128372112e6555cb72e5",
+        "revisions.json": "0526a20e860b2c8e338e90cfcc229227eedb9fea9a332627ac67eb25beb92f1d",
+        "sources.json": "dfc8493cf9201c847218099dc9d96851d40ff5f7f2f6f1c5917cc4f896ecdde4",
         "spell_scaling.json": "7992c942f8636c92be3574638b1203d95f35c54310ec7731d088f8d1e9ccb86e",
         "spells.json": "7134e0c7cf6be05ef1dc9d77f904828ab1b4ec36ac3a2146b254f9dffbd72ee3",
         "talents.json": "f4d35929ce08a32d714a3ab30f95902e4b3eb984bf5480aa7165d2fffe186e46",
@@ -423,7 +423,7 @@
       "hotfixes": [],
       "product": "wowf",
       "revised_at": "2026-11-09",
-      "revision": 5,
+      "revision": 6,
       "version_prefix": "1.60."
     }
   }

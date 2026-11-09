@@ -38,7 +38,8 @@
   "WoWCombatLog-110826_102944.txt",
   "WoWCombatLog-110826_103236.txt",
   "WoWCombatLog-110826_153517.txt",
-  "WoWCombatLog-110826_172854.txt"
+  "WoWCombatLog-110826_172854.txt",
+  "WoWCombatLog-110926_072805.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -7363,14 +7364,14 @@
   "15": {
    "value": 385,
    "certainty": "probable",
-   "source": "journaux : médiane de [346, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 655, 885, 924, 963, 1193, 1328, 1578] des PNJ normaux observés",
-   "n_npcs": 20
+   "source": "journaux : médiane de [346, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385, 385] des PNJ normaux observés",
+   "n_npcs": 13
   },
   "16": {
-   "value": 982,
+   "value": 427,
    "certainty": "probable",
-   "source": "journaux : médiane de [427, 427, 427, 427, 427, 427, 427, 427, 427, 726, 897, 982, 982, 1025, 1068, 1281, 1281, 1366, 1452, 1452, 1473, 1537, 1751] des PNJ normaux observés",
-   "n_npcs": 23
+   "source": "journaux : médiane de [427, 427, 427, 427, 427, 427, 427, 427, 427, 897, 982, 1281, 1281, 1366, 1452, 1452, 1537] des PNJ normaux observés",
+   "n_npcs": 17
   },
   "17": {
    "value": 473,
@@ -11897,12 +11898,6 @@
  },
  "inversions": [
   {
-   "level": 17,
-   "value": 473,
-   "previous_level": 16,
-   "previous": 982
-  },
-  {
    "level": 26,
    "value": 1140,
    "previous_level": 25,
@@ -13565,12 +13560,48 @@
    "reason": "hors norme : 3310 PV au niveau 17, +599,8 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
+   "npc_id": 250484,
+   "name": "Araignée",
+   "levels": [
+    15,
+    16
+   ],
+   "reason": "hors norme : 924 PV au niveau 15, +140,0 % de la médiane des autres PNJ du niveau (385) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
    "npc_id": 250488,
    "name": "Tarentule",
    "levels": [
     17
    ],
    "reason": "hors norme : 661 PV au niveau 17, +39,7 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250618,
+   "name": "Squelette",
+   "levels": [
+    15,
+    16
+   ],
+   "reason": "hors norme : 655 PV au niveau 15, +70,1 % de la médiane des autres PNJ du niveau (385) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250619,
+   "name": "Veuve de couvée",
+   "levels": [
+    15,
+    16
+   ],
+   "reason": "hors norme : 885 PV au niveau 15, +129,9 % de la médiane des autres PNJ du niveau (385) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250622,
+   "name": "Goule décharnée",
+   "levels": [
+    15,
+    16
+   ],
+   "reason": "hors norme : 1328 PV au niveau 15, +244,9 % de la médiane des autres PNJ du niveau (385) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
    "npc_id": 250624,
@@ -13588,6 +13619,14 @@
     14
    ],
    "reason": "hors norme : 483 PV au niveau 14, +40,0 % de la médiane des autres PNJ du niveau (345) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 250626,
+   "name": "Soldat squelette",
+   "levels": [
+    15
+   ],
+   "reason": "hors norme : 1193 PV au niveau 15, +209,9 % de la médiane des autres PNJ du niveau (385) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
    "npc_id": 250631,
@@ -13641,6 +13680,15 @@
    "reason": "hors norme : 1891 PV au niveau 17, +299,8 % de la médiane des autres PNJ du niveau (473) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
+   "npc_id": 255109,
+   "name": "Golem de chair",
+   "levels": [
+    15,
+    16
+   ],
+   "reason": "hors norme : 1578 PV au niveau 15, +309,9 % de la médiane des autres PNJ du niveau (385) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
    "npc_id": 255964,
    "name": "Nécromancien déchu",
    "levels": [
@@ -13657,6 +13705,15 @@
     19
    ],
    "reason": "hors norme : 4576 PV au niveau 19, +700,0 % de la médiane des autres PNJ du niveau (572) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 256040,
+   "name": "Veuve des profondeurs",
+   "levels": [
+    15,
+    16
+   ],
+   "reason": "hors norme : 963 PV au niveau 15, +150,1 % de la médiane des autres PNJ du niveau (385) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
    "npc_id": 256097,
