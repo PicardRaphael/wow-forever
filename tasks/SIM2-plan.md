@@ -299,7 +299,7 @@ Chaque calcul par tranche (10-19 … 60, ou un niveau) doit couvrir, et pouvoir 
    monstres par barre de mana, part du temps passée à boire ou manger, XP/h avec repos, risque de mort.
 4. **Classement au leveling** : en solo, rotation, talents (`climb` et `decide` prennent une fonction de score), objets
    et priorité des statistiques classés à l'**XP/h avec repos** ; le DPS reste affiché, et reste le critère en groupe
-   et en raid. Esprit, Intelligence, Endurance et talents de mana (Arcane Meditation, Improved Water Shield…) prennent
+   et en raid. Esprit, Intelligence, Endurance et talents de mana et de survie prennent
    enfin leur valeur.
 5. **Comparaison par tranche** : build DPS (actuel) contre build leveling trouvé, Chaman (Amélioration, Élémentaire) et
    Mage (Givre, Feu, Arcanes) d'abord, puis les autres classes ; écart d'XP/h et « non départagé » sous le bruit.
