@@ -64,3 +64,28 @@ def test_pets_are_compared_with_only_the_pet_changing(tmp_path):
     mage = {p.key: p for p in read_presets(root / "forever")}["mage/dps/Fire"]
     with pytest.raises(WowsimsError, match="familier"):
         compare_pets(tmp_path, mage, "RaceOrc", ENCOUNTER, runner=PetSim())
+
+
+def test_simulate_pets_action(make_deps, tmp_path, monkeypatch):
+    """`forever_simulate(action="pets", preset, race)` : race du joueur exigée ; rangée du meilleur au moins bon."""
+    from test_sims_brackets import _setup as brackets_setup
+
+    from forever.errors import InvalidArgumentError
+    from forever.pipeline import gitops
+    from forever.sims.report import simulate
+
+    deps = brackets_setup(make_deps, tmp_path)
+    root = deps.cache_dir / "third_party" / "wowsims"
+    (root / "forever" / "proto").mkdir(parents=True, exist_ok=True)
+    (root / "forever" / "proto" / "hunter.proto").write_text(PROTO, encoding="utf-8")
+    builds = root / "forever" / "ui" / "specs" / "hunter" / "dps" / "builds"
+    builds.mkdir(parents=True, exist_ok=True)
+    build = {"player": {"class": "ClassHunter", "talentsString": "53", "equipment": {"items": [{"id": 1}]},
+                        "hunter": {"options": {"classOptions": {"petType": "Raptor"}}},
+                        "rotation": {"type": "TypeAPL"}}, "encounter": ENCOUNTER}  # fmt: skip
+    (builds / "bm.build.json").write_text(json.dumps(build), encoding="utf-8")
+    monkeypatch.setattr(gitops, "subprocess_runner", PetSim())
+    with pytest.raises(InvalidArgumentError, match="Race"):
+        simulate(deps, "pets", preset="hunter/dps/bm")
+    out = simulate(deps, "pets", preset="hunter/dps/bm", race="Orc", iterations=100)
+    assert [r["pet"] for r in out["pets"]] == ["Cat", "Wolf", "Bat"] and out["gear"] == "preset"
