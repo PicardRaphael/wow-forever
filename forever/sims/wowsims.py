@@ -11,7 +11,7 @@ import hashlib
 import json
 import re
 import uuid
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -80,6 +80,7 @@ class Preset:
     debuffs: dict[str, Any] = field(default_factory=dict)
     consumables: dict[str, Any] = field(default_factory=dict)
     encounter: dict[str, Any] | None = None
+    gear_file: str | None = None  # jeu d'équipement de la spé pris par l'outil pour un build nu (`gear_sets/…`)
 
     @property
     def items(self) -> int:
@@ -291,14 +292,33 @@ def _from_presets_ts(
     return out
 
 
+# Jeux d'équipement d'une spé (`gear_sets/*.gear.json`) préférés pour un build nu : avant raid d'abord (choix de
+# l'outil : le niveau d'équipement le plus proche des autres préréglages du dépôt), sinon le premier par nom.
+GEAR_SET_ORDER = ("preraid", "pre_raid", "prebis")
+
+
+def spec_gear_set(spec_dir: Path) -> Path | None:
+    """Jeu d'équipement JSON de la spé pour un build qui n'en porte pas (Démoniste du dépôt, vu le 2026-11-10 :
+    `preraid` et `raid` présents, reliés à rien par l'interface) ; None sans jeu non vide."""
+    files = [f for f in sorted((spec_dir / "gear_sets").glob("*.gear.json")) if _json(f).get("items")]
+    rank = {name: i for i, name in enumerate(GEAR_SET_ORDER)}
+    files.sort(key=lambda f: rank.get(f.name.removesuffix(".gear.json"), len(rank)))
+    return files[0] if files else None
+
+
 def _from_builds(spec_dir: Path, rel: str) -> list[Preset]:
     out = []
+    fallback = spec_gear_set(spec_dir) if (spec_dir / "gear_sets").is_dir() else None
     for path in sorted((spec_dir / "builds").glob("*.build.json")):
         doc = _json(path)
         player = doc.get("player") or {}
         spec_field = next((f for f in SPEC_FIELDS.values() if f in player), None)
         if spec_field is None or not player.get("rotation"):
             continue
+        equipment = dict(player.get("equipment") or {})
+        gear_file = None
+        if not equipment.get("items") and fallback is not None:
+            equipment, gear_file = _json(fallback), f"gear_sets/{fallback.name}"
         out.append(
             Preset(
                 key=f"{rel}/{path.name.removesuffix('.build.json')}",
@@ -306,7 +326,7 @@ def _from_builds(spec_dir: Path, rel: str) -> list[Preset]:
                 spec_field=spec_field,
                 talents=str(player.get("talentsString") or ""),
                 rotation=dict(player["rotation"]),
-                equipment=dict(player.get("equipment") or {}),
+                equipment=equipment,
                 spec_options=dict(player.get(spec_field) or {}),
                 race=player.get("race"),
                 raid_buffs=dict(doc.get("raidBuffs") or {}),
@@ -315,6 +335,7 @@ def _from_builds(spec_dir: Path, rel: str) -> list[Preset]:
                 debuffs=dict(doc.get("debuffs") or {}),
                 consumables=dict(player.get("consumables") or {}),
                 encounter=doc.get("encounter"),
+                gear_file=gear_file,
             )
         )
     return out
@@ -757,15 +778,21 @@ def compare_presets(
     iterations: int = DEFAULT_ITERATIONS,
     seed: int = DEFAULT_SEED,
     runner: gitops.Runner | None = None,
+    equipment: Mapping[str, dict[str, Any]] | None = None,
+    items: Path | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Préréglages (et races) comparés dans des conditions identiques : mêmes buffs de raid, de groupe et individuels,
     mêmes affaiblissements (réunion de ceux des préréglages), même rencontre et durée, même graine ; `consumables` :
     `none` (aucun, strictement identique) ou `own` (ceux de chaque préréglage). Rend les lignes, de la meilleure à la
-    moins bonne, et les conditions appliquées."""
+    moins bonne, et les conditions appliquées. `equipment` : équipement remplaçant celui d'un préréglage (par clé ;
+    ex. choix de GearQuest au niveau 60) ; `items` : fichier des objets ajoutés, passé au binaire."""
     import dataclasses
 
     if consumables not in ("none", "own"):
         raise WowsimsError(f"consommables « {consumables} » : none ou own attendu.", "choisir none ou own")
+    if equipment:
+        cases = [(dataclasses.replace(p, equipment=equipment[p.key]) if p.key in equipment else p, r)
+                 for p, r in cases]  # fmt: skip
     for preset, _ in cases:
         require_gear(preset)
     common = {
@@ -785,8 +812,11 @@ def compare_presets(
             consumables=preset.consumables if consumables == "own" else {},
         )
         out = run_sim(cache_dir, request_for(same, race=race, encounter=encounter, iterations=iterations, seed=seed),
-                      runner=runner)  # fmt: skip
-        rows.append({"preset": preset.key, "race": race, **out})
+                      runner=runner, items=items)  # fmt: skip
+        row = {"preset": preset.key, "race": race, **out}
+        if preset.gear_file and not (equipment and preset.key in equipment):
+            row["gear_file"] = preset.gear_file
+        rows.append(row)
     rows.sort(key=lambda r: -r["dps"])
     best = rows[0]["dps"] if rows else 0.0
     conditions = {**common, "consumables": consumables, "encounter": encounter, "seed": seed, "iterations": iterations}

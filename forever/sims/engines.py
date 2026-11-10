@@ -6,6 +6,8 @@ du client. Aucun calcul de jeu ici : chaque chiffre vient d'un des deux simulate
 from __future__ import annotations
 
 import dataclasses
+from collections.abc import Mapping
+from pathlib import Path
 from typing import Any
 
 from forever.config import Deps
@@ -151,6 +153,8 @@ def compare(
     rotation: str | None,
     ws_note: str,
     iterations: int = wowsims.DEFAULT_ITERATIONS,
+    equipment: Mapping[str, dict[str, Any]] | None = None,
+    items: Path | None = None,
 ) -> dict[str, Any]:
     """`action="compare"` avec des talents choisis ou un autre moteur : talents du préréglage ou `talents` (légaux au
     niveau 60), convertis pour chaque moteur ; `both` rend les deux colonnes et leur écart, un refus d'un moteur
@@ -190,7 +194,8 @@ def compare(
     out: dict[str, Any] = {"level": LEVEL, "engine": engine}
     if engine == "wowsims":
         rows, conditions = wowsims.compare_presets(deps.cache_dir, ws_cases, encounter, consumables=consumables,
-                                                   iterations=iterations)  # fmt: skip
+                                                   iterations=iterations, equipment=equipment,
+                                                   items=items)  # fmt: skip
         by_case = {(c[0].key, c[1]): lab for c, lab in zip(ws_cases, labels, strict=True)}
         out.update(rows=[{**r, "talents": by_case[(r["preset"], r["race"])]} for r in rows], conditions=conditions)
     elif engine == "mythicsim":
@@ -207,7 +212,8 @@ def compare(
         ws_rows: dict[tuple[str, str], dict[str, Any]]
         try:
             got, conditions = wowsims.compare_presets(deps.cache_dir, ws_cases, encounter, consumables=consumables,
-                                                      iterations=iterations)  # fmt: skip
+                                                      iterations=iterations, equipment=equipment,
+                                                      items=items)  # fmt: skip
             ws_rows = {(r["preset"], r["race"]): r for r in got}
             out["conditions"] = conditions
         except ForeverError as err:

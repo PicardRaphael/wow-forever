@@ -32,6 +32,7 @@ ACTIONS = (
     "validate",
 )
 ENGINES = ("wowsims", "mythicsim", "both")
+COMPARE_GEARS = ("preset", "gearquest")  # équipement de `compare` : celui du préréglage, ou GearQuest au 60
 
 
 def _stat(name: str) -> str:
@@ -58,7 +59,7 @@ def simulate(
     popular: bool = True,
     brackets: str | None = None,
     path: str = "auto",
-    gear: str = "gearquest",
+    gear: str | None = None,
     spec: str | None = None,
     level: int | None = None,
     equipped: str | None = None,
@@ -78,7 +79,9 @@ def simulate(
     `both`), `builds` (recherche locale sur `preset` pour `race` ; départs : `talents`, talents du préréglage, builds
     populaires de Talents Forever si `popular` ; `rotation` : rotation du fork de MythicSim). Préréglage sans
     équipement : refusé. La race vient toujours du joueur, jamais du préréglage ; sauf `race_brackets` : toutes les
-    races jouables de la classe (ou `races`) classées par tranche (`brackets`, `path`, `gear`, `conditions`)."""
+    races jouables de la classe (ou `races`) classées par tranche (`brackets`, `path`, `gear`, `conditions`).
+    `gear` : par tranche, `gearquest` (défaut) ou `none` ; pour `compare`, `preset` (défaut : équipement de chaque
+    préréglage) ou `gearquest` (choix de GearQuest au niveau 60 de chaque spécialisation et race)."""
 
     if action not in ACTIONS:
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
@@ -117,7 +120,8 @@ def simulate(
         if not preset:
             raise InvalidArgumentError("Préréglage manquant.", "donner preset (voir action=presets)")
         asked = [r for r in (races or "").split(",") if r.strip()] or None
-        return races_from_sources(deps, preset=preset, brackets=brackets, races=asked, path=path, gear=gear,
+        return races_from_sources(deps, preset=preset, brackets=brackets, races=asked, path=path,
+                                  gear=gear or "gearquest",
                                   spec=spec, iterations=iterations, conditions=conditions)  # fmt: skip
     if action == "brackets":  # SIM2 : sous le 60, par tranche de niveaux (wowsims corrigé, décision 305)
         from forever.sims.brackets import run_from_sources
@@ -134,7 +138,8 @@ def simulate(
         if wanted and ref is not None and ref not in wanted:
             raise InvalidArgumentError(f"reference « {reference} » absente de stats.",
                                        "donner reference parmi stats (ex. SpellDamage)")  # fmt: skip
-        return run_from_sources(deps, preset=preset, race=race, brackets=brackets, path=path, gear=gear, spec=spec,
+        return run_from_sources(deps, preset=preset, race=race, brackets=brackets, path=path,
+                                gear=gear or "gearquest", spec=spec,
                                 iterations=iterations, stats=wanted or None, reference=ref,
                                 conditions=conditions, targets=targets, objective=objective)  # fmt: skip
     pin = pinned(deps.cache_dir)
@@ -143,30 +148,54 @@ def simulate(
     presets = wowsims.read_presets(wowsims_dir(deps.cache_dir) / "forever")
     provenance = local_provenance(deps, certainty="suppose", assumptions=[wowsims.source_note(pin)])
     if action == "presets":
-        listed = [{"key": p.key, "class": p.class_token, "race": p.race, "items": p.items} for p in presets]
+        listed = [{"key": p.key, "class": p.class_token, "race": p.race, "items": p.items,
+                   **({"gear_file": p.gear_file} if p.gear_file else {})} for p in presets]  # fmt: skip
         return {"level": LEVEL, "presets": listed, "provenance": provenance}
     if action == "compare":
         by_key = {p.key: p for p in presets}
+        compare_gear = gear or "preset"
+        if compare_gear not in COMPARE_GEARS:
+            raise InvalidArgumentError(f"Équipement inconnu : « {gear} ».", "choisir " + ", ".join(COMPARE_GEARS))
         pairs = []
+        names: list[str] = []
         for item in (cases or "").split(","):
             key, _, race_name = item.strip().partition("@")
             if key not in by_key or not race_name:
                 raise InvalidArgumentError(f"Cas illisible : « {item} ».", "donner cases, ex. mage/dps/Fire@Human")
             pairs.append((by_key[key], wowsims.race_enum(race_name)))
+            names.append(race_name.strip())
         kw: dict[str, Any] = {"iterations": iterations} if iterations else {}
+        notes: list[str] = []
+        if compare_gear == "gearquest":  # équipement égal : choix de GearQuest au niveau 60 de chaque cas
+            from forever.sims import brackets as sims_brackets
+
+            equipment: dict[str, dict[str, Any]] = {}
+            for (preset_, _), race_name in zip(pairs, names, strict=True):
+                equipment[preset_.key], note = sims_brackets.gearquest_equipment(deps, preset_, race_name, LEVEL)
+                notes.append(note)
+            items, _, items_note = sims_brackets.extra_items(deps.cache_dir)
+            notes += [items_note] if items_note else []
+            kw.update(equipment=equipment, items=items)
+        else:
+            notes += [f"équipement de {p.key} : jeu {p.gear_file} du dépôt de wowsims, pris par l'outil (build sans "
+                      "équipement)" for p, _ in pairs if p.gear_file]  # fmt: skip
         if engine == "wowsims" and not talents:  # comparaison d'avant MS1, inchangée
             rows, fight_conditions = wowsims.compare_presets(
                 deps.cache_dir, pairs, wowsims.reference_encounter(presets), consumables=consumables, **kw
             )
+            provenance["assumptions"] = [*provenance["assumptions"], *notes]
             return {
                 "level": LEVEL,
                 "engine": engine,
+                "gear": compare_gear,
                 "rows": rows,
                 "conditions": fight_conditions,
                 "provenance": provenance,
             }
-        return engines.compare(deps, pairs, presets, engine=engine, talents=talents, consumables=consumables,
-                               rotation=rotation, ws_note=wowsims.source_note(pin), **kw)  # fmt: skip
+        out = engines.compare(deps, pairs, presets, engine=engine, talents=talents, consumables=consumables,
+                              rotation=rotation, ws_note=wowsims.source_note(pin), **kw)  # fmt: skip
+        out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
+        return {**out, "gear": compare_gear}
     if action == "builds":
         found = next((p for p in presets if p.key == preset), None)
         if found is None:

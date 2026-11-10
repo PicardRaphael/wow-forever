@@ -905,6 +905,22 @@ def gearquest_spec(preset_key: str, lead_tree: str) -> str:
     return f"{name}-{class_folder}"
 
 
+def gearquest_equipment(deps: Deps, preset: Preset, race: str, level: int) -> tuple[dict[str, Any], str]:
+    """Équipement de wowsims tiré des choix de GearQuest Forever au niveau `level` pour la spécialisation du préréglage
+    et la race (`forever_gear action=leveling`), et sa note de provenance ; arme gardée telle que GearQuest la
+    choisit (pas d'essai du type d'arme du préréglage, réservé au calcul par tranche)."""
+    from forever.gear import gear_report
+    from forever.sims.engines import ClassTalents, class_of
+
+    class_name = class_of(preset)
+    conv = ClassTalents(deps, class_name)
+    spec = gearquest_spec(preset.key, conv.lead_tree(conv.wowsims.decode(preset.talents)))
+    doc = gear_report(deps, "leveling", class_name=class_name, level=level, race=race, spec=spec)
+    note = (f"équipement de {preset.key} : choix de GearQuest ({spec}, {race}) au niveau {level} "
+            "(forever_gear action=leveling), arme non ajustée au type du préréglage")  # fmt: skip
+    return equipment_from_picks(list(doc.get("picks") or [])), note
+
+
 def candidate_pool(
     db: Mapping[int, Mapping[str, Any]], sources: Sequence[tuple[str, Sequence[int]]], *, level: int, class_id: int
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:

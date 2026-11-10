@@ -480,7 +480,7 @@ def build_server(deps: Deps) -> MCPServer:
         popular: bool = True,
         brackets: str | None = None,
         path: str = "auto",
-        gear: str = "gearquest",
+        gear: str | None = None,
         spec: str | None = None,
         level: int | None = None,
         equipped: str | None = None,
@@ -500,7 +500,8 @@ def build_server(deps: Deps) -> MCPServer:
         par tirages appariés (`stats` séparées par des virgules, ex. « Intellect,SpellDamage,HitRating », rapportées à
         `reference`, `race` exigée) ; `action="compare"` préréglages de classes différentes dans des conditions
         identiques (`cases` : « clé@Race » séparés par des virgules ; mêmes buffs, affaiblissements, rencontre, graine ;
-        `consumables` : `none` aucun, `own` ceux de chaque préréglage). La race vient toujours du joueur (question ou
+        `consumables` : `none` aucun, `own` ceux de chaque préréglage ; `gear` : `preset` (défaut) ou
+        `gearquest`, équipement égal : choix de GearQuest au niveau 60 de chaque spé et race). La race vient toujours du joueur (question ou
         profil, sinon la lui demander), jamais du champ `race` d'un préréglage ; préréglage sans équipement (`items`
         à 0 dans `presets`) : refusé. MS1 (décision 301) : `talents` (« clé=rang,… », nos clés, légaux au niveau 60,
         convertis par identifiant de sort ; un talent sans correspondance chez le moteur est refusé en le nommant) sur
@@ -513,7 +514,7 @@ def build_server(deps: Deps) -> MCPServer:
         compilé avec les correctifs forever : niveau réglable, rang appris au niveau) ; `brackets` : « all » (défaut :
         10-19, 20-29, 30-39, 40-49, 50-59 et 60, un niveau représentatif chacune), des tranches ou des niveaux séparés
         par des virgules ; `path` : `auto` (défaut : plan, sinon build populaire), `plan` (plan de leveling de `spec`), `popular` (build populaire de Talents Forever de l'arbre du préréglage, ordre légal généré) ou `none` ; `gear` :
-        `gearquest` (choix au niveau de chaque tranche) ou `none` (nu) ; solo (aucun buff ni consommable) ; `stats`
+        `gearquest` (défaut : choix au niveau de chaque tranche) ou `none` (nu) ; solo (aucun buff ni consommable) ; `stats`
         (séparées par des virgules) et `reference` : poids des statistiques de chaque tranche (tirages appariés) ;
         chaque ligne porte aussi `ttk_s` (temps pour tuer un monstre normal du niveau) et `xp_per_hour` (sans repos :
         plafond), leurs entrées dans `rates`, ou `rates_missing` (raison).
