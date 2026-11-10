@@ -541,7 +541,8 @@ def build_server(deps: Deps) -> MCPServer:
         `action="tierlist"` : toutes les spés de dégâts de `faction` (`horde`, `alliance`) classées pour `context`
         (`raid` : niveau 60, équipement GearQuest égal ; `donjon` : par tranche, groupe, 3 cibles ; `leveling` : par
         tranche, seul, repos compris, à l'XP par heure) ; gardée (`forever sims tierlist`), le raid se calcule s'il
-        manque."""
+        manque. `action="pets"` : familiers du Chasseur sur `preset` pour `race` (seul le familier change ; `gear`
+        `gearquest` : équipement GearQuest du 60)."""
         from forever.sims.report import simulate
 
         try:

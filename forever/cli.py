@@ -582,6 +582,12 @@ def build_parser() -> argparse.ArgumentParser:
     s_tier.add_argument("--faction", default="horde", choices=["horde", "alliance"], help="faction")
     s_tier.add_argument("--iterations", type=int, default=None, help="combats par essai")
     s_tier.add_argument("--json", action="store_true", help="sortie JSON")
+    s_pets = sims_sub.add_parser("pets", help="familiers du Chasseur comparés au niveau 60 (seul le familier change)")
+    s_pets.add_argument("--preset", default="hunter/dps/bm", help="préréglage de Chasseur")
+    s_pets.add_argument("--race", required=True, help="race du joueur")
+    s_pets.add_argument("--gear", default=None, choices=["preset", "gearquest"], help="équipement")
+    s_pets.add_argument("--iterations", type=int, default=None, help="combats par familier")
+    s_pets.add_argument("--json", action="store_true", help="sortie JSON")
     s_gear = sims_sub.add_parser("gear", help="optimisation de l'équipement par emplacement au niveau (SIM2)")
     s_gear.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
     s_gear.add_argument("--race", required=True, help="race du joueur")
@@ -1955,6 +1961,14 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
         lock.unlink(missing_ok=True)
         provenance = local_provenance(deps, certainty="suppose", assumptions=[f"{len(done)} analyse(s) prêtes"])
         _emit({"done": done, "provenance": provenance}, [f"{len(done)} analyse(s) prêtes"], provenance, args.json)
+        return EXIT_OK
+    if args.sims_command == "pets":
+        from forever.sims.report import simulate
+
+        doc = simulate(deps, "pets", preset=args.preset, race=args.race, gear=args.gear, iterations=args.iterations)
+        lines = [f"Familiers, {doc['preset']} ({doc['race']}, équipement {doc['gear']}) :"]
+        lines += [f"  {r['pet']} : {r['dps']:.1f} DPS ({r['gap_to_best']:+.1f})" for r in doc["pets"]]
+        _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command == "tierlist":
         from forever.sims.tierlist import tier_list

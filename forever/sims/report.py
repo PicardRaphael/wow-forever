@@ -6,6 +6,7 @@ poids des statistiques, comparaisons avec les talents choisis (un moteur ou les 
 
 from __future__ import annotations
 
+import dataclasses
 from typing import Any
 
 from forever.config import Deps
@@ -31,6 +32,7 @@ ACTIONS = (
     "analysis",
     "validate",
     "tierlist",
+    "pets",
 )
 ENGINES = ("wowsims", "mythicsim", "both")
 COMPARE_GEARS = ("preset", "gearquest")  # équipement de `compare` : celui du préréglage, ou GearQuest au 60
@@ -230,6 +232,26 @@ def simulate(
         raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir action=presets")
     encounter = wowsims.reference_encounter(presets)
     kwargs: dict[str, Any] = {"iterations": iterations} if iterations else {}
+    if action == "pets":  # familier du Chasseur : seul petType change (même race, combat, graine)
+        if not race:
+            raise InvalidArgumentError(
+                "Race manquante.", "demander la race au joueur (question ou profil), puis race=…"
+            )
+        pet_notes: list[str] = []
+        trial, items = chosen, None
+        if gear == "gearquest":  # équipement GearQuest du 60 au lieu de celui du préréglage
+            from forever.sims import brackets as sims_brackets
+
+            equipment, note = sims_brackets.gearquest_equipment(deps, chosen, race, LEVEL)
+            trial = dataclasses.replace(chosen, equipment=equipment)
+            items, _, items_note = sims_brackets.extra_items(deps.cache_dir)
+            pet_notes += [note, *([items_note] if items_note else [])]
+        rows = wowsims.compare_pets(deps.cache_dir, trial, wowsims.race_enum(race), encounter, items=items, **kwargs)
+        pet_notes.append("familier seul changé ; ni le familier qui encaisse ni ses buffs de groupe (Furious Howl) ne "
+                     "sont simulés")  # fmt: skip
+        provenance["assumptions"] = [*provenance["assumptions"], *pet_notes]
+        return {"level": LEVEL, "preset": chosen.key, "race": race, "gear": gear or "preset", "pets": rows,
+                "provenance": provenance}  # fmt: skip
     if action == "races":
         names = [wowsims.race_enum(r) for r in (races or "").split(",") if r.strip()]
         if not names:

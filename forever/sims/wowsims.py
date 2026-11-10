@@ -684,6 +684,54 @@ def compare_races(
     return [{**r, "gap_to_best": r["dps"] - best} for r in rows]
 
 
+_PET_ENUM = re.compile(r"enum PetType \{(.*?)\}", re.DOTALL)
+
+
+def pet_types(clone: Path) -> list[str]:
+    """Familles de familier du proto épinglé (`enum PetType` de `proto/hunter.proto`), sans `PetNone`."""
+    path = clone / "proto" / "hunter.proto"
+    m = _PET_ENUM.search(path.read_text(encoding="utf-8")) if path.is_file() else None
+    if m is None:
+        raise WowsimsError("proto de wowsims : énumération PetType introuvable.")
+    pairs = re.findall(r"^\s*(\w+)\s*=\s*(\d+);", m.group(1), re.MULTILINE)
+    return [name for name, _ in sorted(pairs, key=lambda p: int(p[1])) if name != "PetNone"]
+
+
+def compare_pets(
+    cache_dir: Path,
+    preset: Preset,
+    race: str,
+    encounter: dict[str, Any] | None = None,
+    *,
+    pets: Sequence[str] | None = None,
+    iterations: int = DEFAULT_ITERATIONS,
+    seed: int = DEFAULT_SEED,
+    runner: gitops.Runner | None = None,
+    items: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Familiers comparés sur un préréglage de Chasseur : même race, même combat, même graine, seul `petType` des
+    options de la spé change ; du meilleur au moins bon, écart au meilleur."""
+    import copy
+    import dataclasses
+
+    require_gear(preset)
+    options = (preset.spec_options.get("options") or {}).get("classOptions")
+    if not isinstance(options, dict) or "petType" not in options:
+        raise WowsimsError(f"préréglage « {preset.key} » sans familier (petType) : rien à comparer.",
+                           "choisir un préréglage de Chasseur (action=presets)")  # fmt: skip
+    rows = []
+    for pet in pets or pet_types(wowsims_dir(cache_dir) / "forever"):
+        spec_options = copy.deepcopy(preset.spec_options)
+        spec_options["options"]["classOptions"]["petType"] = pet
+        trial = dataclasses.replace(preset, spec_options=spec_options)
+        out = run_sim(cache_dir, request_for(trial, race=race, encounter=encounter, iterations=iterations, seed=seed),
+                      runner=runner, items=items)  # fmt: skip
+        rows.append({"pet": pet, **out})
+    rows.sort(key=lambda r: -r["dps"])
+    best = rows[0]["dps"] if rows else 0.0
+    return [{**r, "gap_to_best": r["dps"] - best} for r in rows]
+
+
 STAT_DELTA = 50.0  # points ajoutés à une statistique pour mesurer son poids (réglage de l'outil)
 _STAT_ENUM = re.compile(r"enum Stat \{(.*?)\}", re.DOTALL)
 
