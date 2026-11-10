@@ -10044,6 +10044,34 @@
      "key": "predatoryInstincts"
     }
    ]
+  },
+  {
+   "revision": 12,
+   "date": "2026-11-10",
+   "motif": "mesure des journaux de combat (table des monstres, forever update)",
+   "command": "forever update --auto",
+   "sources": {
+    "logs": {
+     "WoWCombatLog-111026_184418.txt": "d025448b9d2a49efff330f01afb8c0225e25bbc2aeb776aeb3bf4b3c60055313"
+    }
+   },
+   "changes": [
+    {
+     "file": "monsters.json",
+     "rule": "measure"
+    }
+   ],
+   "automated": true,
+   "rule": {
+    "clauses": {
+     "inputs": false
+    },
+    "carry": {},
+    "inputs": {
+     "mage_leveling": false,
+     "pvp_dr": true
+    }
+   }
   }
  ]
 }
