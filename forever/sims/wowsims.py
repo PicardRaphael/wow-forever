@@ -51,6 +51,11 @@ _SIMPLE = re.compile(r"(?:export )?const (\w+) = PresetUtils\.makePresetSimpleRo
 _BUILD_HELPER = re.compile(r"\bbuild\(\s*'([^']*)',\s*(\w+),\s*(\w+),\s*(\w+),\s*(\w+),\s*(\d+(?:\.\d+)?)\s*\)")
 _LOCAL_OBJECT = re.compile(r"^(?:export )?const (\w+) = (?=\{)", re.MULTILINE)
 _ALIAS = re.compile(r"^export const (\w+) = (\w+);", re.MULTILINE)
+# champ des `defaults` de `spec.ts` -> objet de presets.ts qu'il remplace quand presets.ts ne le donne pas
+_SPEC_DEFAULTS = {"raidBuffs": "DefaultRaidBuffs", "partyBuffs": "DefaultPartyBuffs",
+                  "individualBuffs": "DefaultIndividualBuffs", "debuffs": "DefaultDebuffs"}  # fmt: skip
+# fichier de préréglages partagé de la classe (`import * as WarriorPresets from '../shared/presets';`)
+_NAMESPACE = re.compile(r"^import \* as (\w+) from '(\.\.?/[^']+)';", re.MULTILINE)
 _OTHER_DEFAULTS = re.compile(r"export const OtherDefaults = (?=\{)")
 
 
@@ -127,7 +132,7 @@ def ts_literal(
                 if text[i] == "}":
                     i += 1
                     return out
-                spread = re.compile(r"\.\.\.(\w+)").match(text, i)
+                spread = re.compile(r"\.\.\.([\w.]+)").match(text, i)
                 if spread:  # `...nom` : objet local du même fichier
                     i = spread.end()
                     base = (refs or {}).get(spread.group(1))
@@ -220,12 +225,31 @@ def _from_presets_ts(
         **dict(_TALENT_OBJECT.findall(text)),
     }
     local: dict[str, Any] = {}  # objets locaux (`const nom = {…}`), dans l'ordre du fichier, pour les `...nom`
+    shared: dict[str, Any] = {}  # objets créés d'un fichier partagé importé, par nom (`WarriorPresets.X` et `X`)
+    for ns, src in _NAMESPACE.findall(text):
+        other_path = (spec_dir / src).with_suffix(".ts")
+        if not other_path.is_file() or other_path.resolve() == path.resolve():
+            continue
+        other = _strip_comments(other_path.read_text(encoding="utf-8"))
+        for m in _CREATE.finditer(other):
+            value = _literal_or_empty(other, m.end(), ids, {})
+            local[f"{ns}.{m.group(1)}"] = value
+            shared.setdefault(m.group(1), value)
     for m in _LOCAL_OBJECT.finditer(text):
         local[m.group(1)] = _literal_or_empty(text, m.end(), ids, local)
     created = {m.group(1): _literal_or_empty(text, m.end(), ids, local) for m in _CREATE.finditer(text)}
     for var, alias in _ALIAS.findall(text):  # `export const DefaultOptions = NoPetOptions;`
         if alias in created:
             created[var] = created[alias]
+    for name, value in shared.items():  # buffs ou consommables par défaut pris du fichier partagé s'ils manquent ici
+        created.setdefault(name, value)
+    spec_ts = spec_dir / "spec.ts"  # `defaults` de l'interface de la spé : buffs absents de presets.ts
+    if spec_ts.is_file():
+        spec_text = _strip_comments(spec_ts.read_text(encoding="utf-8"))
+        for field_name, name in _SPEC_DEFAULTS.items():
+            found = re.search(rf"\b{field_name}:\s*\w+\.create\(\s*(?=\{{)", spec_text)
+            if found and name not in created:
+                created[name] = _literal_or_empty(spec_text, found.end(), ids, local)
     # rotations « simples » (`makePresetSimpleRotation`) : converties en APL par l'interface web seulement, le moteur
     # ne les joue pas ; un build qui en porte une prend l'APL du dépôt de même nom, sinon l'APL par défaut de la spé
     simple = {m.group(1) for m in _SIMPLE.finditer(text)}
@@ -386,7 +410,11 @@ def _from_siml(spec_dir: Path, rel: str, binary: Path | None, runner: gitops.Run
                 equipment=dict(player.get("equipment") or {}),
                 spec_options=dict(player.get(spec_field) or {}),
                 race=player.get("race"),
+                distance=float(player["distanceFromTarget"]) if player.get("distanceFromTarget") else None,
+                raid_buffs=dict(doc.get("raidBuffs") or defaults.get("raidBuffs") or {}),
+                party_buffs=dict(doc.get("partyBuffs") or defaults.get("partyBuffs") or {}),
                 individual_buffs=dict(player.get("buffs") or {}),
+                debuffs=dict(doc.get("debuffs") or defaults.get("debuffs") or {}),
                 consumables=dict(player.get("consumables") or {}),
             )
         )
