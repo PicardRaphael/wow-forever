@@ -421,3 +421,14 @@ def test_buffs_missing_from_presets_are_read_from_the_spec_defaults(tmp_path):
     assert fire.raid_buffs == {"arcaneBrilliance": True}  # presets.ts prime
     assert fire.individual_buffs == {"greaterBlessingOfKings": True}
     assert fire.debuffs == {"sunderArmor": True}
+
+
+def test_buff_union_reads_tristate_names_as_their_number():
+    """Buffs à trois états (`TristateEffect` du proto : absent 0, normal 1, amélioré 2) : un préréglage les écrit par
+    nom (`TristateEffectRegular`, lu dans `spec.ts`), un autre par numéro ; la réunion garde le plus fort, en numéro
+    (le raid de la tier list plantait le 2026-11-10)."""
+    from forever.sims.wowsims import _union
+
+    assert _union([{"manaSpringTotem": "TristateEffectRegular"}, {"manaSpringTotem": 2}]) == {"manaSpringTotem": 2}
+    assert _union([{"manaSpringTotem": "TristateEffectImproved"}, {"manaSpringTotem": 1}]) == {"manaSpringTotem": 2}
+    assert _union([{"arcaneIntellect": True}, {"arcaneIntellect": False}]) == {"arcaneIntellect": True}
