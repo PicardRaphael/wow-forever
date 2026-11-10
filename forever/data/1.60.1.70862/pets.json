@@ -2761,9 +2761,9 @@
      "training_cost": 5,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      3
+      30
      ],
      "teach_spell_id": 4195
     },
@@ -2774,9 +2774,9 @@
      "training_cost": 10,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      5
+      50
      ],
      "teach_spell_id": 4196
     },
@@ -2787,9 +2787,9 @@
      "training_cost": 15,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      7
+      70
      ],
      "teach_spell_id": 4197
     },
@@ -2800,9 +2800,9 @@
      "training_cost": 25,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      10
+      100
      ],
      "teach_spell_id": 4198
     },
@@ -2813,9 +2813,9 @@
      "training_cost": 50,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      13
+      130
      ],
      "teach_spell_id": 4199
     },
@@ -2826,9 +2826,9 @@
      "training_cost": 75,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      17
+      170
      ],
      "teach_spell_id": 4200
     },
@@ -2839,9 +2839,9 @@
      "training_cost": 100,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      21
+      210
      ],
      "teach_spell_id": 4201
     },
@@ -2852,9 +2852,9 @@
      "training_cost": 125,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Stamina increased by $s1.",
+     "description": "Health increased by $s1.",
      "tooltip_values": [
-      26
+      260
      ],
      "teach_spell_id": 4202
     },
@@ -2867,7 +2867,7 @@
      "cooldown_s": null,
      "description": "Health increased by $s1.",
      "tooltip_values": [
-      32
+      320
      ],
      "teach_spell_id": 5048
     },
@@ -2880,7 +2880,7 @@
      "cooldown_s": null,
      "description": "Health increased by $s1.",
      "tooltip_values": [
-      40
+      400
      ],
      "teach_spell_id": 5049
     }
@@ -2891,6 +2891,53 @@
     "training_cost": "probable",
     "focus_cost": "certain",
     "cooldown_s": "certain"
+   },
+   "hotfix": {
+    "pushes": [
+     113270
+    ],
+    "rows": [
+     "Spell 4187",
+     "Spell 4188",
+     "Spell 4189",
+     "Spell 4190",
+     "Spell 4191",
+     "Spell 4192",
+     "Spell 4193",
+     "Spell 4194",
+     "SpellAuraOptions 118987",
+     "SpellAuraOptions 119038",
+     "SpellAuraOptions 119096",
+     "SpellAuraOptions 119227",
+     "SpellAuraOptions 119304",
+     "SpellAuraOptions 119309",
+     "SpellAuraOptions 119310",
+     "SpellAuraOptions 119311",
+     "SpellAuraOptions 120251",
+     "SpellAuraOptions 120252",
+     "SpellEffect 682643",
+     "SpellEffect 682700",
+     "SpellEffect 682764",
+     "SpellEffect 682915",
+     "SpellEffect 683003",
+     "SpellEffect 683008",
+     "SpellEffect 683009",
+     "SpellEffect 683010",
+     "SpellEffect 684107",
+     "SpellEffect 684108",
+     "SpellMisc 317392",
+     "SpellMisc 317443",
+     "SpellMisc 317501",
+     "SpellMisc 317632",
+     "SpellMisc 317709",
+     "SpellMisc 317714",
+     "SpellMisc 317715",
+     "SpellMisc 317716",
+     "SpellMisc 318656",
+     "SpellMisc 318657"
+    ],
+    "first_logged_at": null,
+    "dbcache_date": "2026-11-10T07:11:09Z"
    }
   },
   "growl": {
