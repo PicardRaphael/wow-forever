@@ -230,9 +230,9 @@ def _from_presets_ts(
         other_path = (spec_dir / src).with_suffix(".ts")
         if not other_path.is_file() or other_path.resolve() == path.resolve():
             continue
-        other = _strip_comments(other_path.read_text(encoding="utf-8"))
-        for m in _CREATE.finditer(other):
-            value = _literal_or_empty(other, m.end(), ids, {})
+        shared_text = _strip_comments(other_path.read_text(encoding="utf-8"))
+        for m in _CREATE.finditer(shared_text):
+            value = _literal_or_empty(shared_text, m.end(), ids, {})
             local[f"{ns}.{m.group(1)}"] = value
             shared.setdefault(m.group(1), value)
     for m in _LOCAL_OBJECT.finditer(text):
