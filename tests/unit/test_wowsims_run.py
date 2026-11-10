@@ -391,3 +391,33 @@ def test_buffs_and_consumables_of_a_shared_presets_file_are_followed(tmp_path):
     assert fury.raid_buffs == {"battleShout": 1}
     assert fury.debuffs == {"sunderArmor": True}
     assert fury.individual_buffs == {"greaterBlessingOfKings": True}
+
+
+ROGUE_SPEC_TS = """export const RogueSimUI = new IndividualSimUI(parentElem, sim, {
+	defaults: {
+		gear: Presets.P1Gear.gear,
+		raidBuffs: RaidBuffs.create({
+			markOfTheWild: true,
+			battleShout: 1, // Rank 6
+		}),
+		partyBuffs: PartyBuffs.create({}),
+		individualBuffs: IndividualBuffs.create({
+			greaterBlessingOfKings: true,
+		}),
+		debuffs: Debuffs.create({ sunderArmor: true }),
+	},
+});
+"""
+
+
+def test_buffs_missing_from_presets_are_read_from_the_spec_defaults(tmp_path):
+    """Voleur et Druide Farouche du dépôt (vu le 2026-11-10) : buffs de raid, individuels et affaiblissements dans les
+    `defaults` de `spec.ts`, pas dans `presets.ts`. Le préréglage les prend quand `presets.ts` n'en a pas ; ceux de
+    `presets.ts` priment (Mage du faux dépôt : `arcaneBrilliance`)."""
+    root = clone(tmp_path)
+    mage = root / "forever" / "ui" / "specs" / "mage" / "dps"
+    (mage / "spec.ts").write_text(ROGUE_SPEC_TS, encoding="utf-8")
+    fire = {p.key: p for p in read_presets(root / "forever")}["mage/dps/Fire"]
+    assert fire.raid_buffs == {"arcaneBrilliance": True}  # presets.ts prime
+    assert fire.individual_buffs == {"greaterBlessingOfKings": True}
+    assert fire.debuffs == {"sunderArmor": True}
