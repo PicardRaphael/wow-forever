@@ -40,3 +40,30 @@ def test_compare_with_gearquest_gear(make_deps, tmp_path, monkeypatch):
     assert sim.requests[before]["raid"]["parties"][0]["players"][0]["equipment"] != PICKED
     assert json.dumps(out["rows"])  # lignes sérialisables
     assert Path(deps.cache_dir).is_dir()
+
+
+def test_shadow_tree_maps_to_the_gearquest_shadow_spec():
+    """Arbre « Shadow Magic » du client (Prêtre) : spécialisation `shadow-priest` de GearQuest, pas
+    `shadow_magic-priest` (aucun objet ; vu le 2026-11-10)."""
+    from forever.sims.brackets import gearquest_spec
+
+    assert gearquest_spec("priest/dps/testing", "Shadow Magic") == "shadow-priest"
+
+
+def test_empty_slots_are_not_gear():
+    """Équipement aux 17 emplacements vides (aucun choix d'objet) : nu, donc refusé comme un préréglage sans
+    équipement (le Prêtre a été simulé nu le 2026-11-10)."""
+    import dataclasses
+
+    import pytest
+    from wowsims_fakes import BUILD
+
+    from forever.sims.wowsims import Preset, WowsimsError, require_gear
+
+    empty = Preset(key="priest/dps/x", class_token="ClassPriest", spec_field="shadowPriest", talents="",
+                   rotation={}, equipment={"items": [{} for _ in range(17)]}, spec_options={})  # fmt: skip
+    assert empty.items == 0
+    with pytest.raises(WowsimsError, match="sans équipement"):
+        require_gear(empty)
+    assert dataclasses.replace(empty, equipment={"items": [{}, {"id": 1}]}).items == 1
+    assert BUILD  # faux du dépôt importable
