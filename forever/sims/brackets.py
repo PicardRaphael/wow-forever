@@ -493,7 +493,7 @@ def run_brackets(
                     w = wowsims.stat_weights(
                         deps.cache_dir, case, list(stats), reference=reference or stats[0], race=race_token,
                         encounter=fight, iterations=iterations or wowsims.DEFAULT_ITERATIONS,
-                        runner=runner, level=level, base_stats=doc, items=items_path,
+                        runner=runner, level=level, base_stats=doc, items=items_path, naked=not case.items,
                     )  # fmt: skip
                     row["weights"] = {k: w[k] for k in ("per_point", "normalised", "reference", "delta", "base_dps")}
                     # ordre de priorité : du plus grand au plus petit gain par point
@@ -893,7 +893,10 @@ def optimise_from_sources(
 # dossier de spé de wowsims -> spécialisation de GearQuest, quand le dossier la nomme
 _GQ_FOLDERS = {"retribution": "retribution", "balance": "balance", "elemental": "elemental",
                "enhancement": "enhancement", "feralcat": "feral", "feralbear": "bear"}  # fmt: skip
-_GQ_TREES = {"feral_combat": "feral"}  # arbre du client -> spécialisation de GearQuest, quand ils diffèrent
+_GQ_TREES = {
+    "feral_combat": "feral",
+    "shadow_magic": "shadow",
+}  # arbre du client -> spécialisation de GearQuest, quand ils diffèrent
 
 
 def gearquest_spec(preset_key: str, lead_tree: str) -> str:
@@ -905,10 +908,17 @@ def gearquest_spec(preset_key: str, lead_tree: str) -> str:
     return f"{name}-{class_folder}"
 
 
+@functools.lru_cache(maxsize=4)
+def _reference_fight(cache_dir: str) -> dict[str, Any] | None:
+    """Combat de référence du dépôt épinglé (lu une fois par dossier de cache)."""
+    return wowsims.reference_encounter(wowsims.read_presets(wowsims_dir(Path(cache_dir)) / "forever"))
+
+
 def gearquest_equipment(deps: Deps, preset: Preset, race: str, level: int) -> tuple[dict[str, Any], str]:
     """Équipement de wowsims tiré des choix de GearQuest Forever au niveau `level` pour la spécialisation du préréglage
-    et la race (`forever_gear action=leveling`), et sa note de provenance ; arme gardée telle que GearQuest la
-    choisit (pas d'essai du type d'arme du préréglage, réservé au calcul par tranche)."""
+    et la race (`forever_gear action=leveling`), et sa note de provenance. Arme ajustée comme pour le calcul par
+    tranche (`match_weapons`) : une arme d'un autre type que celle du préréglage est remplacée par la meilleure arme
+    de ce type de la réserve des addons, si elle fait plus de dégâts (combat du préréglage, même graine)."""
     from forever.gear import gear_report
     from forever.sims.engines import ClassTalents, class_of
 
@@ -916,9 +926,30 @@ def gearquest_equipment(deps: Deps, preset: Preset, race: str, level: int) -> tu
     conv = ClassTalents(deps, class_name)
     spec = gearquest_spec(preset.key, conv.lead_tree(conv.wowsims.decode(preset.talents)))
     doc = gear_report(deps, "leveling", class_name=class_name, level=level, race=race, spec=spec)
-    note = (f"équipement de {preset.key} : choix de GearQuest ({spec}, {race}) au niveau {level} "
-            "(forever_gear action=leveling), arme non ajustée au type du préréglage")  # fmt: skip
-    return equipment_from_picks(list(doc.get("picks") or [])), note
+    items = list(equipment_from_picks(list(doc.get("picks") or []))["items"])
+    note = (
+        f"équipement de {preset.key} : choix de GearQuest ({spec}, {race}) au niveau {level} (forever_gear "
+        "action=leveling)"
+    )
+    if not any(items) or not preset.items:
+        return {"items": items}, note
+    items_path = extra_items(deps.cache_dir)[0]
+    fight = _reference_fight(str(deps.cache_dir))  # combat de référence du dépôt, comme `compare`
+    race_token = wowsims.race_enum(race)
+
+    def run(trial: list[dict[str, Any]]) -> dict[str, Any]:
+        same = dataclasses.replace(preset, equipment={"items": trial})
+        req = wowsims.request_for(same, race=race_token, encounter=fight)
+        return wowsims.run_sim(deps.cache_dir, req, items=items_path)
+
+    db = item_database(deps.cache_dir)
+    names = weapon_type_names(wowsims_dir(deps.cache_dir) / "forever")
+    pool = functools.partial(lambda: pool_from_sources(deps, class_name, spec, level, race)[0])
+    items, _, weapon = match_weapons(run, items, run(items), preset.equipment, db, pool, level, names)
+    if weapon is not None:
+        note += f" ; arme : {weapon['choice']} (type du préréglage : " + ", ".join(
+            f"{s} {t}" for s, t in weapon["reference_type"].items()) + ")"  # fmt: skip
+    return {"items": items}, note
 
 
 def candidate_pool(

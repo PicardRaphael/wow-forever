@@ -85,7 +85,7 @@ class Preset:
     @property
     def items(self) -> int:
         """Objets équipés par le préréglage (0 : personnage nu, jamais simulé)."""
-        return len(self.equipment.get("items") or [])
+        return sum(1 for item in self.equipment.get("items") or [] if item)  # emplacement vide : rien
 
 
 def require_gear(preset: Preset) -> None:
@@ -684,10 +684,13 @@ def stat_weights(
     level: int | None = None,
     base_stats: dict[str, Any] | None = None,
     items: Path | None = None,
+    naked: bool = False,
 ) -> dict[str, Any]:
     """Poids des statistiques par tirages appariés : un combat sans bonus, puis un par statistique avec `delta` points
-    de plus (même préréglage, même graine) ; gain de dégâts par seconde par point, et rapporté à `reference`."""
-    require_gear(preset)
+    de plus (même préréglage, même graine) ; gain de dégâts par seconde par point, et rapporté à `reference`.
+    `naked` : personnage nu voulu (calcul par tranche sans équipement), sans refus."""
+    if not naked:
+        require_gear(preset)
     names = stat_names(wowsims_dir(cache_dir) / "forever")
     unknown = [s for s in [*stats, reference] if s not in names]
     if unknown:
