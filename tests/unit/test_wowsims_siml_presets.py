@@ -83,3 +83,29 @@ def test_rotation_declared_inside_an_object_is_read(tmp_path):
     cat = presets["druid/feralcat/défaut"]
     assert cat.rotation == {"type": "TypeAPL", "priorityList": [1]} and cat.talents == "050022-532"
     assert cat.spec_field == "feralCatDruid"
+
+
+class DefaultsRunner(SimlRunner):
+    """`defaults.siml` : buffs de raid et affaiblissements au premier niveau ; build : joueur à 12 m de la cible."""
+
+    def __call__(self, args, cwd, timeout=None):
+        args = list(args)
+        self.calls.append(args)
+        if args[-1].endswith("defaults.siml"):
+            doc = {"raidBuffs": {"battleShout": 1}, "debuffs": {"sunderArmor": True}, "player": {"race": "RaceOrc"}}
+            return subprocess.CompletedProcess(args, 0, json.dumps(doc), "")
+        return subprocess.CompletedProcess(args, 0, json.dumps({"player": {**PLAYER, "distanceFromTarget": 12}}), "")
+
+
+def test_siml_defaults_give_raid_buffs_debuffs_and_distance(tmp_path):
+    """Chasseur et Paladin Vindicte du dépôt (vu le 2026-11-10) : buffs de raid et affaiblissements dans
+    `defaults.siml` (premier niveau du document), distance à la cible dans le joueur du build ; le préréglage les
+    porte, comme wowsims qui charge le build par-dessus ses valeurs par défaut."""
+    root = clone(tmp_path)
+    spec = root / "forever" / "ui" / "specs" / "hunter" / "dps"
+    (spec / "builds").mkdir(parents=True)
+    (spec / "defaults.siml").write_text("siml 1\n", encoding="utf-8")
+    (spec / "builds" / "sv.siml").write_text("siml 1\n", encoding="utf-8")
+    sv = {p.key: p for p in read_presets(root / "forever", runner=DefaultsRunner())}["hunter/dps/sv"]
+    assert sv.raid_buffs == {"battleShout": 1} and sv.debuffs == {"sunderArmor": True}
+    assert sv.distance == 12 and sv.race == "RaceOrc"
