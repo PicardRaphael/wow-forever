@@ -43,7 +43,8 @@
   "WoWCombatLog-110926_073147.txt",
   "WoWCombatLog-110926_085109.txt",
   "WoWCombatLog-111026_072943.txt",
-  "WoWCombatLog-111026_184418.txt"
+  "WoWCombatLog-111026_184418.txt",
+  "WoWCombatLog-111026_191657.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -149,6 +150,13 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 102,
+     "fought": null
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 120,
      "fought": null
     }
    }
@@ -581,7 +589,7 @@
     "15": {
      "max_hp": 385,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-111026_191657.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 328,
      "fought": null
     },
@@ -595,14 +603,21 @@
    }
   },
   "441": {
-   "name": "Dragonnet noir",
+   "name": "Black Dragon Whelp",
    "zone_id": 44,
    "rank": 0,
    "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 330,
+     "fought": null
+    },
     "18": {
      "max_hp": 521,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-111026_191657.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 354,
      "fought": null
     }
@@ -616,14 +631,14 @@
     "15": {
      "max_hp": 385,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-111026_191657.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 328,
      "fought": null
     },
     "16": {
      "max_hp": 427,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-111026_191657.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 356,
      "fought": null
     }
@@ -973,7 +988,7 @@
     "17": {
      "max_hp": 473,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-111026_191657.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 386,
      "fought": true
     }
@@ -1491,7 +1506,7 @@
     "15": {
      "max_hp": 385,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110726_115127.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110726_115127.txt, WoWCombatLog-111026_191657.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 328,
      "fought": null
     }
@@ -2205,7 +2220,7 @@
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110626_182926.txt (bloc avancé, 14 individu(s))",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 120,
      "fought": null
     }
@@ -3010,14 +3025,14 @@
     "28": {
      "max_hp": 1164,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110926_085109.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 896,
      "fought": null
     },
     "29": {
      "max_hp": 1236,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110926_085109.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 950,
      "fought": null
     }
@@ -4718,7 +4733,7 @@
     "5": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_172854.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-110826_172854.txt, WoWCombatLog-111026_191657.txt (bloc avancé, 2 individu(s))",
      "questie_hp": null,
      "fought": null
     }
@@ -8638,7 +8653,7 @@
     "55": {
      "max_hp": 7204,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110926_085109.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 5228,
      "fought": null
     }
@@ -9334,6 +9349,76 @@
      "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 1910,
      "fought": null
+    }
+   }
+  },
+  "14388": {
+   "name": "Rogue Black Drake",
+   "zone_id": 12,
+   "rank": 1,
+   "levels": {
+    "50": {
+     "max_hp": 8727,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 6645,
+     "fought": false
+    }
+   }
+  },
+  "14390": {
+   "name": "Expeditionary Mountaineer",
+   "zone_id": 12,
+   "rank": 1,
+   "levels": {
+    "36": {
+     "max_hp": 4980,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
+    },
+    "37": {
+     "max_hp": 5211,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 4008,
+     "fought": false
+    },
+    "39": {
+     "max_hp": 5691,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
+    },
+    "40": {
+     "max_hp": 5943,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
+    }
+   }
+  },
+  "14393": {
+   "name": "Expeditionary Priest",
+   "zone_id": 12,
+   "rank": 1,
+   "levels": {
+    "39": {
+     "max_hp": 5691,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
+    },
+    "42": {
+     "max_hp": 6438,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111026_191657.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
     }
    }
   },
@@ -11041,6 +11126,12 @@
    "level": 16,
    "measured": 427,
    "questie": 356
+  },
+  {
+   "npc_id": 441,
+   "level": 17,
+   "measured": 473,
+   "questie": 330
   },
   {
    "npc_id": 441,
@@ -15073,6 +15164,18 @@
    "level": 30,
    "measured": 2484,
    "questie": 1910
+  },
+  {
+   "npc_id": 14388,
+   "level": 50,
+   "measured": 8727,
+   "questie": 6645
+  },
+  {
+   "npc_id": 14390,
+   "level": 37,
+   "measured": 5211,
+   "questie": 4008
   }
  ],
  "questie_correction": {
@@ -15269,6 +15372,12 @@
     "ratio": 1.0
    },
    {
+    "npc_id": 94,
+    "name": "Vide-gousset défias",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 97,
     "name": "Riverpaw Runt",
     "level": 8,
@@ -15438,7 +15547,13 @@
    },
    {
     "npc_id": 441,
-    "name": "Dragonnet noir",
+    "name": "Black Dragon Whelp",
+    "level": 17,
+    "ratio": 1.4333333333333333
+   },
+   {
+    "npc_id": 441,
+    "name": "Black Dragon Whelp",
     "level": 18,
     "ratio": 1.4717514124293785
    },
@@ -17078,7 +17193,8 @@
    "npc_id": 94,
    "name": "Vide-gousset défias",
    "levels": [
-    5
+    5,
+    6
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
@@ -17231,8 +17347,9 @@
   },
   {
    "npc_id": 441,
-   "name": "Dragonnet noir",
+   "name": "Black Dragon Whelp",
    "levels": [
+    17,
     18
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
@@ -19719,6 +19836,34 @@
    "name": "Dun Morogh Mountaineer",
    "levels": [
     30
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 14388,
+   "name": "Rogue Black Drake",
+   "levels": [
+    50
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 14390,
+   "name": "Expeditionary Mountaineer",
+   "levels": [
+    36,
+    37,
+    39,
+    40
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 14393,
+   "name": "Expeditionary Priest",
+   "levels": [
+    39,
+    42
    ],
    "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
