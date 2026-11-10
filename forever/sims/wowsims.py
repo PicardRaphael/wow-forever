@@ -788,11 +788,16 @@ def replay_reference(
     return report
 
 
+# `enum TristateEffect` du proto : un buff à trois états écrit par nom (`spec.ts`) vaut son numéro
+_TRISTATE = {"TristateEffectMissing": 0, "TristateEffectRegular": 1, "TristateEffectImproved": 2}
+
+
 def _union(dicts: Sequence[dict[str, Any]]) -> dict[str, Any]:
     """Réunion de buffs (un buff donné par un préréglage l'est pour tous ; valeur numérique : la plus grande)."""
     out: dict[str, Any] = {}
     for d in dicts:
         for k, v in d.items():
+            v = _TRISTATE.get(v, v) if isinstance(v, str) else v  # nom du proto -> numéro
             if isinstance(v, bool) or not isinstance(v, int | float):
                 out[k] = out.get(k) or v
             else:
