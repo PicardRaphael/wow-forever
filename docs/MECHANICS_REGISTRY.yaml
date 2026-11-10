@@ -1659,7 +1659,10 @@ mechanics:
       - "relevés du joueur (ForeverLogger, forever xp check) : mechanics.json xp.lower_mob_base, monstre plus bas à XP de base au niveau du monstre (décision 249)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : LevelExperience, ExpectedStat.ArmorConstant, T08b)"
       - "wowsims/forever compilé avec les correctifs de SIM2 (DPS par tranche, forever/sims/brackets.py) : entrée du temps pour tuer de toutes les classes"
+      - "wowsims/forever, sortie du combat (resources, tto, secondsOomAvg, chanceOfDeath) et journal de débogage (« of N total », tics OtherActionManaRegen Tag 2) : mana dépensée, dégâts subis, mana et vie maximales, régénération hors incantation de toutes les classes (SIM2 §10, L17)"
     tests:
+      - tests/unit/test_sims_leveling.py::test_cycle_counts_the_rest_needed_after_the_run_between_mobs
+      - tests/unit/test_sims_leveling.py::test_rotations_are_ranked_by_xp_per_hour_with_rest_not_by_dps
       - tests/unit/test_engine_leveling.py::test_monster_formulas_match_the_seed
       - tests/unit/test_engine_leveling.py::test_downtime_is_the_longer_of_drinking_and_eating
       - tests/unit/test_sim_leveling.py::test_analytic_close_to_monte_carlo
@@ -2469,4 +2472,26 @@ mechanics:
       - tests/unit/test_sims_pet_stats.py::test_pet_stats_file_is_passed_apart_then_removed
       - tests/unit/test_sims_pet_stats.py::test_brackets_say_pets_keep_level_60_values_without_client_data
     tolerance: null
-    note: "SIM2 (décision 305) : table du client certaine, son usage par wowsims probable (parts mesurées par wowsims aux niveaux 11 à 30). Le bloc creature n'est dans les données qu'après le prochain forever decode/update : d'ici là familiers aux valeurs du 60 (surestimés, dit ligne par ligne). Non corrigé : attributs fixes des démons (Force, Intelligence, puissance d'attaque du Voidwalker et de la Succube, mana du Diablotin) saisis par wowsims au 60 ; PV par Endurance du maître non relevés"
+    note: "SIM2 (décision 305) : table du client certaine, son usage par wowsims probable (parts mesurées par wowsims aux niveaux 11 à 30). Bloc creature dans les données depuis 1.60.1.70862 r11 (2026-11-10). Non corrigé : attributs fixes des démons (Force, Intelligence, puissance d'attaque du Voidwalker et de la Succube, mana du Diablotin) saisis par wowsims au 60 ; PV par Endurance du maître non relevés"
+  - id: L17
+    categorie: simulateurs
+    description: "Rencontre de leveling (solo) : monstre normal du niveau qui frappe le joueur, combat au temps pour tuer, repos par monstre et XP par heure repos compris ; rotations classées à l'XP par heure"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/<version>/monsters.json (hp_by_level : mes journaux, sinon Questie corrigé)"
+      - "Client, table ExpectedStat : CreatureArmor, CreatureAutoAttackDps par niveau (character_scaling.json, bloc creature)"
+      - "wowsims/forever : raid.tanks (la cible frappe le joueur) ; coups de la cible BaseDamageMin × (1 + écart × aléa + PA × coefficient) (sim/core/attack.go, écart et PA à 0) ; pas de fin de combat à la mort de la cible (durée fixe : amorce puis PV / DPS)"
+      - "forever/data/<version>/spells.json (utility.conjure_water, conjure_food) : boisson et repas du niveau, pris pour toutes les classes (suppose)"
+    tests:
+      - tests/unit/test_sims_leveling.py::test_fight_metrics_read_mana_spent_gained_damage_taken_and_oom_per_iteration
+      - tests/unit/test_sims_leveling.py::test_probe_logs_give_the_pools_and_the_regen_while_not_casting
+      - tests/unit/test_sims_leveling.py::test_leveling_encounter_is_one_normal_mob_of_the_level_that_hits_the_player
+      - tests/unit/test_sims_leveling.py::test_leveling_fight_lasts_the_time_to_kill_and_the_mob_hits_the_player
+      - tests/unit/test_sims_leveling.py::test_rotations_are_ranked_by_xp_per_hour_with_rest_not_by_dps
+      - tests/unit/test_sims_leveling.py::test_missing_creature_values_keep_the_reference_fight_and_say_why
+      - tests/unit/test_sims_leveling.py::test_default_mob_reads_hit_points_from_monsters_and_the_rest_from_expected_stat
+      - tests/unit/test_sims_leveling.py::test_analysis_key_names_the_objective_model
+    tolerance: null
+    note: "SIM2 §10 (demande du 2026-11-10). Multiplicateur de dégâts d'une créature normale pris à 1 (ExpectedStat tel quel) ; boisson et repas des autres classes supposés égaux aux conjurations du Mage (OPEN_QUESTIONS SIM2-b) ; soins entre les combats, fuite et ajouts de monstres non modélisés ; talents et poids des statistiques pas encore classés à l'XP par heure."

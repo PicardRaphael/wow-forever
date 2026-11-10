@@ -554,6 +554,12 @@ def build_parser() -> argparse.ArgumentParser:
     s_brk.add_argument("--reference", default=None, help="statistique de référence des poids (défaut : la première)")
     s_brk.add_argument("--conditions", default="solo", choices=["solo", "group", "raid"], help="conditions du combat")
     s_brk.add_argument("--targets", type=int, default=1, help="nombre de cibles identiques (zone au-delà de 1)")
+    s_brk.add_argument(
+        "--objective",
+        default="leveling",
+        choices=["leveling", "dps"],
+        help="leveling (défaut, solo : XP par heure avec repos) ou dps (combat de référence)",
+    )
     s_rbk = sims_sub.add_parser("races-brackets", help="races jouables de la classe comparées par tranche (SIM2)")
     s_rbk.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
     s_rbk.add_argument("--brackets", default=None, help="« all » (défaut), tranches ou niveaux, ex. 20-29,60 ou 22")
@@ -1843,6 +1849,27 @@ def _sims_lines(doc: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _leveling_lines(row: dict[str, Any]) -> list[str]:
+    """Lignes du cycle de leveling d'une tranche (SIM2 §10)."""
+    lv = row["leveling"]
+    out = [f"    monstre du niveau : {row['ttk_s']:.1f} s pour tuer, {lv['mana_spent']:.0f} mana et "
+           f"{lv['damage_taken']:.0f} PV par monstre, repos {lv['rest_s']:.1f} s par monstre"
+           + (f" ({lv['limited_by']})" if lv.get("limited_by") else "")]  # fmt: skip
+    bars = []
+    if lv.get("kills_per_mana_bar") is not None:
+        bars.append(f"{lv['kills_per_mana_bar']:.1f} monstres par barre de mana")
+    if lv.get("kills_per_hp_bar") is not None:
+        bars.append(f"{lv['kills_per_hp_bar']:.1f} par barre de vie")
+    if bars:
+        out.append("    " + ", ".join(bars))
+    if row.get("xp_per_hour") is not None:
+        out.append(f"    {row['xp_per_hour']:.0f} XP/h repos compris ({row['xp_per_hour_no_rest']:.0f} sans repos, "
+                   f"{100 * lv.get('rest_share', 0.0):.0f} % du temps au repos)")  # fmt: skip
+    if lv.get("death_chance"):
+        out.append(f"    risque de mort par combat : {100 * lv['death_chance']:.0f} %")
+    return out
+
+
 def _validate_lines(doc: dict[str, Any]) -> list[str]:
     """Texte de `forever sims validate` : chiffres recopiés de la mesure et du calcul."""
     who = doc["character"]
@@ -1952,7 +1979,8 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
 
         doc = simulate(deps, "brackets", preset=args.preset, race=args.race, brackets=args.brackets, path=args.path,
                        gear=args.gear, spec=args.spec, iterations=args.iterations, stats=args.stats,
-                       reference=args.reference, conditions=args.conditions, targets=args.targets)  # fmt: skip
+                       reference=args.reference, conditions=args.conditions, targets=args.targets,
+                       objective=args.objective)  # fmt: skip
         head = (
             f"{doc['preset']} ({doc['race']}, wowsims corrigé, {doc['conditions']}, {doc.get('targets', 1)} cible(s))"
         )
@@ -1969,9 +1997,13 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
                     if "chosen" in wp:
                         text += f", {wp['chosen']} : {wp['delta']:+.1f} DPS contre {wp['proposed']}"
                     lines.append(text + (f" ; {wp['note']}" if wp.get("note") else "") + ")")
-                if row.get("ttk_s") is not None:
+                if row.get("leveling"):
+                    lines.extend(_leveling_lines(row))
+                elif row.get("ttk_s") is not None:
                     xph = f", {row['xp_per_hour']:.0f} XP/h (sans repos)" if row.get("xp_per_hour") is not None else ""
                     lines.append(f"    monstre normal : {row['ttk_s']:.1f} s pour tuer{xph}")
+                if row.get("leveling_missing"):
+                    lines.append(f"    {row['leveling_missing']}")
                 if row.get("rates_missing"):
                     lines.append(f"    {row['rates_missing']}")
                 if row.get("weights"):

@@ -295,16 +295,24 @@ def run_brackets(
     rotation: str = "best",
     candidates_at: Callable[[int], Sequence[Mapping[str, Any]]] | None = None,
     targets: int = 1,
+    objective: str = "dps",
+    mob_at: Callable[[int], Mapping[str, Any] | None] | None = None,
 ) -> dict[str, Any]:
     """Un combat par tranche (voir le module) ; une ligne par tranche : niveau, talents, équipement, dégâts par
     seconde et écart type, source (commit, correctifs, niveau), ou l'erreur de la tranche. `candidates_at` : réserve
     de candidats au niveau, où chercher une arme du type de celle du préréglage (voir `match_weapons`) ; `targets` :
-    nombre de cibles identiques de la rencontre (zone au-delà de 1)."""
+    nombre de cibles identiques de la rencontre (zone au-delà de 1) ; `objective="leveling"` (solo, une cible) : un
+    monstre du niveau, rotations classées à l'XP par heure avec repos (`forever.sims.leveling`), `mob_at` : monstre du
+    niveau (défaut : données installées)."""
+    from forever.sims import leveling
     from forever.sims.engines import class_of
+    from forever.sims.leveling_rates import cycle
 
     wanted = parse_brackets(brackets)
     if targets < 1:
         raise InvalidArgumentError(f"Nombre de cibles impossible : {targets}.", "donner targets=1 ou plus")
+    if objective not in leveling.OBJECTIVES:
+        raise InvalidArgumentError(f"objectif inconnu : « {objective} ».", "choisir " + ", ".join(leveling.OBJECTIVES))
     if conditions not in CONDITIONS:
         raise InvalidArgumentError(f"conditions inconnues : « {conditions} ».", "choisir " + ", ".join(CONDITIONS))
     if not race:
@@ -341,6 +349,21 @@ def run_brackets(
     db: dict[int, dict[str, Any]] | None = None  # base d'objets des simulateurs, lue au premier besoin
     names: dict[int, str] | None = None
     rows: list[dict[str, Any]] = []
+    gd_cache: list[Any] = []
+
+    def game_data() -> Any:
+        if not gd_cache:
+            from forever.gamedata import build_game_data
+            from forever.store import load_version
+
+            gd_cache.append(build_game_data(load_version(deps)))
+        return gd_cache[0]
+
+    def default_mob(level: int) -> Mapping[str, Any] | None:
+        from forever.store import load_version
+
+        return leveling.mob_from(game_data(), load_version(deps).read_json(bs.CHARACTER_FILE), level)
+
     for label, level in wanted:
         keys = talents_at(steps, level)
         row: dict[str, Any] = {"bracket": label, "level": level, "talents": keys}
@@ -378,17 +401,61 @@ def run_brackets(
                 doc = None
                 row["base_stats"] = (f"statistiques de base du niveau 60 : binaire sans le correctif {bs.PATCH} "
                                      "(lancer `forever sims update`)")  # fmt: skip
-            tried: list[tuple[str, Preset, dict[str, Any]]] = []
+            mob = None
+            if objective == "leveling":
+                if conditions != "solo" or targets > 1:
+                    row["leveling_missing"] = "objectif leveling en solo et à une cible seulement : objectif DPS"
+                else:
+                    mob = (mob_at or default_mob)(level)
+                    if mob is None:
+                        row["leveling_missing"] = (
+                            f"monstre du niveau {level} incomplet (PV de monsters.json ou valeurs de créature "
+                            "d'ExpectedStat absentes) : combat de référence gardé, objectif DPS")  # fmt: skip
+            row["objective"] = "leveling" if mob is not None else "dps"
+            n_it = iterations or wowsims.DEFAULT_ITERATIONS
+
+            def sim(req: dict[str, Any], level: int = level, doc: Any = doc) -> dict[str, Any]:
+                return wowsims.run_sim(deps.cache_dir, req, runner=runner, level=level, base_stats=doc,
+                                       items=items_path)  # fmt: skip
+
+            pools: dict[str, Any] = {}
+            if mob is not None:
+                probe = wowsims.request_for(case, race=race_token, encounter=leveling.leveling_encounter(
+                    encounter, level, mob, duration=leveling.PROBE_S), iterations=1)  # fmt: skip
+                pools = leveling.pools_from_logs(str(sim(leveling.as_probe(leveling.as_tank(probe))).get("logs") or ""))
+            tried: list[tuple[str, Preset, dict[str, Any], dict[str, Any]]] = []
             for rot_name, rot in rotations:
                 rot_case = dataclasses.replace(case, rotation=rot)
-                rot_request = wowsims.request_for(rot_case, race=race_token, encounter=fight,
-                                                  iterations=iterations or wowsims.DEFAULT_ITERATIONS)  # fmt: skip
-                tried.append((rot_name, rot_case, wowsims.run_sim(deps.cache_dir, rot_request, runner=runner,
-                                                                  level=level, base_stats=doc, items=items_path)))  # fmt: skip
-            best_name, case, out = max(tried, key=lambda t: float(t[2]["dps"]))
+                if mob is None:
+                    rot_request = wowsims.request_for(rot_case, race=race_token, encounter=fight, iterations=n_it)
+                    tried.append((rot_name, rot_case, sim(rot_request), {}))
+                    continue
+                prime = leveling.leveling_encounter(encounter, level, mob, duration=leveling.PRIME_S)
+                first = sim(leveling.as_tank(wowsims.request_for(rot_case, race=race_token, encounter=prime,
+                                                                 iterations=n_it)))  # fmt: skip
+                duration = float(mob["hp"]) / float(first["dps"]) if float(first["dps"]) > 0 else leveling.PRIME_S
+                kill = leveling.leveling_encounter(encounter, level, mob, duration=duration)
+                o = sim(leveling.as_tank(wowsims.request_for(rot_case, race=race_token, encounter=kill,
+                                                             iterations=n_it)))  # fmt: skip
+                o["_encounter"] = kill
+                tried.append((rot_name, rot_case, o, cycle(game_data(), level, mob, o, pools, duration)))
+
+            def score(t: tuple[str, Preset, dict[str, Any], dict[str, Any]]) -> tuple[float, float]:
+                xp = t[3].get("xp_per_hour")
+                return (float(xp) if xp is not None else float("-inf"), float(t[2]["dps"]))
+
+            best_name, case, out, rates = max(tried, key=score if mob is not None else lambda t: (0.0, t[2]["dps"]))
+            if mob is not None:
+                fight = out.pop("_encounter")
+                for _, _, o, _ in tried:
+                    o.pop("_encounter", None)
+                row.update(rates)
+            out.pop("logs", None)
             row["rotation"] = best_name
             if len(tried) > 1:
-                row["rotations"] = [{"rotation": n, "dps": o["dps"], "stdev": o["stdev"]} for n, _, o in tried]
+                row["rotations"] = [{"rotation": n, "dps": o["dps"], "stdev": o["stdev"],
+                                     **({"xp_per_hour": r.get("xp_per_hour")} if mob is not None else {})}
+                                    for n, _, o, r in tried]  # fmt: skip
             if candidates_at is not None:
                 if db is None:
                     db = item_database(deps.cache_dir)
@@ -441,6 +508,8 @@ def run_brackets(
                      "dépôt (pas de rotation de zone dédiée quand le dépôt n'en a pas)")  # fmt: skip
     else:
         notes.append("une seule cible")
+    if any(r.get("objective") == "leveling" for r in rows):
+        notes.extend(leveling.NOTES)
     if len(rotations) > 1:
         notes.append(f"rotation : la meilleure des {len(rotations)} rotations de la spécialisation (APL du dépôt de "
                      "wowsims), essayées dans les conditions de chaque tranche, même graine")  # fmt: skip
@@ -525,6 +594,7 @@ def run_from_sources(
     reference: str | None = None,
     conditions: str = "solo",
     targets: int = 1,
+    objective: str = "leveling",
 ) -> dict[str, Any]:
     """`run_brackets` avec les sources installées : parcours `path` (plan de leveling ou aucun) et équipement `gear`
     (choix de GearQuest au niveau de chaque tranche, ou nu)."""
@@ -533,7 +603,8 @@ def run_from_sources(
     )
     out = run_brackets(deps, preset=preset, race=race, brackets=brackets, steps=steps, picks_at=picks_at,
                        iterations=iterations, anchors=anchors, stats=stats, reference=reference,
-                       conditions=conditions, candidates_at=candidates_at, targets=targets)  # fmt: skip
+                       conditions=conditions, candidates_at=candidates_at, targets=targets,
+                       objective=objective)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     from forever.sims.leveling_rates import add_rates
 

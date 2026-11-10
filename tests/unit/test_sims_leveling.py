@@ -135,7 +135,7 @@ def _leveling(make_deps, tmp_path, mob=MOB):
 
 
 def test_leveling_fight_lasts_the_time_to_kill_and_the_mob_hits_the_player(make_deps, tmp_path):
-    _, sim, out = _leveling(make_deps, tmp_path)
+    _, sim, _ = _leveling(make_deps, tmp_path)
     fights = [r for r in sim.requests if not r["simOptions"].get("debugFirstIteration")]
     for req in fights:
         assert req["raid"]["tanks"] == [{"type": "Player", "index": 0}]

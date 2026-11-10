@@ -161,3 +161,49 @@ def grind_xp_per_hour(xp_per_kill: float, kill_s: float, between_s: float) -> fl
     if total <= 0:
         raise ValueError(f"temps par monstre nul ou négatif ({total:g} s)")
     return xp_per_kill * SECONDS_PER_HOUR / total
+
+
+def rest_per_kill(
+    *,
+    mana_net: float,
+    mana_regen: float,
+    mana_rest_rate: float,
+    hp_lost: float,
+    hp_regen: float,
+    hp_rest_rate: float,
+    between: float,
+) -> tuple[float, str | None]:
+    """Repos par monstre d'un enchaînement (SIM2 §10) : ce que le combat coûte (mana nette, vie perdue), moins ce que
+    la régénération hors combat rend pendant la course `between`, rendu au rythme du repos (boisson ou repas, plus la
+    régénération) ; mana et vie se rendent en même temps : le plus long des deux. Rend (secondes, ressource qui
+    limite : « mana », « vie » ou None sans repos).
+
+    Registre : I6"""
+    mana_deficit = max(0.0, mana_net - mana_regen * between)
+    hp_deficit = max(0.0, hp_lost - hp_regen * between)
+    times: dict[str, float] = {}
+    for name, deficit, rate in (("mana", mana_deficit, mana_rest_rate), ("vie", hp_deficit, hp_rest_rate)):
+        if deficit <= 0:
+            continue
+        if rate <= 0:
+            raise ValueError(f"repos impossible : {name} à rendre ({deficit:g}) sans rythme de repos")
+        times[name] = deficit / rate
+    if not times:
+        return 0.0, None
+    limiter = max(times, key=lambda k: times[k])
+    return times[limiter], limiter
+
+
+def grind_xp_per_hour_rested(xp_per_kill: float, kill_s: float, between_s: float, rest_s: float) -> float:
+    """XP par heure de monstres enchaînés, repos compris : XP d'un monstre sur combat, course et repos par monstre.
+
+    Registre : I6"""
+    return grind_xp_per_hour(xp_per_kill, kill_s, between_s + rest_s)
+
+
+def kills_per_bar(pool: float, cost_per_kill: float) -> float | None:
+    """Monstres tués avec une barre pleine (mana ou vie) au coût net par monstre, sans repos ni régénération ; None
+    quand un monstre ne coûte rien.
+
+    Registre : I6"""
+    return pool / cost_per_kill if cost_per_kill > 0 else None

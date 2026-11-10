@@ -487,6 +487,7 @@ def build_server(deps: Deps) -> MCPServer:
         candidates: str | None = None,
         conditions: str = "solo",
         targets: int = 1,
+        objective: str = "leveling",
         character: str | None = None,
         log: str | None = None,
         sv: str | None = None,
@@ -521,7 +522,9 @@ def build_server(deps: Deps) -> MCPServer:
         niveau) ; chaque candidat essayé à sa place, gain, seuil de bruit, verdict « meilleur » ou « non départagé ».
         `conditions` (brackets) : `solo` (leveling, défaut), `group` (buffs du préréglage), `raid` (buffs,
         consommables, boss au-dessus : comparable aux classements de MythicSim) ; `targets` (brackets) : nombre de
-        cibles identiques (1 par défaut ; zone au-delà, ex. 3 ou 5), rendu dans `targets` et la provenance.
+        cibles identiques (1 par défaut ; zone au-delà, ex. 3 ou 5), rendu dans `targets` et la provenance ;
+        `objective` (brackets) : `leveling` (défaut, solo à une cible : monstre du niveau qui frappe, mana et vie,
+        rotations classées à l'XP par heure avec repos, champs `leveling`) ou `dps` (combat de référence).
         `action="race_brackets"` : toutes
         les races jouables de la classe de `preset` (races.json ; ou `races`) par tranche (`brackets`, `path`,
         `gear`, `conditions` comme brackets), mêmes talents, équipement et graine ; triées par dégâts, écart à la
@@ -539,7 +542,7 @@ def build_server(deps: Deps) -> MCPServer:
                             iterations=iterations, cases=cases, consumables=consumables, talents=talents,
                             engine=engine, rotation=rotation, max_steps=max_steps, popular=popular, brackets=brackets,
                             path=path, gear=gear, spec=spec, level=level, equipped=equipped,
-                            candidates=candidates, conditions=conditions, targets=targets,
+                            candidates=candidates, conditions=conditions, targets=targets, objective=objective,
                             character=character, log=log, sv=sv, group=group)  # fmt: skip
         except ForeverError as err:
             return cast(dict[str, Any], _error_result(deps, err))

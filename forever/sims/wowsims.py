@@ -474,6 +474,32 @@ def _binary(cache_dir: Path) -> tuple[Path, dict[str, Any]]:
     return binary, pin
 
 
+def fight_metrics(player: dict[str, Any], iterations: int) -> dict[str, Any]:
+    """Ressources d'un combat lues dans la sortie de wowsims (SIM2 §10), moyennes par itération : mana dépensée (gains
+    de mana négatifs : coûts des sorts), mana gagnée (régénération, objets, talents), dégâts subis (gains de vie
+    négatifs), temps avant la panne de mana (`tto`), secondes sans mana (`secondsOomAvg`), chance de mort."""
+    n = max(iterations, 1)
+    spent = gained = taken = 0.0
+    for r in player.get("resources") or []:
+        gain = float(r.get("gain") or 0.0)
+        if r.get("type") == "ResourceTypeMana":
+            if gain < 0:
+                spent -= gain
+            else:
+                gained += gain
+        elif r.get("type") == "ResourceTypeHealth" and gain < 0:
+            taken -= gain
+    tto = (player.get("tto") or {}).get("avg")
+    return {
+        "mana_spent": spent / n,
+        "mana_gained": gained / n,
+        "damage_taken": taken / n,
+        "tto_s": float(tto) if tto is not None else None,
+        "oom_s": float(player.get("secondsOomAvg") or 0.0),
+        "death_chance": float(player.get("chanceOfDeath") or 0.0),
+    }
+
+
 def run_sim(
     cache_dir: Path,
     request: dict[str, Any],
@@ -557,8 +583,14 @@ def run_sim(
         err = result["error"]
         message = str(err.get("message", err) if isinstance(err, dict) else err).split("\nStack Trace", 1)[0]
         raise WowsimsError(f"wowsims : {message.strip()}", "vérifier la requête (préréglage, race, combat)")
-    dps = result["raidMetrics"]["parties"][0]["players"][0]["dps"]
+    player = result["raidMetrics"]["parties"][0]["players"][0]
+    dps = player["dps"]
+    iterations = int(result.get("iterationsDone", 0))
+    out_extra: dict[str, Any] = {"fight": fight_metrics(player, iterations)}
+    if result.get("logs"):
+        out_extra["logs"] = str(result["logs"])
     return {
+        **out_extra,
         "dps": float(dps.get("avg", 0.0)),
         "stdev": float(dps.get("stdev", 0.0)),
         "iterations": int(result.get("iterationsDone", 0)),

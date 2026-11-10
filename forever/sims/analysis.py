@@ -26,11 +26,14 @@ def _version(deps: Deps) -> tuple[str, str]:
     pin = pinned(deps.cache_dir) or {}
     commit = str(pin.get("commit") or "sans-wowsims")[:12]
     patches = str((pin.get("patches") or {}).get("sha256") or "")[:8]
-    return load_version(deps).game_version, f"{commit}-{patches}" if patches else commit
+    from forever.sims.leveling import MODEL
+
+    # modèle de l'objectif (SIM2 §10) dans la clé : une analyse faite au DPS seul est périmée, la veille la relance
+    return load_version(deps).game_version, f"{commit}-{patches}-{MODEL}" if patches else f"{commit}-{MODEL}"
 
 
 def analysis_path(deps: Deps, preset: str, race: str) -> Path:
-    """Fichier de l'analyse : `<cache>/analysis/<version des données>/<commit et correctifs>/<préréglage>-<race>.json`."""
+    """Fichier de l'analyse : `<cache>/analysis/<version des données>/<commit, correctifs et modèle>/<préréglage>-<race>.json`."""
     from forever.sims.wowsims import race_enum
 
     version, sims = _version(deps)
