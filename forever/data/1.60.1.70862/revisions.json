@@ -7970,6 +7970,2080 @@
      "pvp_dr": true
     }
    }
+  },
+  {
+   "revision": 11,
+   "date": "2026-11-10",
+   "motif": "valeurs de créature d'ExpectedStat (PV, armure, DPS d'attaque par niveau) pour la rencontre de leveling de SIM2 et les familiers (0006-pets)",
+   "command": "forever install ~/AppData/Local/Temp/claude/6520b470d42d1afe/19b9a4dc-7f68-43cd-8ca3-1eee239bbe09/scratchpad/cand-70862 --yes",
+   "candidate": {
+    "path": "~/AppData/Local/Temp/claude/6520b470d42d1afe/19b9a4dc-7f68-43cd-8ca3-1eee239bbe09/scratchpad/cand-70862",
+    "data_sha": "ba789044e044"
+   },
+   "report": "docs/research/data-1.60.1.70862-r11.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 2,
+    "added_file": 0,
+    "replaced_file": 4,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 180,
+    "rules": 0,
+    "review": 0
+   },
+   "changes": [
+    {
+     "file": "talents.json",
+     "path": "wakeOfFire.source",
+     "before": {
+      "build": "1.60.1.70862",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-10",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards.",
+      "client_key": "improvedFireBlast"
+     },
+     "after": {
+      "build": "1.60.1.70862",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-10",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards."
+     },
+     "source": "client 1.60.1.70862, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "hotStreak.source",
+     "before": {
+      "build": "1.60.1.70862",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-10",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage.",
+      "client_key": "heatingUp"
+     },
+     "after": {
+      "build": "1.60.1.70862",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-10",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage."
+     },
+     "source": "client 1.60.1.70862, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.0",
+     "before": null,
+     "after": 20.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.1",
+     "before": null,
+     "after": 21.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.2",
+     "before": null,
+     "after": 46.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.3",
+     "before": null,
+     "after": 82.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.4",
+     "before": null,
+     "after": 126.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.5",
+     "before": null,
+     "after": 180.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.6",
+     "before": null,
+     "after": 245.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.7",
+     "before": null,
+     "after": 322.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.8",
+     "before": null,
+     "after": 412.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.9",
+     "before": null,
+     "after": 518.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.10",
+     "before": null,
+     "after": 545.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.11",
+     "before": null,
+     "after": 580.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.12",
+     "before": null,
+     "after": 615.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.13",
+     "before": null,
+     "after": 650.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.14",
+     "before": null,
+     "after": 685.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.15",
+     "before": null,
+     "after": 721.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.16",
+     "before": null,
+     "after": 756.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.17",
+     "before": null,
+     "after": 791.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.18",
+     "before": null,
+     "after": 826.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.19",
+     "before": null,
+     "after": 861.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.20",
+     "before": null,
+     "after": 897.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.21",
+     "before": null,
+     "after": 932.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.22",
+     "before": null,
+     "after": 967.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.23",
+     "before": null,
+     "after": 1002.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.24",
+     "before": null,
+     "after": 1037.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.25",
+     "before": null,
+     "after": 1072.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.26",
+     "before": null,
+     "after": 1108.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.27",
+     "before": null,
+     "after": 1142.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.28",
+     "before": null,
+     "after": 1177.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.29",
+     "before": null,
+     "after": 1212.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.30",
+     "before": null,
+     "after": 1247.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.31",
+     "before": null,
+     "after": 1283.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.32",
+     "before": null,
+     "after": 1317.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.33",
+     "before": null,
+     "after": 1353.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.34",
+     "before": null,
+     "after": 1387.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.35",
+     "before": null,
+     "after": 1494.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.36",
+     "before": null,
+     "after": 1607.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.37",
+     "before": null,
+     "after": 1724.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.38",
+     "before": null,
+     "after": 1849.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.39",
+     "before": null,
+     "after": 1980.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.40",
+     "before": null,
+     "after": 2117.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.41",
+     "before": null,
+     "after": 2262.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.42",
+     "before": null,
+     "after": 2414.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.43",
+     "before": null,
+     "after": 2574.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.44",
+     "before": null,
+     "after": 2742.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.45",
+     "before": null,
+     "after": 2798.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.46",
+     "before": null,
+     "after": 2853.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.47",
+     "before": null,
+     "after": 2907.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.48",
+     "before": null,
+     "after": 2963.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.49",
+     "before": null,
+     "after": 3018.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.50",
+     "before": null,
+     "after": 3072.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.51",
+     "before": null,
+     "after": 3128.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.52",
+     "before": null,
+     "after": 3183.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.53",
+     "before": null,
+     "after": 3237.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.54",
+     "before": null,
+     "after": 3292.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.55",
+     "before": null,
+     "after": 3348.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.56",
+     "before": null,
+     "after": 3402.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.57",
+     "before": null,
+     "after": 3457.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.58",
+     "before": null,
+     "after": 3512.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · armor.59",
+     "before": null,
+     "after": 3566.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.0",
+     "before": null,
+     "after": 0.77037197351,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.1",
+     "before": null,
+     "after": 1.15746355057,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.2",
+     "before": null,
+     "after": 1.62908411026,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.3",
+     "before": null,
+     "after": 2.25077462196,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.4",
+     "before": null,
+     "after": 3.0063495636,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.5",
+     "before": null,
+     "after": 4.00402402878,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.6",
+     "before": null,
+     "after": 5.18357181549,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.7",
+     "before": null,
+     "after": 6.024061203,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.8",
+     "before": null,
+     "after": 6.90567064285,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.9",
+     "before": null,
+     "after": 7.61957216263,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.10",
+     "before": null,
+     "after": 8.59953212738,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.11",
+     "before": null,
+     "after": 9.83585453033,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.12",
+     "before": null,
+     "after": 10.71273612976,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.13",
+     "before": null,
+     "after": 11.80829143524,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.14",
+     "before": null,
+     "after": 12.85480499268,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.15",
+     "before": null,
+     "after": 13.58711147308,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.16",
+     "before": null,
+     "after": 14.5638589859,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.17",
+     "before": null,
+     "after": 15.25296020508,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.18",
+     "before": null,
+     "after": 16.18219947815,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.19",
+     "before": null,
+     "after": 17.10286331177,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.20",
+     "before": null,
+     "after": 17.74541282654,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.21",
+     "before": null,
+     "after": 18.59864997864,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.22",
+     "before": null,
+     "after": 19.22664260864,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.23",
+     "before": null,
+     "after": 20.05244827271,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.24",
+     "before": null,
+     "after": 20.82846641541,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.25",
+     "before": null,
+     "after": 21.48515129089,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.26",
+     "before": null,
+     "after": 22.34799003601,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.27",
+     "before": null,
+     "after": 22.99615097046,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.28",
+     "before": null,
+     "after": 23.8218421936,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.29",
+     "before": null,
+     "after": 24.69375419617,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.30",
+     "before": null,
+     "after": 25.3156375885,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.31",
+     "before": null,
+     "after": 26.08427619934,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.32",
+     "before": null,
+     "after": 26.73922920227,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.33",
+     "before": null,
+     "after": 27.51086425781,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.34",
+     "before": null,
+     "after": 28.2556438446,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.35",
+     "before": null,
+     "after": 28.94437217712,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.36",
+     "before": null,
+     "after": 29.85236167908,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.37",
+     "before": null,
+     "after": 30.62602043152,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.38",
+     "before": null,
+     "after": 31.58934211731,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.39",
+     "before": null,
+     "after": 32.58558273315,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.40",
+     "before": null,
+     "after": 34.14254760742,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.41",
+     "before": null,
+     "after": 36.28594970703,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.42",
+     "before": null,
+     "after": 38.70747375488,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.43",
+     "before": null,
+     "after": 41.91373825073,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.44",
+     "before": null,
+     "after": 43.99250793457,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.45",
+     "before": null,
+     "after": 44.89542007446,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.46",
+     "before": null,
+     "after": 46.0213508606,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.47",
+     "before": null,
+     "after": 46.92918395996,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.48",
+     "before": null,
+     "after": 48.02968597412,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.49",
+     "before": null,
+     "after": 49.20170593262,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.50",
+     "before": null,
+     "after": 50.15997314453,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.51",
+     "before": null,
+     "after": 51.38513946533,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.52",
+     "before": null,
+     "after": 52.36908340454,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.53",
+     "before": null,
+     "after": 53.56260681152,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.54",
+     "before": null,
+     "after": 54.68286895752,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.55",
+     "before": null,
+     "after": 55.76281738281,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.56",
+     "before": null,
+     "after": 56.9397315979,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.57",
+     "before": null,
+     "after": 58.03160476685,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.58",
+     "before": null,
+     "after": 59.21518325806,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · auto_attack_dps.59",
+     "before": null,
+     "after": 60.45291519165,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.0",
+     "before": null,
+     "after": 42.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.1",
+     "before": null,
+     "after": 55.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.2",
+     "before": null,
+     "after": 71.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.3",
+     "before": null,
+     "after": 86.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.4",
+     "before": null,
+     "after": 102.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.5",
+     "before": null,
+     "after": 120.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.6",
+     "before": null,
+     "after": 137.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.7",
+     "before": null,
+     "after": 156.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.8",
+     "before": null,
+     "after": 180.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.9",
+     "before": null,
+     "after": 208.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.10",
+     "before": null,
+     "after": 239.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.11",
+     "before": null,
+     "after": 272.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.12",
+     "before": null,
+     "after": 307.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.13",
+     "before": null,
+     "after": 345.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.14",
+     "before": null,
+     "after": 385.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.15",
+     "before": null,
+     "after": 427.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.16",
+     "before": null,
+     "after": 473.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.17",
+     "before": null,
+     "after": 521.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.18",
+     "before": null,
+     "after": 572.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.19",
+     "before": null,
+     "after": 629.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.20",
+     "before": null,
+     "after": 677.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.21",
+     "before": null,
+     "after": 731.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.22",
+     "before": null,
+     "after": 787.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.23",
+     "before": null,
+     "after": 846.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.24",
+     "before": null,
+     "after": 909.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.25",
+     "before": null,
+     "after": 975.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.26",
+     "before": null,
+     "after": 1040.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.27",
+     "before": null,
+     "after": 1109.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.28",
+     "before": null,
+     "after": 1177.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.29",
+     "before": null,
+     "after": 1242.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.30",
+     "before": null,
+     "after": 1308.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.31",
+     "before": null,
+     "after": 1374.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.32",
+     "before": null,
+     "after": 1443.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.33",
+     "before": null,
+     "after": 1512.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.34",
+     "before": null,
+     "after": 1586.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.35",
+     "before": null,
+     "after": 1660.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.36",
+     "before": null,
+     "after": 1737.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.37",
+     "before": null,
+     "after": 1814.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.38",
+     "before": null,
+     "after": 1897.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.39",
+     "before": null,
+     "after": 1981.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.40",
+     "before": null,
+     "after": 2061.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.41",
+     "before": null,
+     "after": 2146.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.42",
+     "before": null,
+     "after": 2231.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.43",
+     "before": null,
+     "after": 2317.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.44",
+     "before": null,
+     "after": 2402.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.45",
+     "before": null,
+     "after": 2495.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.46",
+     "before": null,
+     "after": 2587.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.47",
+     "before": null,
+     "after": 2681.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.48",
+     "before": null,
+     "after": 2779.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.49",
+     "before": null,
+     "after": 2909.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.50",
+     "before": null,
+     "after": 3040.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.51",
+     "before": null,
+     "after": 3174.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.52",
+     "before": null,
+     "after": 3317.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.53",
+     "before": null,
+     "after": 3458.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.54",
+     "before": null,
+     "after": 3602.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.55",
+     "before": null,
+     "after": 3755.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.56",
+     "before": null,
+     "after": 3909.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.57",
+     "before": null,
+     "after": 4105.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.58",
+     "before": null,
+     "after": 4234.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "character_scaling.json",
+     "path": "creature · health.59",
+     "before": null,
+     "after": 4365.0,
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": "e1c8f2841b54",
+     "after": "7b554b4d6298",
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    },
+    {
+     "file": "races.json",
+     "path": "*",
+     "before": "112487753c72",
+     "after": "f8c339e281fd",
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    },
+    {
+     "file": "pets.json",
+     "path": "*",
+     "before": "692e4bacac63",
+     "after": "98a30af502b7",
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    },
+    {
+     "file": "quest_rewards.json",
+     "path": "*",
+     "before": "92c5c2af984b",
+     "after": "ddaace239760",
+     "source": "Client 1.60.1.70862 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 30,
+     "source": "observation",
+     "certainty": "certain",
+     "carried": true,
+     "carried_from": "révision 10",
+     "date": "2026-10-02",
+     "revision": 1
+    }
+   },
+   "hotfixes": [
+    112414,
+    112623,
+    112624,
+    112635,
+    112640,
+    112641,
+    112686,
+    112687,
+    112694,
+    112695,
+    112707,
+    112709,
+    112713,
+    112720,
+    112724,
+    112726,
+    112727,
+    112740,
+    112741,
+    112742,
+    112753,
+    112758,
+    112765,
+    112766,
+    112770,
+    112771,
+    112775,
+    112791,
+    112819,
+    112831,
+    112833,
+    112838,
+    112839,
+    112840,
+    112843,
+    112844,
+    112845,
+    112852,
+    112858,
+    112863,
+    112864,
+    112875,
+    112878,
+    112887,
+    112890,
+    112900,
+    112901,
+    112918,
+    112919,
+    112920,
+    112922,
+    112934,
+    112935,
+    112947,
+    112948,
+    112949,
+    112952,
+    112953,
+    112957,
+    112961,
+    112964,
+    112965,
+    112976,
+    112980,
+    112985,
+    112992,
+    112994,
+    112996,
+    113000,
+    113004,
+    113005,
+    113007,
+    113008,
+    113011,
+    113015,
+    113016,
+    113020,
+    113027,
+    113030,
+    113038,
+    113040,
+    113042,
+    113043,
+    113044,
+    113046,
+    113051,
+    113061,
+    113069,
+    113070,
+    113081,
+    113082,
+    113085,
+    113088,
+    113091,
+    113092,
+    113093,
+    113096,
+    113099,
+    113106,
+    113108,
+    113121,
+    113124,
+    113127,
+    113131,
+    113134,
+    113136,
+    113139,
+    113141,
+    113149,
+    113150,
+    113156,
+    113161,
+    113162,
+    113163,
+    113164,
+    113170,
+    113185,
+    113186,
+    113187,
+    113191,
+    113194,
+    113200,
+    113201,
+    113202,
+    113205,
+    113209,
+    113213,
+    113214,
+    113217,
+    113221,
+    113223,
+    113257,
+    113269,
+    113270,
+    113272,
+    113273,
+    113276,
+    113277,
+    113278,
+    113279,
+    113280,
+    113282,
+    113283,
+    113284,
+    113285,
+    113292,
+    113293,
+    113311,
+    113320,
+    113323,
+    113325,
+    113326,
+    113329,
+    113330,
+    113335,
+    113336,
+    113340,
+    113341,
+    113343,
+    113344,
+    113348,
+    113349,
+    113350,
+    113351,
+    113365,
+    113367,
+    113368,
+    113375,
+    113380,
+    113382,
+    113388,
+    113396,
+    113403,
+    113412,
+    113413,
+    113414,
+    113428,
+    113438,
+    113440,
+    113443,
+    113448,
+    113449,
+    113450,
+    113455,
+    113463,
+    113465,
+    113481,
+    113483,
+    113486,
+    113492,
+    113496,
+    113498,
+    113500,
+    113527,
+    113530,
+    113531,
+    113534,
+    113537,
+    113538,
+    113539,
+    113542,
+    113548,
+    113557,
+    113570,
+    113571,
+    113574,
+    113601,
+    113611,
+    113623,
+    113643,
+    113649,
+    113650,
+    113654,
+    113658,
+    113659,
+    113664,
+    113669,
+    113670,
+    113676,
+    113684,
+    113687,
+    113695,
+    113696,
+    113698,
+    113702,
+    113704,
+    113710,
+    113726,
+    113731,
+    113732,
+    113758,
+    113769,
+    113770,
+    113772,
+    113774,
+    113776,
+    113777,
+    113778,
+    113780,
+    113785,
+    113789,
+    113791,
+    113792,
+    113794,
+    113796,
+    113797,
+    113804,
+    113805,
+    113810,
+    113811,
+    113814,
+    113820,
+    113823,
+    113825,
+    113826,
+    113828,
+    113846,
+    113853,
+    113854,
+    113862,
+    113863,
+    113864,
+    113888
+   ],
+   "renamed_in_classes": [
+    {
+     "class": "Mage",
+     "client_key": "improvedFireBlast",
+     "key": "wakeOfFire"
+    },
+    {
+     "class": "Mage",
+     "client_key": "heatingUp",
+     "key": "hotStreak"
+    },
+    {
+     "class": "Warrior",
+     "client_key": "improvedWhirlwind",
+     "key": "ragingBlows"
+    },
+    {
+     "class": "Paladin",
+     "client_key": "unsealedWrath",
+     "key": "twistOfLight"
+    },
+    {
+     "class": "Rogue",
+     "client_key": "coupDeGrace",
+     "key": "improvedEviscerate"
+    },
+    {
+     "class": "Rogue",
+     "client_key": "efficientStrikes",
+     "key": "improvedSinisterStrike"
+    },
+    {
+     "class": "Rogue",
+     "client_key": "quickGetaway",
+     "key": "quietus"
+    },
+    {
+     "class": "Shaman",
+     "client_key": "trialByFire",
+     "key": "improvedFireNova"
+    },
+    {
+     "class": "Shaman",
+     "client_key": "lightningMastery",
+     "key": "elementalMastery"
+    },
+    {
+     "class": "Mage",
+     "client_key": "accelerant",
+     "key": "improvedFireball"
+    },
+    {
+     "class": "Mage",
+     "client_key": "precision",
+     "key": "elementalPrecision"
+    },
+    {
+     "class": "Druid",
+     "client_key": "naturalInstinct",
+     "key": "predatoryInstincts"
+    }
+   ]
   }
  ]
 }

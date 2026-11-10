@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70862 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 9 (forever install, 2026-11-10)",
+      "source": "Client 1.60.1.70862 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 11 (forever install, 2026-11-10)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70862 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 9 (forever install, 2026-11-10)",
+      "source": "Client 1.60.1.70862 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 11 (forever install, 2026-11-10)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -238,7 +238,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 9 (forever install, 2026-11-10)"
+        "installé en révision 11 (forever install, 2026-11-10)"
       ]
     },
     "races.json": {
@@ -247,7 +247,7 @@
       "notes": [
         "races jouables, classes permises et raciaux (decode_rules.json, racial_skill_lines)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 9 (forever install, 2026-11-10)"
+        "installé en révision 11 (forever install, 2026-11-10)"
       ]
     },
     "pvp_items.json": {
@@ -319,7 +319,8 @@
       "certainty": "certain",
       "notes": [
         "ratios du personnage par classe et par niveau, XP, repos, constante d'armure, courbes de régénération (decode_rules.json, character_scaling) ; recoupement par les GameTables dans crosscheck",
-        "PV par Endurance et constante d'armure : sens ou usage par le serveur probable"
+        "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
+        "installé en révision 11 (forever install, 2026-11-10)"
       ]
     },
     "pets.json": {
@@ -328,7 +329,7 @@
       "notes": [
         "familles du Chasseur, capacités et rangs, bonus de famille, régimes, cartes (decode_rules.json, pets) ; écarts internes au client dans observations",
         "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits du masque) et effets de Hunter Pet Scaling : sens probable",
-        "installé en révision 9 (forever install, 2026-11-10)"
+        "installé en révision 11 (forever install, 2026-11-10)"
       ]
     },
     "pet_rules.json": {
@@ -358,7 +359,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 9 (forever install, 2026-11-10)"
+        "installé en révision 11 (forever install, 2026-11-10)"
       ]
     },
     "xp_bonuses.json": {
@@ -386,7 +387,7 @@
       ]
     }
   },
-  "revision": 10,
+  "revision": 11,
   "revised_at": "2026-11-10",
   "hotfixes": {
     "dbcache": {
@@ -397,7 +398,7 @@
       "size": 5954333,
       "sha256": "6e9e6340fa092c29730699dd60ef2f29b21fbc4f48c5e11e5f094d060b15da26",
       "file_date": "2026-11-10T07:11:06Z",
-      "read_at": "2026-11-10T07:11:09Z"
+      "read_at": "2026-11-10T13:41:49Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
