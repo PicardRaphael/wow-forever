@@ -577,6 +577,11 @@ def build_parser() -> argparse.ArgumentParser:
     s_ana.add_argument("--race", default=None, help="race (défaut : race jouable par défaut de la classe)")
     s_ana.add_argument("--iterations", type=int, default=None, help="combats par essai")
     s_ana.add_argument("--json", action="store_true", help="sortie JSON")
+    s_tier = sims_sub.add_parser("tierlist", help="tier list d'une faction par contexte (leveling, donjon, raid)")
+    s_tier.add_argument("--context", required=True, choices=["leveling", "donjon", "raid"], help="contexte")
+    s_tier.add_argument("--faction", default="horde", choices=["horde", "alliance"], help="faction")
+    s_tier.add_argument("--iterations", type=int, default=None, help="combats par essai")
+    s_tier.add_argument("--json", action="store_true", help="sortie JSON")
     s_gear = sims_sub.add_parser("gear", help="optimisation de l'équipement par emplacement au niveau (SIM2)")
     s_gear.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Frost Frost Incin")
     s_gear.add_argument("--race", required=True, help="race du joueur")
@@ -1950,6 +1955,19 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
         lock.unlink(missing_ok=True)
         provenance = local_provenance(deps, certainty="suppose", assumptions=[f"{len(done)} analyse(s) prêtes"])
         _emit({"done": done, "provenance": provenance}, [f"{len(done)} analyse(s) prêtes"], provenance, args.json)
+        return EXIT_OK
+    if args.sims_command == "tierlist":
+        from forever.sims.tierlist import tier_list
+
+        doc = tier_list(deps, context=args.context, faction=args.faction, iterations=args.iterations)
+        key = doc["order"]
+        lines = [f"Tier list {doc['context']} ({doc['faction']}), classée par {key} :"]
+        for section in doc["brackets"]:
+            lines.append(f"  {section['bracket']} :")
+            for row in section["ranking"]:
+                xp = f", {row['xp_per_hour']:.0f} XP/h" if row.get("xp_per_hour") else ""
+                lines.append(f"    {row['preset']} ({row['race']}) : {row['dps']:.1f} DPS{xp}")
+        _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.sims_command == "gear":
         from forever.sims.report import simulate

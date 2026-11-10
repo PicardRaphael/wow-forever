@@ -30,6 +30,7 @@ ACTIONS = (
     "gear",
     "analysis",
     "validate",
+    "tierlist",
 )
 ENGINES = ("wowsims", "mythicsim", "both")
 COMPARE_GEARS = ("preset", "gearquest")  # équipement de `compare` : celui du préréglage, ou GearQuest au 60
@@ -71,6 +72,8 @@ def simulate(
     log: str | None = None,
     sv: str | None = None,
     group: str = "bracket",
+    context: str | None = None,
+    faction: str | None = None,
 ) -> dict[str, Any]:
     """`action` : `presets` (liste, objets équipés de chacun), `races` (races séparées par des virgules, sur
     `preset`), `weights` (statistiques séparées par des virgules, rapportées à `reference`, `race` du joueur exigée),
@@ -89,6 +92,19 @@ def simulate(
         raise InvalidArgumentError(f"Moteur inconnu : « {engine} ».", "choisir " + ", ".join(ENGINES))
     if action == "validate":  # SIM2 3e : journaux de combat comparés au calcul par tranche
         return validate_from_disk(deps, character=character, log=log, sv=sv, preset=preset, group=group)
+    if action == "tierlist":  # tier list gardée (forever sims tierlist) ; le raid se calcule ici s'il manque
+        from forever.sims import tierlist
+
+        ctx, fac = context or "raid", faction or "horde"
+        if ctx not in tierlist.CONTEXTS:
+            raise InvalidArgumentError(f"Contexte inconnu : « {ctx} ».", "choisir " + ", ".join(tierlist.CONTEXTS))
+        kept = tierlist.read_tier_list(deps, ctx, fac)
+        if kept is not None:
+            return kept
+        if ctx != "raid":  # par tranche, toutes les spécialisations : long, jamais dans un appel d'outil
+            raise InvalidArgumentError(f"Tier list « {ctx} » ({fac}) pas encore calculée : `forever sims tierlist`.",
+                                       f"lancer `uv run forever sims tierlist --context {ctx} --faction {fac}`")  # fmt: skip
+        return tierlist.tier_list(deps, context=ctx, faction=fac, iterations=iterations)
     if action == "analysis":  # SIM2 bloc 15 : analyse gardée (forever sims analyse), jamais recalculée ici
         from forever.sims.analysis import dps_presets, read_analysis
 

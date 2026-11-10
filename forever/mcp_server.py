@@ -492,6 +492,8 @@ def build_server(deps: Deps) -> MCPServer:
         log: str | None = None,
         sv: str | None = None,
         group: str = "bracket",
+        context: str | None = None,
+        faction: str | None = None,
     ) -> dict[str, Any]:
         """Calculs de wowsims/forever (et de MythicSim, MS1) au niveau 60 seulement, toutes classes (décisions 293 et 294 : simulateur
         maintenu par d'autres, compilé tel quel, épinglé) : `action="presets"` préréglages du dépôt (`key` :
@@ -535,7 +537,11 @@ def build_server(deps: Deps) -> MCPServer:
         `log` fichier ou dossier, défaut `<jeu>/Logs` ; `sv` fichier ForeverLogger.lua) par tranche (`group` :
         `bracket`, ou `level`), comparé au calcul de la tranche (`preset` facultatif) : écart relatif, verdict
         « non départagé » sous le bruit, certitude `probable` pour une tranche recoupée, sinon `suppose`. Les
-        hypothèses de la provenance disent ce qui reste au niveau 60 (attributs de base) : les citer."""
+        hypothèses de la provenance disent ce qui reste au niveau 60 (attributs de base) : les citer.
+        `action="tierlist"` : toutes les spés de dégâts de `faction` (`horde`, `alliance`) classées pour `context`
+        (`raid` : niveau 60, équipement GearQuest égal ; `donjon` : par tranche, groupe, 3 cibles ; `leveling` : par
+        tranche, seul, repos compris, à l'XP par heure) ; gardée (`forever sims tierlist`), le raid se calcule s'il
+        manque."""
         from forever.sims.report import simulate
 
         try:
@@ -544,7 +550,8 @@ def build_server(deps: Deps) -> MCPServer:
                             engine=engine, rotation=rotation, max_steps=max_steps, popular=popular, brackets=brackets,
                             path=path, gear=gear, spec=spec, level=level, equipped=equipped,
                             candidates=candidates, conditions=conditions, targets=targets, objective=objective,
-                            character=character, log=log, sv=sv, group=group)  # fmt: skip
+                            character=character, log=log, sv=sv, group=group, context=context,
+                            faction=faction)  # fmt: skip
         except ForeverError as err:
             return cast(dict[str, Any], _error_result(deps, err))
 

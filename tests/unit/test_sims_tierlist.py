@@ -73,7 +73,7 @@ def test_raid_compares_at_level_60_and_result_is_kept(make_deps, tmp_path):
     calls = []
     out = tierlist.tier_list(deps, context="raid", faction="horde", presets=PRESETS, run_compare=_fake_compare(calls))
     assert len(calls) == 1 and out["brackets"][0]["level"] == 60
-    assert [r["preset"] for r in out["brackets"][0]["ranking"]][0] == "shaman/elemental/testing"
+    assert out["brackets"][0]["ranking"][0]["preset"] == "shaman/elemental/testing"
     again = tierlist.tier_list(deps, context="raid", faction="horde", presets=PRESETS,
                                run_compare=_fake_compare(calls))  # fmt: skip
     assert len(calls) == 1 and again["brackets"] == out["brackets"]  # relu, pas recalculé
