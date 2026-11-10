@@ -325,3 +325,69 @@ def test_compare_takes_replaced_equipment_and_extra_items(tmp_path):
         compare_presets(tmp_path, cases, ENCOUNTER, runner=Sim(), equipment={"mage/dps/Fire": {"items": []}})
     with pytest.raises(WowsimsError, match="0004-items"):  # objets ajoutés : passés au binaire (correctif exigé)
         compare_presets(tmp_path, cases, ENCOUNTER, runner=Sim(), items=tmp_path / "extra_items.json")
+
+
+WARRIOR_SHARED_TS = """import * as Consumables from '@features/settings/model/consumables_auto_gen';
+
+export const DefaultIndividualBuffs = IndividualBuffs.create({
+	greaterBlessingOfKings: true,
+});
+
+export const DefaultRaidBuffs = RaidBuffs.create({
+	battleShout: 1,
+});
+
+export const DefaultDebuffs = Debuffs.create({
+	sunderArmor: true,
+});
+
+export const DefaultConsumables = ConsumesSpec.create({
+	foodId: 11,
+	elixirIds: [12, 13],
+});
+"""
+WARRIOR_TS = """import * as WarriorPresets from '../shared/presets';
+import fury from './apls/fury.apl.json';
+import FuryJson from './gear_sets/fury.gear.json';
+
+export const FuryGear = PresetUtils.makePresetGear('Pre-BiS', FuryJson, { devOnly: true });
+export const FuryApl = PresetUtils.makePresetAPLRotation('Fury', fury);
+export const FuryTalents = PresetUtils.makePresetTalents('Fury', SavedTalents.create({ talentsString: '303-35' }));
+
+export const DefaultOptions = WarriorOptions.create({
+	classOptions: {
+		startingRage: 50,
+	},
+});
+
+export const DefaultConsumables = ConsumesSpec.create({
+	...WarriorPresets.DefaultConsumables,
+	resourcePotId: 14,
+});
+
+export const FuryBuild = PresetUtils.makePresetBuild('Pre-BiS', {
+	gear: FuryGear,
+	talents: FuryTalents,
+	rotation: FuryApl,
+});
+"""
+
+
+def test_buffs_and_consumables_of_a_shared_presets_file_are_followed(tmp_path):
+    """Guerrier du dépôt (vu le 2026-11-10) : buffs, affaiblissements et consommables importés de
+    `../shared/presets.ts` (`import * as WarriorPresets`) et étalés (`...WarriorPresets.DefaultConsumables`). Le
+    préréglage les porte au lieu de se battre sans rien ; les valeurs propres au fichier de la spé priment."""
+    root = clone(tmp_path)
+    specs = root / "forever" / "ui" / "specs" / "warrior"
+    (specs / "dps" / "apls").mkdir(parents=True)
+    (specs / "dps" / "gear_sets").mkdir()
+    (specs / "shared").mkdir()
+    (specs / "shared" / "presets.ts").write_text(WARRIOR_SHARED_TS, encoding="utf-8")
+    (specs / "dps" / "presets.ts").write_text(WARRIOR_TS, encoding="utf-8")
+    (specs / "dps" / "apls" / "fury.apl.json").write_text(json.dumps({"type": "TypeAPL"}), encoding="utf-8")
+    (specs / "dps" / "gear_sets" / "fury.gear.json").write_text(json.dumps({"items": [{"id": 1}]}), encoding="utf-8")
+    fury = {p.key: p for p in read_presets(root / "forever")}["warrior/dps/Pre-BiS"]
+    assert fury.consumables == {"foodId": 11, "elixirIds": [12, 13], "resourcePotId": 14}
+    assert fury.raid_buffs == {"battleShout": 1}
+    assert fury.debuffs == {"sunderArmor": True}
+    assert fury.individual_buffs == {"greaterBlessingOfKings": True}
