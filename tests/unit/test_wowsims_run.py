@@ -286,3 +286,42 @@ def test_gear_weights_skip_a_preset_without_gear(tmp_path):
         json.dumps({"StatIntellect": 0.5}), encoding="utf-8"
     )
     assert gear_weights(tmp_path, "destruction-warlock", "Orc") is None
+
+
+def test_a_naked_build_takes_the_gear_set_of_its_spec(tmp_path):
+    """Démoniste du dépôt (vu le 2026-11-10) : builds sans équipement, mais `gear_sets/preraid.gear.json` et
+    `raid.gear.json` dans le dossier de la spé, reliés à rien par l'interface. Le préréglage prend le jeu d'avant raid
+    (choix de l'outil, dit par `gear_file`) au lieu d'être refusé ; sans jeu d'équipement, il reste nu."""
+    root = clone(tmp_path)
+    spec = root / "forever" / "ui" / "specs" / "warlock" / "dps"
+    (spec / "builds").mkdir(parents=True)
+    (spec / "gear_sets").mkdir()
+    (spec / "builds" / "destro.build.json").write_text(json.dumps(_naked_build()), encoding="utf-8")
+    (spec / "gear_sets" / "raid.gear.json").write_text(json.dumps({"items": [{"id": 1}, {"id": 2}, {"id": 3}]}),
+                                                      encoding="utf-8")  # fmt: skip
+    (spec / "gear_sets" / "preraid.gear.json").write_text(json.dumps({"items": [{"id": 4}, {"id": 5}]}),
+                                                         encoding="utf-8")  # fmt: skip
+    destro = {p.key: p for p in read_presets(root / "forever")}["warlock/dps/destro"]
+    assert destro.items == 2 and destro.gear_file == "gear_sets/preraid.gear.json"
+    fire = {p.key: p for p in read_presets(root / "forever")}["mage/dps/Fire"]
+    assert fire.gear_file is None  # équipement venu du préréglage lui-même : rien à dire
+
+
+def test_compare_takes_replaced_equipment_and_extra_items(tmp_path):
+    """Comparaison à équipement égal (demande du 2026-11-10) : l'équipement de chaque cas peut être remplacé (choix de
+    GearQuest au niveau 60), les buffs restant communs ; le fichier des objets ajoutés est passé au binaire."""
+    from forever.sims.wowsims import compare_presets
+
+    root = clone(tmp_path)
+    presets = {p.key: p for p in read_presets(root / "forever")}
+    cases = [(presets["mage/dps/Fire"], "RaceGnome"), (presets["shaman/elemental/testing"], "RaceDwarf")]
+    gear = {"items": [{"id": 7}, {}]}
+    sim = Sim()
+    compare_presets(tmp_path, cases, ENCOUNTER, runner=sim, equipment={"mage/dps/Fire": gear})
+    players = [r["raid"]["parties"][0]["players"][0] for r in sim.requests]
+    assert players[0]["equipment"] == gear
+    assert players[1]["equipment"] == presets["shaman/elemental/testing"].equipment
+    with pytest.raises(WowsimsError, match="sans équipement"):  # remplacé par rien : refusé comme un préréglage nu
+        compare_presets(tmp_path, cases, ENCOUNTER, runner=Sim(), equipment={"mage/dps/Fire": {"items": []}})
+    with pytest.raises(WowsimsError, match="0004-items"):  # objets ajoutés : passés au binaire (correctif exigé)
+        compare_presets(tmp_path, cases, ENCOUNTER, runner=Sim(), items=tmp_path / "extra_items.json")
