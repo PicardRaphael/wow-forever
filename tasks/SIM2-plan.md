@@ -261,3 +261,60 @@ Chaque calcul par tranche (10-19 … 60, ou un niveau) doit couvrir, et pouvoir 
 - **Anomalie 3 corrigée** (type d'arme) : quand l'arme proposée n'a pas le `weaponType` de l'arme du préréglage de wowsims, la meilleure arme de ce type de la réserve au niveau est essayée par simulation (main droite puis main gauche, même graine) et l'ensemble le plus fort gardé (`weapon` dans la ligne). Assassinat 45 : 101 au lieu de 55 DPS.
 - **Zone** : `targets` (défaut 1) sur `brackets` (CLI `--targets`, MCP `targets`) : N copies de la cible de référence au niveau. Mage Feu 60 : 511 (1 cible) contre 686 DPS (5 cibles). Reste : rotations de zone dédiées (aucune APL de zone dans le dépôt), 3 et 5 cibles par défaut dans l'analyse.
 - **Bloc 17 fait** : correctif `0006-pets` : familiers (Chasseur, faucons, démons) au niveau du personnage, valeurs de créature du client (ExpectedStat : PV, armure, DPS) passées par `--forever-pet-stats=` ; bloc `creature` ajouté à `character_scaling.json` par `forever decode`, présent après le prochain `forever update` (valeurs du 60 d'ici là, dit ligne par ligne). Restent au 60 : attributs fixes des démons saisis par wowsims.
+
+## 10. Objectif leveling (demande du 2026-11-10 : « les builds sont au DPS, pas au leveling : assez de mana, assez de vie »)
+
+### Constat (code de `main` au 2026-11-10, données 1.60.1.70862 r10)
+- **La rencontre de chaque tranche est celle du raid** : `encounter_at` (`forever/sims/brackets.py`) ne change que
+  `level` et `canCrush` de la cible de référence de wowsims : 180 s (±5), armure 3731, coups de 2601 toutes les 2 s.
+  Au niveau 25, on mesure donc un combat soutenu de 3 minutes contre une armure de boss, pas « tuer un monstre de son
+  niveau, se reposer, repartir ». Les dégâts physiques sous le 60 sont écrasés par cette armure.
+- **Tout se classe au DPS** : rotation `best`, `climb` (`forever/sims/builds.py`), équipement (`gear`), priorité des
+  statistiques ; aucun ne voit la mana ni la vie. Les talents viennent du plan Polestar ou du build populaire, jamais
+  jugés sur le leveling.
+- **Le repos n'est pas compté** : `leveling_rates.py` dit que « wowsims ne rend ni la mana dépensée ni les dégâts
+  subis ». C'est faux : chaque sortie porte `tto` (temps avant panne de mana), `secondsOomAvg` (Amélioration 60 :
+  47,97 s sans mana sur 180), `dtps`, `chanceOfDeath`, et `resources` (mana gagnée par source, `OtherActionDamageTaken`).
+  `run_sim` n'en lit que `dps`.
+- Bloc `creature` (ExpectedStat) promis par le bloc 17 : absent de `character_scaling.json` en r10 (la règle existe dans
+  `forever/pipeline/character_scaling.py`, mais aucune version décodée depuis) ; il faut une révision (`--hotfixes`
+  avec le DBCache archivé, puis `install`) ou la prochaine version.
+
+### Les deux questions (décision 288)
+- Qui maintient déjà ça mieux que nous ? wowsims rend mana, panne, dégâts subis et mort ; le client rend PV, armure et
+  dégâts des créatures (ExpectedStat) ; mes journaux (ForeverLogger, `WoWCombatLog`) rendent le vrai temps entre deux
+  monstres. Seule la composition est à nous ; le repos est `engine/mana.py:downtime` (I6), déjà pur.
+- Prochain patch ? Tout vient des données décodées et du simulateur recompilé : rien ne casse, l'analyse est relancée
+  par la veille et donne un rapport des valeurs qui changent.
+
+### Blocs (tests d'abord, sorties de wowsims factices dans `tests/fixtures/`, aucun réseau)
+1. **Lecture complète de la sortie** : `run_sim` rend aussi `tto`, `secondsOomAvg`, `dtps`, `chanceOfDeath`, mana
+   gagnée et dégâts subis par combat (moyennes par itération). Docstring et `NOTES` de `leveling_rates.py` corrigés.
+2. **Rencontre de leveling** (`conditions="solo"`, défaut) : une cible normale du niveau L : PV de `hp_by_level`
+   (`monsters.json`, mes journaux), armure et dégâts d'ExpectedStat (`creature`), fin du combat à la mort de la cible
+   (option de durée par la vie de la cible dans le proto, à vérifier ; sinon durée = PV / DPS mesuré, recalée en une
+   passe). Groupe et raid gardent la rencontre de référence.
+3. **Cycle de leveling** : combat (durée, mana dépensée, dégâts subis lus dans wowsims) → repos (`downtime`, boisson et
+   repas du niveau, Esprit) seulement quand la barre est vide ou la vie basse → course (`run_between_s`). Rend :
+   monstres par barre de mana, part du temps passée à boire ou manger, XP/h avec repos, risque de mort.
+4. **Classement au leveling** : en solo, rotation, talents (`climb` et `decide` prennent une fonction de score), objets
+   et priorité des statistiques classés à l'**XP/h avec repos** ; le DPS reste affiché, et reste le critère en groupe
+   et en raid. Esprit, Intelligence, Endurance et talents de mana (Arcane Meditation, Improved Water Shield…) prennent
+   enfin leur valeur.
+5. **Comparaison par tranche** : build DPS (actuel) contre build leveling trouvé, Chaman (Amélioration, Élémentaire) et
+   Mage (Givre, Feu, Arcanes) d'abord, puis les autres classes ; écart d'XP/h et « non départagé » sous le bruit.
+6. **Recoupement** (AMI2) : XP/h prédite contre mes sessions ForeverLogger de la même tranche ; écart en question ouverte.
+
+### Registre
+- I6 (repos) : utilisé avec des entrées de wowsims ; nouvelle entrée « rencontre de leveling » ; certitude `suppose`
+  tant qu'aucune tranche n'est recoupée par mes journaux.
+
+### Bloqué sur toi
+- **Ta consigne « DPS par défaut »** (CLAUDE.md, « Analyser ») devient-elle « XP/h avec repos par défaut, seul » ? C'est
+  ta règle, je ne la change pas sans toi.
+- Révision des données pour le bloc `creature` (révision d'une version installée : manifeste réécrit par
+  `manifest --update`, avec ton accord).
+
+### Essai en jeu (décision 273)
+- Une session de 30 minutes de grind au Chaman (ou au Mage) avec le build leveling de ta tranche ; ForeverLogger
+  enregistre ; je compare monstres par barre de mana, temps de repos et XP/h au calcul.
