@@ -418,6 +418,19 @@ def run_brackets(
                 return wowsims.run_sim(deps.cache_dir, req, runner=runner, level=level, base_stats=doc,
                                        items=items_path)  # fmt: skip
 
+            def kill_cycle(c: Preset, mob: Mapping[str, Any], pools: Mapping[str, Any], level: int = level,
+                           sim: Callable[..., dict[str, Any]] = sim, n_it: int = n_it,
+                           ) -> tuple[dict[str, Any], dict[str, Any]]:  # fmt: skip
+                # amorce, puis combat au temps pour tuer (la cible frappe le joueur), puis cycle de repos
+                prime = leveling.leveling_encounter(encounter, level, mob, duration=leveling.PRIME_S)
+                first = sim(leveling.as_tank(wowsims.request_for(c, race=race_token, encounter=prime,
+                                                                 iterations=n_it)))  # fmt: skip
+                duration = float(mob["hp"]) / float(first["dps"]) if float(first["dps"]) > 0 else leveling.PRIME_S
+                kill = leveling.leveling_encounter(encounter, level, mob, duration=duration)
+                o = sim(leveling.as_tank(wowsims.request_for(c, race=race_token, encounter=kill, iterations=n_it)))
+                o["_encounter"] = kill
+                return o, cycle(game_data(), level, mob, o, pools, duration)
+
             pools: dict[str, Any] = {}
             if mob is not None:
                 probe = wowsims.request_for(case, race=race_token, encounter=leveling.leveling_encounter(
@@ -430,15 +443,8 @@ def run_brackets(
                     rot_request = wowsims.request_for(rot_case, race=race_token, encounter=fight, iterations=n_it)
                     tried.append((rot_name, rot_case, sim(rot_request), {}))
                     continue
-                prime = leveling.leveling_encounter(encounter, level, mob, duration=leveling.PRIME_S)
-                first = sim(leveling.as_tank(wowsims.request_for(rot_case, race=race_token, encounter=prime,
-                                                                 iterations=n_it)))  # fmt: skip
-                duration = float(mob["hp"]) / float(first["dps"]) if float(first["dps"]) > 0 else leveling.PRIME_S
-                kill = leveling.leveling_encounter(encounter, level, mob, duration=duration)
-                o = sim(leveling.as_tank(wowsims.request_for(rot_case, race=race_token, encounter=kill,
-                                                             iterations=n_it)))  # fmt: skip
-                o["_encounter"] = kill
-                tried.append((rot_name, rot_case, o, cycle(game_data(), level, mob, o, pools, duration)))
+                o, rates_of = kill_cycle(rot_case, mob, pools)
+                tried.append((rot_name, rot_case, o, rates_of))
 
             def score(t: tuple[str, Preset, dict[str, Any], dict[str, Any]]) -> tuple[float, float]:
                 xp = t[3].get("xp_per_hour")
@@ -478,6 +484,10 @@ def run_brackets(
                     if weapon["choice"] == WEAPON_CHOICES[1]:
                         case = dataclasses.replace(case, equipment={"items": items})
                         picks = [{"item": i["id"]} for i in items if i]
+                        if mob is not None:  # arme changée : cycle de leveling refait avec elle
+                            out, rates = kill_cycle(case, mob, pools)
+                            fight = out.pop("_encounter")
+                            row.update(rates)
             if stats:
                 try:
                     w = wowsims.stat_weights(
