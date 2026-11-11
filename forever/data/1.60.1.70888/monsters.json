@@ -52,7 +52,8 @@
   "WoWCombatLog-111126_091604.txt",
   "WoWCombatLog-111126_113923.txt",
   "WoWCombatLog-111126_114912.txt",
-  "WoWCombatLog-111126_134533.txt"
+  "WoWCombatLog-111126_134533.txt",
+  "WoWCombatLog-111126_155318.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -1906,14 +1907,14 @@
    }
   },
   "721": {
-   "name": "Rabbit",
+   "name": "Lapin",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "1": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_103236.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1,
      "fought": null
     }
@@ -2123,7 +2124,7 @@
     "5": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-110826_083108.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
      "fought": null
     }
@@ -4194,6 +4195,216 @@
     }
    }
   },
+  "1984": {
+   "name": "Jeune sanglier des chardons",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 42,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 53 individu(s))",
+     "questie_hp": 42,
+     "fought": false
+    },
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 35 individu(s))",
+     "questie_hp": 55,
+     "fought": false
+    }
+   }
+  },
+  "1985": {
+   "name": "Sanglier des chardons",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 39 individu(s))",
+     "questie_hp": 55,
+     "fought": false
+    },
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 51 individu(s))",
+     "questie_hp": 71,
+     "fought": false
+    }
+   }
+  },
+  "1986": {
+   "name": "Araignée Tissebois",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 51 individu(s))",
+     "questie_hp": 71,
+     "fought": false
+    },
+    "4": {
+     "max_hp": 86,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 75 individu(s))",
+     "questie_hp": 86,
+     "fought": false
+    }
+   }
+  },
+  "1988": {
+   "name": "Grell",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 55,
+     "fought": false
+    },
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 71,
+     "fought": false
+    }
+   }
+  },
+  "1989": {
+   "name": "Grellide",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 37 individu(s))",
+     "questie_hp": 71,
+     "fought": false
+    },
+    "4": {
+     "max_hp": 86,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 86,
+     "fought": false
+    }
+   }
+  },
+  "1994": {
+   "name": "Githyiss la Vile",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 102,
+     "fought": false
+    }
+   }
+  },
+  "1995": {
+   "name": "Hibou Strigid",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 102,
+     "fought": false
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 120,
+     "fought": false
+    }
+   }
+  },
+  "1998": {
+   "name": "Rôdeuse Tissebois",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 102,
+     "fought": false
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 120,
+     "fought": false
+    }
+   }
+  },
+  "2031": {
+   "name": "Jeune sabre-de-nuit",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 42,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 97 individu(s))",
+     "questie_hp": 42,
+     "fought": false
+    }
+   }
+  },
+  "2032": {
+   "name": "Sabre-de-nuit galeux",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 64 individu(s))",
+     "questie_hp": 55,
+     "fought": false
+    }
+   }
+  },
+  "2042": {
+   "name": "Sabre-de-nuit sauvage",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 102,
+     "fought": false
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 120,
+     "fought": false
+    }
+   }
+  },
   "2044": {
    "name": "Forlorn Spirit",
    "zone_id": 0,
@@ -5518,7 +5729,7 @@
     "2": {
      "max_hp": 55,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt (bloc avancé, 153 individu(s))",
+     "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 154 individu(s))",
      "questie_hp": 55,
      "fought": true
     }
@@ -5574,14 +5785,14 @@
     "3": {
      "max_hp": 71,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 146 individu(s))",
+     "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 158 individu(s))",
      "questie_hp": 69,
      "fought": true
     },
     "4": {
      "max_hp": 86,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 128 individu(s))",
+     "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 144 individu(s))",
      "questie_hp": 83,
      "fought": true
     }
@@ -5595,14 +5806,14 @@
     "3": {
      "max_hp": 71,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 30 individu(s))",
+     "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 35 individu(s))",
      "questie_hp": 72,
      "fought": true
     },
     "4": {
      "max_hp": 86,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 51 individu(s))",
+     "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 55 individu(s))",
      "questie_hp": 86,
      "fought": true
     }
@@ -5672,7 +5883,7 @@
     "3": {
      "max_hp": 71,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt (bloc avancé, 168 individu(s))",
+     "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 169 individu(s))",
      "questie_hp": 71,
      "fought": true
     }
@@ -9515,7 +9726,7 @@
     "4": {
      "max_hp": 86,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt (bloc avancé, 11 individu(s))",
+     "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 86,
      "fought": true
     }
@@ -16953,7 +17164,7 @@
    },
    {
     "npc_id": 721,
-    "name": "Rabbit",
+    "name": "Lapin",
     "level": 1,
     "ratio": 1.0
    },
@@ -17526,6 +17737,120 @@
     "name": "Mangeclaw",
     "level": 11,
     "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 1984,
+    "name": "Jeune sanglier des chardons",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1984,
+    "name": "Jeune sanglier des chardons",
+    "level": 2,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1985,
+    "name": "Sanglier des chardons",
+    "level": 2,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1985,
+    "name": "Sanglier des chardons",
+    "level": 3,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1986,
+    "name": "Araignée Tissebois",
+    "level": 3,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1986,
+    "name": "Araignée Tissebois",
+    "level": 4,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1988,
+    "name": "Grell",
+    "level": 2,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1988,
+    "name": "Grell",
+    "level": 3,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1989,
+    "name": "Grellide",
+    "level": 3,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1989,
+    "name": "Grellide",
+    "level": 4,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1994,
+    "name": "Githyiss la Vile",
+    "level": 5,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1995,
+    "name": "Hibou Strigid",
+    "level": 5,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1995,
+    "name": "Hibou Strigid",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1998,
+    "name": "Rôdeuse Tissebois",
+    "level": 5,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1998,
+    "name": "Rôdeuse Tissebois",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 2031,
+    "name": "Jeune sabre-de-nuit",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 2032,
+    "name": "Sabre-de-nuit galeux",
+    "level": 2,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 2042,
+    "name": "Sabre-de-nuit sauvage",
+    "level": 5,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 2042,
+    "name": "Sabre-de-nuit sauvage",
+    "level": 6,
+    "ratio": 1.0
    },
    {
     "npc_id": 2044,
@@ -19093,7 +19418,7 @@
   },
   {
    "npc_id": 721,
-   "name": "Rabbit",
+   "name": "Lapin",
    "levels": [
     1
    ],
@@ -19759,6 +20084,102 @@
     11
    ],
    "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 1984,
+   "name": "Jeune sanglier des chardons",
+   "levels": [
+    1,
+    2
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1985,
+   "name": "Sanglier des chardons",
+   "levels": [
+    2,
+    3
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1986,
+   "name": "Araignée Tissebois",
+   "levels": [
+    3,
+    4
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1988,
+   "name": "Grell",
+   "levels": [
+    2,
+    3
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1989,
+   "name": "Grellide",
+   "levels": [
+    3,
+    4
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1994,
+   "name": "Githyiss la Vile",
+   "levels": [
+    5
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1995,
+   "name": "Hibou Strigid",
+   "levels": [
+    5,
+    6
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1998,
+   "name": "Rôdeuse Tissebois",
+   "levels": [
+    5,
+    6
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 2031,
+   "name": "Jeune sabre-de-nuit",
+   "levels": [
+    1
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 2032,
+   "name": "Sabre-de-nuit galeux",
+   "levels": [
+    2
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 2042,
+   "name": "Sabre-de-nuit sauvage",
+   "levels": [
+    5,
+    6
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 2044,
