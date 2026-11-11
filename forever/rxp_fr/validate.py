@@ -56,7 +56,17 @@ def _names(bodies: Iterable[str]) -> set[str]:
 
 
 def _nexts(body: str) -> list[str]:
-    return [part.strip().rpartition("\\")[2] for text in header(body, "next") for part in text.split(";")]
+    r"""Guides désignés par `#next` : « Groupe\Guide » ou « Guide » (le groupe est celui du guide)."""
+    return [part.strip() for text in header(body, "next") for part in text.split(";")]
+
+
+def _groups(bodies: Iterable[str]) -> set[str]:
+    return {g.strip() for body in bodies for g in header(body, "group")}
+
+
+def _known(ref: str, names: set[str], groups: set[str]) -> bool:
+    group, _, name = ref.rpartition("\\")
+    return name.strip() in names and (not group or group.strip() in groups)
 
 
 def _norm(body: str) -> str:
@@ -70,6 +80,8 @@ def validate_file(
     known_names: set[str],
     english_names: set[str] | None = None,
     restedxp: Iterable[str] = (),
+    known_groups: Iterable[str] = (),
+    english_groups: Iterable[str] = (),
 ) -> list[str]:
     """Erreurs du fichier français `french` généré depuis `english` (liste vide : valide). `known_names` : noms des
     guides des autres fichiers français ; `english_names` : ceux des autres fichiers anglais ; `restedxp` : guides
@@ -92,6 +104,7 @@ def validate_file(
         return errors
     fr_known = _names(fr_guides) | known_names
     en_known = _names(en_guides) | (english_names or set())
+    fr_groups, en_groups = _groups(fr_guides) | set(known_groups), _groups(en_guides) | set(english_groups)
     for k, (en_body, fr_body) in enumerate(zip(en_guides, fr_guides, strict=True), 1):
         name = (header(en_body, "name") or [f"n°{k}"])[0].strip()
         if _norm(fr_body) in theirs:
@@ -109,6 +122,6 @@ def validate_file(
             errors.append(f"guide {name} : #next change de nombre de guides")
             continue
         for x, y in zip(en_next, fr_next, strict=True):
-            if x in en_known and y not in fr_known:
+            if _known(x, en_known, en_groups) and not _known(y, fr_known, fr_groups):
                 errors.append(f"guide {name} : #next « {y} » ne désigne aucun guide français (anglais : « {x} »)")
     return errors

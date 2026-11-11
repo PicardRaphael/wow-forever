@@ -16,7 +16,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 # En-têtes dont la valeur se traduit (noms de guide, groupes) ; les autres en-têtes restent intacts.
-TITLE_HEADERS = frozenset({"name", "displayname", "next", "group", "subgroup"})
+TITLE_HEADERS = frozenset({"name", "displayname", "next", "group", "subgroup", "include"})
 TEXT_MARKERS = (">>", "+", "*")
 # Couleurs de RestedXP qui entourent un nom, et la sorte de nom : PNJ, objet, objet ou objet du monde à ramasser.
 NAME_COLOURS = {"FRIENDLY": "npc", "ENEMY": "npc", "LOOT": "item", "BUY": "item", "PICK": "pick"}

@@ -139,3 +139,19 @@ def test_nothing_is_written_when_validation_fails(make_deps, tmp_path):
     doc = translate_addons(deps, translator=Fake(broken="]] {1}"))
     assert doc["written"] == [] and doc["errors"]
     assert target.read_bytes() == before
+
+
+def test_a_next_with_a_group_translates_the_group_and_the_name():
+    r"""RestedXP range les guides par `groupe||nom` : « Groupe\Guide » se traduit en entier."""
+    english, _text, _, _ = _generate(Fake())
+    en2 = english.replace("#next 10-12 Test Marsh", "#next RestedXP Forever Guide (A)\\10-12 Test Marsh", 1)
+    rxp = glossary(ADDONS)
+    mem = Memory()
+    for en, fr in rxp.phrases.items():
+        mem.put(en, fr, "restedxp", date="d")
+    names = NameTable([("restedxp", rxp.names), ("client", client_layer(FIX / "wago"))])
+    out, _ = generate_file(en2, FR.read_bytes().decode("utf-8"), names=names, memory=mem, translator=Fake(), meta={})
+    assert "#next RestedXP Guide Forever (A)\\10-12 Marais d’Essai" in out
+    assert validate_file(en2, out, known_names=set()) == []
+    broken = out.replace("#next RestedXP Guide Forever (A)\\", "#next RestedXP Forever Guide (A)\\", 1)
+    assert any("#next" in e for e in validate_file(en2, broken, known_names=set()))

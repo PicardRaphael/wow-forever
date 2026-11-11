@@ -158,10 +158,12 @@ class _Generator:
             return text
         lead, trail = text[: len(text) - len(text.lstrip())], text[len(text.rstrip()) :]
         group, _, name = value.rpartition("\\")
+        # « Groupe\Guide » (`#next`, `#include`) : RestedXP range les guides par groupe et nom, les deux traduits
+        prefix = self._title(group, collect, guide=False) + "\\" if group else ""
         if guide:
             found = self.names.find("guide", name)
             if found is not None:
-                return lead + (group + "\\" if group else "") + found.fr + trail
+                return lead + prefix + found.fr + trail
         tpl = make_template(name)
         key = TITLE + tpl.pattern
         if collect:
@@ -169,7 +171,7 @@ class _Generator:
             return text
         fr, _ = self.resolved.get(key, (None, "anglais"))
         out = fill(fr, [s.raw for s in tpl.slots]) if fr is not None else name
-        return lead + (group + "\\" if group else "") + out + trail
+        return lead + prefix + out + trail
 
     def _quest(self, line: Line, collect: bool) -> str | None:
         command = (line.command or "").lower()
@@ -210,7 +212,7 @@ class _Generator:
                 parts = re.split(r"(;)", line.text)
                 text = "".join(p if p == ";" else self._title(p, collect, guide=True) for p in parts)
             else:
-                text = self._title(line.text, collect, guide=command in ("name", "displayname"))
+                text = self._title(line.text, collect, guide=command in ("name", "displayname", "include"))
             return line.prefix + text + line.suffix
         if line.kind == "command" and command in UNTRANSLATED_COMMANDS and not collect:
             prefix = self._targets(line) if ">>" not in line.prefix else line.prefix

@@ -274,6 +274,11 @@ class _Collector:
         command = (en.command or "").lower()
         if en.kind == "header" and command in ("name", "displayname"):
             self.name("guide", en.text.strip(), fr.text.strip())
+        elif en.kind == "header" and command == "include":
+            en_ref, fr_ref = en.text.strip().rpartition("\\"), fr.text.strip().rpartition("\\")
+            self.name("guide", en_ref[2].strip(), fr_ref[2].strip())
+            if en_ref[0] and fr_ref[0]:
+                self.text(en_ref[0], fr_ref[0], title=True)
         elif en.kind == "header" and command == "next":
             a, b = en.text.split(";"), fr.text.split(";")
             if len(a) == len(b):

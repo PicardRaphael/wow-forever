@@ -164,20 +164,32 @@ def translate_addons(
             }
         )
     english_names: set[str] = set()
+    english_groups: set[str] = set()
     french_names: dict[str, set[str]] = {}
+    french_groups: dict[str, set[str]] = {}
     for rel, path in english_files(addons):
-        english_names |= {n.strip() for b in guide_bodies(read_text(path)) for n in header(b, "name")}
+        en_bodies = guide_bodies(read_text(path))
+        english_names |= {n.strip() for b in en_bodies for n in header(b, "name")}
+        english_groups |= {n.strip() for b in en_bodies for n in header(b, "group")}
         fr_path = addons.joinpath(*FR_DIR, rel)
-        text = outputs.get(rel) or (read_text(fr_path) if fr_path.is_file() else "")
-        french_names[rel] = {n.strip() for b in guide_bodies(text) for n in header(b, "name")}
+        fr_bodies = guide_bodies(outputs.get(rel) or (read_text(fr_path) if fr_path.is_file() else ""))
+        french_names[rel] = {n.strip() for b in fr_bodies for n in header(b, "name")}
+        french_groups[rel] = {n.strip() for b in fr_bodies for n in header(b, "group")}
     errors: list[str] = []
     for row in rows:
         rel = row["file"]
         known = set().union(*(v for k, v in french_names.items() if k != rel))
+        groups = set().union(*(v for k, v in french_groups.items() if k != rel))
         en_text = read_text(addons.joinpath(*EN_DIR, rel))
         theirs = guide_bodies(restedxp_french(addons, rel, saved))
         row["errors"] = validate_file(
-            en_text, outputs[rel], known_names=known, english_names=english_names, restedxp=theirs
+            en_text,
+            outputs[rel],
+            known_names=known,
+            english_names=english_names,
+            restedxp=theirs,
+            known_groups=groups,
+            english_groups=english_groups,
         )
         errors += [f"{rel} : {e}" for e in row["errors"]]
     if write_id is None:
