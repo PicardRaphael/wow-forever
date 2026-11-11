@@ -15,6 +15,7 @@ from forever.rxp_fr.source import GUARD, MARKER, UNTRANSLATED_COMMANDS, guide_bo
 from forever.rxp_fr.tokens import TITLE_HEADERS, Line, parse_line
 
 _END = re.compile(r"\]=*\]")
+_OPEN = re.compile(r"\[=*\[")  # le Lua 5.1 du jeu refuse aussi une ouverture de chaîne longue dans une chaîne longue
 
 
 def _ids(prefix: str) -> list[str]:
@@ -44,6 +45,8 @@ def _check_line(n: int, en: Line, fr: Line) -> str | None:
         return f"{where} : ligne non traduisible changée"
     if _END.search(fr.text) and not _END.search(en.text):
         return f"{where} : « ]] » introduit (fin de la chaîne Lua)"
+    if _OPEN.search(fr.render()) and not _OPEN.search(en.render()):
+        return f"{where} : « [[ » introduit (refusé par le Lua 5.1 du jeu dans une chaîne longue)"
     if _END.search(fr.prefix) and not _END.search(en.prefix):
         return f"{where} : « ]] » introduit (fin de la chaîne Lua)"
     if _colour(fr.text) != _colour(en.text) or _colour(fr.prefix) != _colour(en.prefix):
@@ -96,6 +99,11 @@ def validate_file(
     extra = sum(1 for ln in lines if _END.search(ln) and ln.strip() != "]])") - sum(
         1 for ln in english.split("\n") if _END.search(ln) and ln.strip() != "]])"
     )
+    opened = sum(1 for ln in lines if _OPEN.search(ln) and "RegisterGuide" not in ln) - sum(
+        1 for ln in english.split("\n") if _OPEN.search(ln) and "RegisterGuide" not in ln
+    )
+    if opened > 0:
+        errors.append(f"{opened} ligne(s) avec « [[ » introduit (refusé par le Lua 5.1 du jeu)")
     if extra > 0:
         errors.append(f"{extra} ligne(s) avec « ]] » introduit (fin de la chaîne Lua)")
     en_guides, fr_guides = guide_bodies(english), guide_bodies(french)

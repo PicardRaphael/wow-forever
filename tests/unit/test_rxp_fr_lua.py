@@ -6,7 +6,7 @@ Valeurs : mini-addon inventé pour le test (`tests/fixtures/rxp_fr/`)."""
 import shutil
 from pathlib import Path
 
-from lupa import LuaRuntime
+from lupa.lua51 import LuaRuntime  # Lua 5.1, celui du jeu (refuse `[[` dans une chaîne longue)
 
 from forever.rxp_fr.run import translate_addons
 

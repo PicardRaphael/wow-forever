@@ -38,7 +38,7 @@ from forever.rxp_fr.translator import Resolved, Translator, resolve
 
 __all__ = ["GENERATOR_VERSION", "GUARD", "MARKER", "Report", "generate_file", "marker_info", "source_sha"]
 
-GENERATOR_VERSION = 1
+GENERATOR_VERSION = 2  # 2 : noms entre crochets écartés, `[[` refusé (Lua 5.1 du jeu)
 _EN_GUARD = re.compile(r"^[ \t]*local L = GetLocale\(\)[^\r\n]*enabledLocale[^\r\n]*(?:\r?\n)?", re.MULTILINE)
 _MARK = re.compile(r"v(?P<version>\d+) source=(?P<source>[0-9a-f]{12})")
 _LEVELS = re.compile(r"^((?:\{\d+\}(?:-\{\d+\})?\.?|\{\d+\}\.)\s+)(.+)$")

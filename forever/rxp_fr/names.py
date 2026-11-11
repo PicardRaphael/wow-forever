@@ -62,11 +62,17 @@ class Name:
     source: str
 
 
+def usable(name: str) -> bool:
+    """Nom utilisable dans un guide : ni crochet (noms de développement du client, « [UNUSED] … », qui donneraient
+    `[[` refusé par le Lua 5.1 du jeu dans une chaîne longue), ni code `|`, ni saut de ligne."""
+    return bool(name) and not any(c in name for c in "[]|\r\n")
+
+
 def unique_map(pairs: Iterable[tuple[Key, str]]) -> dict[Key, str]:
     """Nom anglais -> nom français, sans les noms anglais qui mènent à plusieurs noms français."""
     seen: dict[Key, set[str]] = defaultdict(set)
     for en, fr in pairs:
-        if fr:
+        if usable(fr):
             seen[en].add(fr)
     return {en: next(iter(frs)) for en, frs in seen.items() if len(frs) == 1}
 
@@ -82,7 +88,7 @@ class NameTable:
     def find(self, kind: str, key: Key) -> Name | None:
         for source, layer in self.layers:
             found = layer.get(kind, {}).get(key)
-            if found:
+            if found and usable(found):
                 return Name(found, source)
         return None
 
