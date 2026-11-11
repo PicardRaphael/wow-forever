@@ -70,6 +70,7 @@ def simulate(
     conditions: str = "solo",
     targets: int = 1,
     objective: str = "leveling",
+    gear_objective: str = "dps",
     character: str | None = None,
     log: str | None = None,
     sv: str | None = None,
@@ -131,7 +132,7 @@ def simulate(
             cands = [{"slot": k, "item": v} for k, v in parse_equipped(candidates).items()]
         return optimise_from_sources(deps, preset=preset, race=race, level=level,
                                      equipped=parse_equipped(equipped or ""), candidates=cands, path=path, spec=spec,
-                                     iterations=iterations)  # fmt: skip
+                                     iterations=iterations, objective=gear_objective)  # fmt: skip
     if action == "race_brackets":  # SIM2 §9 : toutes les races jouables de la classe, par tranche
         from forever.sims.races import races_from_sources
 

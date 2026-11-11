@@ -596,6 +596,12 @@ def build_parser() -> argparse.ArgumentParser:
     s_gear.add_argument("--candidates", default=None, help="candidats (même forme ; défaut : choix de GearQuest)")
     s_gear.add_argument("--path", default="auto", choices=["auto", "plan", "popular", "none"], help="talents")
     s_gear.add_argument("--iterations", type=int, default=None, help="combats par essai")
+    s_gear.add_argument(
+        "--objective",
+        default="dps",
+        choices=["dps", "leveling"],
+        help="classement : DPS, ou XP par heure avec repos (leveling, sous le 60)",
+    )
     s_gear.add_argument("--json", action="store_true", help="sortie JSON")
     s_brk.add_argument("--json", action="store_true", help="sortie JSON")
     s_val = sims_sub.add_parser("validate", help="DPS mesuré dans les journaux de combat contre le calcul par tranche")
@@ -2000,7 +2006,8 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
         from forever.sims.report import simulate
 
         doc = simulate(deps, "gear", preset=args.preset, race=args.race, level=args.level, equipped=args.equipped,
-                       candidates=args.candidates, path=args.path, iterations=args.iterations)  # fmt: skip
+                       candidates=args.candidates, path=args.path, iterations=args.iterations,
+                       gear_objective=args.objective)  # fmt: skip
         lines = [f"Équipement au niveau {doc['level']}, {doc['preset']} : départ {doc['base']['dps']:.1f} DPS"]
         for slot, group in doc["by_slot"].items():
             lines.append(f"  {slot} (porté : {', '.join(map(str, group['equipped'])) or 'rien'}) :")

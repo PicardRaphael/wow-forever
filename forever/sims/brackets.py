@@ -750,9 +750,13 @@ def optimise_gear(
     iterations: int | None = None,
     runner: gitops.Runner | None = None,
     anchors: Sequence[Mapping[str, Any]] | None = None,
+    objective: str = "dps",
+    mob_at: Callable[[int], Mapping[str, Any] | None] | None = None,
 ) -> dict[str, Any]:
     """Chaque candidat essayé à sa place sur l'équipement porté, au niveau `level`, conditions des tranches, même
-    graine ; gain, seuil de bruit et verdict (règle de MS1) ; triés par gain. Voir le module."""
+    graine ; gain, seuil de bruit et verdict (règle de MS1) ; triés par gain. `objective="leveling"` (sous le 60) :
+    chaque essai dans le cycle de leveling des tranches (monstre du niveau qui frappe, combat au temps pour tuer,
+    repos), classé à l'XP par heure avec repos (`xp_gain`), le DPS restant affiché. Voir le module."""
     from forever.sims import base_stats as bs
     from forever.sims.builds import decide
     from forever.sims.engines import class_of
@@ -788,15 +792,51 @@ def optimise_gear(
     code = conv.wowsims.encode(keys)
     n = iterations or wowsims.DEFAULT_ITERATIONS
 
-    def run(gear: Mapping[str, int]) -> dict[str, Any]:
+    def sim(request: dict[str, Any]) -> dict[str, Any]:
+        return wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc, items=items_path)
+
+    def case_of(gear: Mapping[str, int]) -> Preset:
         items: list[dict[str, Any]] = [{} for _ in SLOT_NAMES]
         for slot, item in gear.items():
             items[SLOT_NAMES.index(slot)] = {"id": int(item)}
-        case = solo_preset(chosen, talents=code, equipment={"items": items})
-        request = wowsims.request_for(case, race=race_token, encounter=encounter, iterations=n)
-        return wowsims.run_sim(deps.cache_dir, request, runner=runner, level=level, base_stats=doc, items=items_path)
+        return solo_preset(chosen, talents=code, equipment={"items": items})
+
+    mob: Mapping[str, Any] | None = None
+    pools: dict[str, Any] = {}
+    reference = wowsims.reference_encounter(presets)
+    if objective == "leveling" and level < wowsims.MAX_LEVEL:
+        from forever.gamedata import build_game_data
+        from forever.sims import leveling
+        from forever.sims.leveling_rates import cycle
+        from forever.store import load_version
+
+        gd = build_game_data(load_version(deps))
+        mob = (mob_at or (lambda lv: leveling.mob_from(gd, load_version(deps).read_json(bs.CHARACTER_FILE), lv)))(level)
 
     base_gear = {k: v for k, v in equipped.items() if known is None or v in known}
+
+    def run(gear: Mapping[str, int]) -> dict[str, Any]:
+        case = case_of(gear)
+        if mob is None:
+            return sim(wowsims.request_for(case, race=race_token, encounter=encounter, iterations=n))
+        # cycle de leveling des tranches : amorce, combat au temps pour tuer (la cible frappe), puis repos
+        prime = leveling.leveling_encounter(reference, level, mob, duration=leveling.PRIME_S)
+        first = sim(leveling.as_tank(wowsims.request_for(case, race=race_token, encounter=prime, iterations=n)))
+        duration = float(mob["hp"]) / float(first["dps"]) if float(first["dps"]) > 0 else leveling.PRIME_S
+        kill = leveling.leveling_encounter(reference, level, mob, duration=duration)
+        out = sim(leveling.as_tank(wowsims.request_for(case, race=race_token, encounter=kill, iterations=n)))
+        rates = cycle(gd, level, mob, out, pools, duration)
+        return {**out, "xp_per_hour": rates.get("xp_per_hour")}
+
+    if mob is not None:  # sonde de repos (mana et vie maximales, régénération) sur l'équipement porté
+        probe = wowsims.request_for(case_of(base_gear), race=race_token, encounter=leveling.leveling_encounter(
+            reference, level, mob, duration=leveling.PROBE_S), iterations=1)  # fmt: skip
+        pools.update(leveling.pools_from_logs(str(sim(leveling.as_probe(leveling.as_tank(probe))).get("logs") or "")))
+
+    def better(trial: Mapping[str, Any]) -> float:
+        xp = trial.get("xp_per_hour")
+        return float(xp) if mob is not None and xp is not None else float(trial["dps"])
+
     base = run(base_gear)
     rows: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
@@ -813,18 +853,26 @@ def optimise_gear(
         best: dict[str, Any] | None = None
         for target in targets:
             trial = run({**base_gear, target: item})
-            if best is None or trial["dps"] > best["dps"]:
+            if best is None or better(trial) > better(best):
                 best = {**trial, "slot": target}
         assert best is not None
-        rows.append({"item": item, "slot": best["slot"], "replaces": equipped.get(best["slot"]),
-                     "dps": best["dps"], **decide(base, best)})  # fmt: skip
-    rows.sort(key=lambda r: -float(r["gain"]))
+        row = {"item": item, "slot": best["slot"], "replaces": equipped.get(best["slot"]), "dps": best["dps"],
+               **decide(base, best)}  # fmt: skip
+        if mob is not None:
+            row.update(xp_per_hour=best.get("xp_per_hour"), xp_gain=better(best) - better(base))
+        rows.append(row)
+    rows.sort(key=lambda r: -float(r["xp_gain"] if mob is not None else r["gain"]))
     notes = [wowsims.source_note(pin), *NOTES, *([items_note] if items_note else []),
              ("optimisation : chaque candidat à sa place sur l'équipement porté, même graine ; « non départagé » : "
               "gain sous deux erreurs types de la différence (règle de MS1)")]  # fmt: skip
+    if mob is not None:
+        notes.append("objectif leveling : chaque essai dans le cycle des tranches (monstre du niveau qui frappe, "
+                     "repos) ; classement à l'XP par heure avec repos (xp_gain), DPS affiché")  # fmt: skip
     return {"preset": chosen.key, "race": race_token, "level": level, "by_slot": rank_by_slot(rows, equipped),
-            "base": {"dps": base["dps"],
-            "stdev": base["stdev"], "equipped": dict(equipped)}, "candidates": rows, "skipped": skipped,
+            "objective": "leveling" if mob is not None else "dps",
+            "base": {"dps": base["dps"], "stdev": base["stdev"], "equipped": dict(equipped),
+                     **({"xp_per_hour": base.get("xp_per_hour")} if mob is not None else {})},
+            "candidates": rows, "skipped": skipped,
             "provenance": local_provenance(deps, certainty="suppose", assumptions=notes)}  # fmt: skip
 
 
@@ -840,6 +888,7 @@ def optimise_from_sources(
     spec: str | None = None,
     gear_spec: str | None = None,
     iterations: int | None = None,
+    objective: str = "dps",
 ) -> dict[str, Any]:
     """`optimise_gear` avec les sources installées : parcours de talents (`path`, comme les tranches), candidats
     donnés ou choix de GearQuest au niveau, relevés d'attributs de ForeverLogger."""
@@ -885,7 +934,7 @@ def optimise_from_sources(
         notes.append("départ : ensemble de GearQuest du niveau (aucun équipement porté donné)")
     anchors, _files = logger_anchors(deps, chosen.class_token)
     out = optimise_gear(deps, preset=preset, race=race, level=level, equipped=equipped, candidates=candidates,
-                        steps=steps, iterations=iterations, anchors=anchors)  # fmt: skip
+                        steps=steps, iterations=iterations, anchors=anchors, objective=objective)  # fmt: skip
     out["provenance"]["assumptions"] = [*out["provenance"]["assumptions"], *notes]
     return out
 
