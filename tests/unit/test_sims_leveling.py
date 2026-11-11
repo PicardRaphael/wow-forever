@@ -240,8 +240,15 @@ def test_gear_is_ranked_by_xp_per_hour_with_rest_when_leveling(make_deps, tmp_pa
 
     deps = brackets_setup(make_deps, tmp_path)
     cands = [{"slot": "Head", "item": 501}, {"slot": "Chest", "item": 502}]
-    kw = {"preset": "mage/dps/Fire", "race": "Human", "level": 25, "equipped": {}, "candidates": cands,
-          "steps": FROST_STEPS, "iterations": 10}
+    kw = {
+        "preset": "mage/dps/Fire",
+        "race": "Human",
+        "level": 25,
+        "equipped": {},
+        "candidates": cands,
+        "steps": FROST_STEPS,
+        "iterations": 10,
+    }
     lev = optimise_gear(deps, **kw, runner=GearLevelingSim(), objective="leveling", mob_at=lambda level: MOB)
     assert [r["item"] for r in lev["candidates"]] == [502, 501]
     assert lev["objective"] == "leveling" and lev["base"]["xp_per_hour"] > 0
