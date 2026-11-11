@@ -2761,7 +2761,7 @@
      "training_cost": 5,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       30
      ],
@@ -2774,7 +2774,7 @@
      "training_cost": 10,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       50
      ],
@@ -2787,7 +2787,7 @@
      "training_cost": 15,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       70
      ],
@@ -2800,7 +2800,7 @@
      "training_cost": 25,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       100
      ],
@@ -2813,7 +2813,7 @@
      "training_cost": 50,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       130
      ],
@@ -2826,7 +2826,7 @@
      "training_cost": 75,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       170
      ],
@@ -2839,7 +2839,7 @@
      "training_cost": 100,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       210
      ],
@@ -2852,7 +2852,7 @@
      "training_cost": 125,
      "focus_cost": null,
      "cooldown_s": null,
-     "description": "Health increased by $s1.",
+     "description": "Stamina increased by $s1.",
      "tooltip_values": [
       260
      ],
@@ -2897,14 +2897,6 @@
      113270
     ],
     "rows": [
-     "Spell 4187",
-     "Spell 4188",
-     "Spell 4189",
-     "Spell 4190",
-     "Spell 4191",
-     "Spell 4192",
-     "Spell 4193",
-     "Spell 4194",
      "SpellAuraOptions 118987",
      "SpellAuraOptions 119038",
      "SpellAuraOptions 119096",
@@ -2937,7 +2929,7 @@
      "SpellMisc 318657"
     ],
     "first_logged_at": null,
-    "dbcache_date": "2026-11-11T07:37:27Z"
+    "dbcache_date": "2026-11-11T11:20:22Z"
    }
   },
   "growl": {

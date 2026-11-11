@@ -66,7 +66,8 @@
     "Changements installés dans 1.60.1.70862 en révision 9 (forever install, 2026-11-10) : champ applied_in_revision.",
     "Changements installés dans 1.60.1.70862 en révision 11 (forever install, 2026-11-10) : champ applied_in_revision.",
     "Repris de 1.60.1.70862 à l'installation de 1.60.1.70888 (forever install --new-version, 2026-11-11) : applied_in_revision garde la révision d'origine.",
-    "Changements installés dans 1.60.1.70888 en révision 1 (forever install, 2026-11-11) : champ applied_in_revision."
+    "Changements installés dans 1.60.1.70888 en révision 1 (forever install, 2026-11-11) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70888 en révision 3 (forever install, 2026-11-11) : champ applied_in_revision."
   ],
   "changes": [
     {
