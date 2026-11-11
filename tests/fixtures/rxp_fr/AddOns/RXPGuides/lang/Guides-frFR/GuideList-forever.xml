@@ -1,0 +1,4 @@
+<Ui>
+	<Script file="forever\Test-Isle.lua"/>
+	<Script file="forever\Test-Paired.lua"/>
+</Ui>
