@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from forever.rxp_fr.memory import TITLE, Memory
-from forever.rxp_fr.names import Key, NameTable
+from forever.rxp_fr.names import Key, Name, NameTable
 from forever.rxp_fr.patterns import PLACE_PHRASES, QUEST_PREFIXES, apply_patterns
 from forever.rxp_fr.source import (
     GUARD,
@@ -102,7 +102,7 @@ class _Generator:
             return found
         for en, fr in PLACE_PHRASES.items():
             if key.startswith(en) and "{" not in key:
-                place = self.names.find("zone", key[len(en) :].rstrip(".!"))
+                place = self._zone(key[len(en) :].rstrip(".!"))
                 if place is not None:
                     return fr + place.fr.replace("{", "{{").replace("}", "}}") + key[len(key.rstrip(".!")) :]
         for command, (en, fr) in QUEST_PREFIXES.items():
@@ -113,6 +113,10 @@ class _Generator:
                     return fr + title.fr.replace("{", "{{").replace("}", "}}")
         return None
 
+    def _zone(self, name: str) -> Name | None:
+        """Nom de lieu : carte (UiMap) d'abord, puis zone (AreaTable)."""
+        return self.names.find("zone", name) or self.names.find("area", name)
+
     def _title_parts(self, pattern: str) -> str | None:
         """Nom de guide « niveaux zone/zone » traduit par les noms de zone du client, s'ils le sont tous."""
         m = _LEVELS.match(pattern)
@@ -121,7 +125,7 @@ class _Generator:
             return None
         parts = []
         for part in rest.split("/"):
-            found = self.names.find("zone", part.strip()) or self.names.find("guide_part", part.strip())
+            found = self._zone(part.strip())
             if found is None:
                 return None
             parts.append(found.fr.replace("{", "{{").replace("}", "}}"))

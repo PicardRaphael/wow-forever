@@ -43,6 +43,12 @@ class Line:
         return self.prefix + self.text + self.suffix
 
 
+def _lead(head: str, rest: str) -> tuple[str, str]:
+    """Blancs de tête du texte rangés dans le préfixe (`>> Accept …` : le texte commence au mot)."""
+    text = rest.lstrip(" 	")
+    return head + rest[: len(rest) - len(text)], text
+
+
 def _split_suffix(rest: str) -> tuple[str, str]:
     """(texte, suffixe) : le suffixe commence aux blancs qui précèdent le premier `<<`, ou aux blancs de fin."""
     cut = rest.find("<<")
@@ -75,14 +81,15 @@ def parse_line(raw: str) -> Line:
         command = stripped[1:].split(None, 1)[0] if len(stripped) > 1 else ""
         at = raw.find(">>")
         if at >= 0:
-            text, suffix = _split_suffix(raw[at + 2 :])
-            return Line("command", raw[: at + 2], text, suffix, command)
+            head, rest = _lead(raw[: at + 2], raw[at + 2 :])
+            text, suffix = _split_suffix(rest)
+            return Line("command", head, text, suffix, command)
         body, suffix = _split_suffix(raw)
         return Line("command", body, "", suffix, command)
     for marker in TEXT_MARKERS:
         if stripped.startswith(marker):
-            head = indent + marker
-            text, suffix = _split_suffix(raw[len(head) :])
+            head, rest = _lead(indent + marker, raw[len(indent) + len(marker) :])
+            text, suffix = _split_suffix(rest)
             return Line("text", head, text, suffix)
     return Line("other", raw, "", "")
 

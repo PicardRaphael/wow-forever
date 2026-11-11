@@ -22,7 +22,7 @@ Layer = Mapping[str, Mapping[Key, str]]
 CLIENT_TABLES: tuple[tuple[str, str, str], ...] = (
     ("SpellName", "Name_lang", "spell"),
     ("UiMap", "Name_lang", "zone"),
-    ("AreaTable", "AreaName_lang", "zone"),
+    ("AreaTable", "AreaName_lang", "area"),  # après UiMap : AreaTable a des doublons de développement
     ("ItemSparse", "Display_lang", "item"),
     ("ChrRaces", "Name_lang", "race"),
     ("CreatureFamily", "Name_lang", "family"),
