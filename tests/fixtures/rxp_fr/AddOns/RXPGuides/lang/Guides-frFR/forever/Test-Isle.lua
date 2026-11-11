@@ -4,7 +4,7 @@ RXPGuides.RegisterGuide([[
 #forever
 #version 1
 #name 1-5 Île d’Essai
-#group RestedXP Guide Forever (A) << Alliance
+#group Guide Test Forever (A) << Alliance
 #subgroup Guide Speedrun 1-20 << Alliance
 #next 5-10 Île d’Essai
 #defaultfor Testrace

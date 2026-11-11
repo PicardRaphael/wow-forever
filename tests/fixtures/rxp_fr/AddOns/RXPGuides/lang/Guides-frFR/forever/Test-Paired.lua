@@ -3,7 +3,7 @@ RXPGuides.RegisterGuide([[
 #forever
 #version 1
 #name 1-3 Val Jumelé
-#group RestedXP Guide Forever (A) << Alliance
+#group Guide Test Forever (A) << Alliance
 #subgroup Guide Speedrun 1-20 << Alliance
 #next 10-12 Marais d’Essai
 

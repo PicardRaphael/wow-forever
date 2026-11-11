@@ -64,7 +64,7 @@ def test_guide_names_and_titles_come_from_the_paired_headers():
     assert rxp.names["guide"]["10-12 Test Marsh"] == "10-12 Marais d’Essai"
     assert rxp.names["guide"]["5-10 Testing Isle"] == "5-10 Île d’Essai"
     assert rxp.phrases["titre|Speedrun Guide {1}-{2}"] == "Guide Speedrun {1}-{2}"
-    assert rxp.phrases["titre|RestedXP Forever Guide (A)"] == "RestedXP Guide Forever (A)"
+    assert rxp.phrases["titre|Test Forever Guide (A)"] == "Guide Test Forever (A)"
 
 
 def test_phrases_of_the_glossary_keep_the_english_slot_numbers():

@@ -4,7 +4,7 @@ RXPGuides.RegisterGuide([[
 #forever
 #version 1
 #name 1-5 Testing Isle
-#group RestedXP Forever Guide (A) << Alliance
+#group Test Forever Guide (A) << Alliance
 #subgroup Speedrun Guide 1-20 << Alliance
 #next 5-10 Testing Isle
 #defaultfor Testrace
@@ -24,7 +24,7 @@ RXPGuides.RegisterGuide([[
 #forever
 #version 1
 #name 5-10 Testing Isle
-#group RestedXP Forever Guide (A) << Alliance
+#group Test Forever Guide (A) << Alliance
 #subgroup Speedrun Guide 1-20 << Alliance
 #next 10-12 Test Marsh
 
@@ -45,7 +45,7 @@ RXPGuides.RegisterGuide([[
 #forever
 #version 1
 #name 10-12 Test Marsh
-#group RestedXP Forever Guide (A) << Alliance
+#group Test Forever Guide (A) << Alliance
 #subgroup Speedrun Guide 1-20 << Alliance
 
 step
