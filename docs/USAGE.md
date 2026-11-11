@@ -236,6 +236,18 @@ uv run forever route guide <id>                         # guide RestedXP à impo
 uv run forever route recette                            # routes acceptées ou refusées face à RestedXP (décision 279)
 ```
 
+**Guides RestedXP en français** (client frFR, FR1 ; sans réseau, sans traduction automatique)
+```powershell
+uv run forever rxp traduire --simulation                # rapport : guides générés, recopiés, phrases et noms par source
+uv run forever rxp traduire                             # écrit lang/Guides-frFR/forever/… puis /reload en jeu
+uv run forever rxp traduire --manquants                 # phrases et noms restés en anglais
+uv run forever rxp traduire --importer lot.json         # traductions d'une session ({anglais: français}), puis écriture
+uv run forever rxp traduire --annuler                   # remet les fichiers français de RestedXP
+```
+Les guides que RestedXP a traduits sont recopiés tels quels. La mémoire de traduction vit dans
+`%USERPROFILE%\.foreverxp_fr\memoire.json` (une entrée `manuel` n'est jamais écrasée). La veille régénère d'elle-même
+après une mise à jour de RestedXP (carte « Mis à jour », `forever update undo <id>`).
+
 **Exports** (chaînes que je colle moi-même ; aucune n'est importée par forever)
 ```powershell
 uv run forever export naowh-build --class Mage --level <niveau> --talents <clé>=<rang>,…   # ou --code <lien>, --popular 1

@@ -119,6 +119,7 @@ décision 288 ; une tranche gardée par un événement extérieur est sautée ta
 
 | Tranche | But | Dépend de |
 | --- | --- | --- |
+| FR1 | Guides RestedXP de Forever en français (client frFR), générés et tenus à jour par la veille (décision 306) | — |
 | CJ1 (fin) | Corrections de l'essai du 4 novembre ; fin du bloc 6b (cartes, puis bascule du défaut après essai) ; clôture | essai du 4 novembre |
 | VF1 | Version finale suivie : rapport des valeurs qui changent, `VALUES_VERSION` montée en une fois ; valeurs héritées de la Classic remplacées par des valeurs Forever lues ou mesurées | sortie, veille |
 | BL1 | Base locale unique (`<cache>/kb/`) : pilote quêtes et donjons, puis objets, PNJ, sorts, zones | VF1 |
