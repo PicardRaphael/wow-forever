@@ -71,3 +71,15 @@ def test_only_new_phrases_reach_the_translator():
 def test_without_translator_a_new_phrase_stays_english():
     out = resolve(["Brand new"], Memory(), None, date="d")
     assert out["Brand new"] == (None, "anglais")
+
+
+def test_the_backup_keeps_the_memory(make_deps, tmp_path):
+    """Q4 : `forever backup` sauvegarde la mémoire (hors dépôt, à côté du profil)."""
+    from forever.backup import collect
+    from forever.rxp_fr.memory import memory_path
+
+    deps = make_deps()
+    mem = Memory()
+    mem.put("Wait here", "Attendez ici", "manuel", date="d")
+    mem.save(memory_path(deps))
+    assert any(item.path == "rxp_fr/memoire.json" for item in collect(deps))

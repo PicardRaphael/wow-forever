@@ -7,6 +7,7 @@ Valeurs : lignes inventées pour le test (`tests/fixtures/rxp_fr/`), aucun texte
 from pathlib import Path
 
 import pytest
+
 from forever.rxp_fr.tokens import fill, make_template, parse_line, placeholders
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "rxp_fr" / "AddOns" / "RXPGuides"

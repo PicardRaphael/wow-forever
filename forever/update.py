@@ -713,8 +713,11 @@ def _fetch_version(run: _Run, version: str, rules: Mapping[str, Any]) -> list[st
     localized: dict[str, list[str]] = {}
     for key in ("tables", "class_tables", "character_tables", "pet_tables"):
         enus += [t for t in rules.get(key, []) if t not in enus]
-    for key in ("localized_tables", "localized_class_tables", "localized_pet_tables"):
-        for locale, names in (rules.get(key) or {}).items():
+    from forever.rxp_fr.names import french_name_tables
+
+    sources = [*(rules.get(k) or {} for k in ("localized_tables", "localized_class_tables", "localized_pet_tables"))]
+    for source in [*sources, french_name_tables(run.deps.wow_dir)]:  # FR1 (Q3) : noms des guides RestedXP en français
+        for locale, names in source.items():
             localized.setdefault(locale, [])
             localized[locale] += [t for t in names if t not in localized[locale]]
     fetch_tables(deps, version, enus, log=run.say)
@@ -1873,14 +1876,45 @@ def _step_addons(run: _Run) -> Step:
         data["profile_error"] = [str(exc)]
     if synced:
         data["profile"] = synced
+    rxp_fr = _rxp_fr(run, data)
     if changed or proposals:
         detail = f"{len(changed)} addon(s) changé(s), {len(proposals)} à inventorier"
         if remeasured:
             detail += " ; " + " ; ".join(remeasured)
         if review:
             detail += f" ; {review} relecture(s) en session signalée(s), rien n'est bloqué"
-        return Step("addons", "fait", detail, data)
+        return Step("addons", "fait", detail + rxp_fr, data)
+    if rxp_fr:
+        return Step("addons", "fait", "aucun addon changé" + rxp_fr, data)
     return Step("addons", "rien", "aucun addon changé", data)
+
+
+def _rxp_fr(run: _Run, data: dict[str, Any]) -> str:
+    """FR1 : guides RestedXP de Forever régénérés en français si le marqueur manque ou si la source anglaise a
+    changé (fiche « Mis à jour », annulable) ; rend la fin du détail de l'étape, vide s'il n'y a rien à faire."""
+    try:
+        from forever.rxp_fr.run import watch
+
+        doc = watch(run.deps, dry_run=run.options.dry_run)
+    except (OSError, ValueError, ForeverError) as exc:
+        data["rxp_fr_error"] = str(exc)
+        return f" ; guides RestedXP en français non régénérés : {exc}"
+    if doc is None:
+        return ""
+    data["rxp_fr"] = {k: doc[k] for k in ("written", "errors", "write_id", "phrases") if k in doc}
+    if doc["errors"]:
+        return (
+            f" ; guides RestedXP en français : validation en échec, rien n'est écrit ({len(doc['errors'])} erreur(s))"
+        )
+    if run.options.dry_run:
+        return " ; guides RestedXP en français à régénérer (essai à blanc, rien n'est écrit)"
+    if doc["written"]:
+        english = doc["phrases"].get("anglais", 0)
+        return (
+            f" ; guides RestedXP en français régénérés : {', '.join(doc['written'])} ({english} phrase(s) restées en "
+            f"anglais, `forever rxp traduire --manquants`) ; annuler : forever update undo {doc['write_id']}"
+        )
+    return ""
 
 
 def _step_guides(run: _Run) -> Step:
@@ -2819,6 +2853,14 @@ def undo(
     record = load_installed(deps.cache_dir, record_id)
     if record.get("state") == "annulée":
         raise InvalidArgumentError(f"L'installation {record_id} est déjà annulée.", "rien à faire")
+    if record.get("kind") == "rxp_fr":  # FR1 : guides français remis tels qu'avant l'écriture, sans git
+        from forever.rxp_fr.install import restore_previous
+        from forever.rxp_fr.run import addons_dir
+
+        restored = restore_previous(addons_dir(deps), deps.cache_dir, record_id)
+        update_installed(deps.cache_dir, record_id, state="annulée", undone_at=deps.now().isoformat())
+        detail = f"guides RestedXP en français remis tels qu'avant : {', '.join(restored)}"
+        return {"id": record_id, "state": "annulée", "status": "fait", "detail": detail}
     command = f"forever update undo {record_id}"
     run = _Run(deps, UpdateOptions(), runner, None, deps.data_dir)
     run.progress = progress

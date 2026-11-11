@@ -8,7 +8,6 @@ import shutil
 from pathlib import Path
 
 from forever.rxp_fr.build import MARKER
-
 from forever.update import UpdateOptions, run_update, undo
 from forever.update_installed import list_installed
 

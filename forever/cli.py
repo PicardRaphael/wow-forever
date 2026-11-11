@@ -1095,6 +1095,19 @@ def build_parser() -> argparse.ArgumentParser:
     doctor = sub.add_parser("doctor", help="contrôle de toute l'installation, sans réseau, avec la correction (LN1)")
     doctor.add_argument("--json", action="store_true", help="sortie JSON")
 
+    rxp = sub.add_parser("rxp", help="guides RestedXP de Forever en français (FR1)")
+    rxp_sub = rxp.add_subparsers(dest="rxp_command", required=True, parser_class=_Parser)
+    rxp_tr = rxp_sub.add_parser(
+        "traduire", help="générer les guides RestedXP manquants en français (client frFR), sans réseau"
+    )
+    rxp_tr.add_argument("--simulation", action="store_true", help="rapport sans rien écrire")
+    rxp_tr.add_argument("--annuler", action="store_true", help="remettre les fichiers français de RestedXP")
+    rxp_tr.add_argument("--manquants", action="store_true", help="phrases et noms restés en anglais (sans rien écrire)")
+    rxp_tr.add_argument(
+        "--importer", help="lot de traductions d'une session (JSON {gabarit anglais: gabarit français}), puis écrire"
+    )
+    rxp_tr.add_argument("--json", action="store_true", help="sortie JSON")
+
     backup = sub.add_parser("backup", help="sauvegarder ce qui n'est pas sur GitHub ; list, restore (LN1)")
     backup.add_argument("--reason", default="à la main", help="raison notée dans la sauvegarde")
     backup.add_argument("--json", action="store_true", help="sortie JSON")
@@ -5442,6 +5455,50 @@ def _cmd_doctor(deps: Deps, args: argparse.Namespace) -> int:
     return doctor.exit_code(checks)
 
 
+def _cmd_rxp(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever rxp traduire` : guides RestedXP de Forever en français (FR1)."""
+    from forever.rxp_fr.run import cancel, translate_addons
+
+    if args.annuler:
+        doc = cancel(deps)
+        restored = doc["restored"]
+        lines = [f"Fichiers de RestedXP remis : {', '.join(restored) if restored else 'aucun (rien à annuler)'}"]
+        _emit(doc, lines, doc["provenance"], args.json)
+        return EXIT_OK
+    importing = Path(args.importer) if args.importer else None
+    doc = translate_addons(deps, simulate=args.simulation or args.manquants, importing=importing)
+    if args.manquants:
+        lines = [f"Phrases restées en anglais : {len(doc['missing_phrases'])}"]
+        lines += [f"  {p}" for p in doc["missing_phrases"][:200]]
+        lines.append(f"Noms restés en anglais : {len(doc['missing_names'])}")
+        lines += [f"  {n['kind']} : {n['name']}" for n in doc["missing_names"][:200]]
+        _emit(doc, lines, doc["provenance"], args.json)
+        return EXIT_OK
+    lines = []
+    for row in doc["files"]:
+        lines.append(
+            f"{row['file']} : {row['generated']} guide(s) générés, {row['copied']} recopiés de RestedXP "
+            f"({row['english_guides']} en anglais)"
+        )
+    phrases = doc["phrases"]
+    lines.append(
+        "Phrases : " + ", ".join(f"{k} {v}" for k, v in sorted(phrases.items())) if phrases else "Phrases : aucune"
+    )
+    lines.append("Noms traduits : " + (", ".join(f"{k} {v}" for k, v in sorted(doc["names"].items())) or "aucun"))
+    if doc["imported"] is not None:
+        lines.append(f"Lot importé : {doc['imported']['accepted']} accepté(s), {doc['imported']['refused']} refusé(s)")
+    if doc["errors"]:
+        lines.append(f"Validation en échec, rien n'est écrit ({len(doc['errors'])} erreur(s)) :")
+        lines += [f"  {e}" for e in doc["errors"][:30]]
+    elif doc["simulation"]:
+        lines.append("Simulation : rien n'est écrit.")
+    else:
+        written = doc["written"]
+        lines.append(f"Écrit : {', '.join(written)} ; /reload en jeu" if written else "Déjà à jour : rien à écrire.")
+    _emit(doc, lines, doc["provenance"], args.json)
+    return EXIT_OK if not doc["errors"] else EXIT_INTEGRITY
+
+
 def _cmd_backup(deps: Deps, args: argparse.Namespace) -> int:
     root, warning = default_backup_root(deps)
     provenance = local_provenance(deps, assumptions=[warning] if warning else [])
@@ -5574,6 +5631,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "export": _cmd_export,
         "wow": _cmd_wow,
         "backup": _cmd_backup,
+        "rxp": _cmd_rxp,
         "doctor": _cmd_doctor,
     }
     try:

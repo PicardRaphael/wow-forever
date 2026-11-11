@@ -6,8 +6,9 @@ Valeurs : mini-addon inventé pour le test (`tests/fixtures/rxp_fr/`)."""
 import shutil
 from pathlib import Path
 
-from forever.rxp_fr.run import translate_addons
 from lupa import LuaRuntime
+
+from forever.rxp_fr.run import translate_addons
 
 FIX = Path(__file__).resolve().parents[1] / "fixtures" / "rxp_fr"
 

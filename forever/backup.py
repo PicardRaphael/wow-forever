@@ -231,6 +231,9 @@ def collect(deps: Deps) -> list[_Item]:
     profile = _profile_file(deps)
     if profile.is_file():
         items.append(_Item("profile", profile, f"profil/{profile.name}"))
+    memory = profile.parent / "rxp_fr" / "memoire.json"  # FR1 (Q4) : mémoire de traduction, hors dépôt
+    if memory.is_file():
+        items.append(_Item("cache", memory, "rxp_fr/memoire.json"))
     for folder in _install_folders(deps):
         product = product_of(folder)[0]
         tag = product or folder.name

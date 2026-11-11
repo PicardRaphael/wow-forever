@@ -7,10 +7,9 @@ import json
 import shutil
 from pathlib import Path
 
+from forever.cli import main
 from forever.rxp_fr.build import MARKER
 from forever.rxp_fr.memory import Memory, memory_path
-
-from forever.cli import main
 
 FIX = Path(__file__).resolve().parents[1] / "fixtures" / "rxp_fr"
 REL = Path("Interface/AddOns/RXPGuides/lang/Guides-frFR/forever/Test-Isle.lua")

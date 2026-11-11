@@ -8,6 +8,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+
 from forever.rxp_fr.build import GUARD, MARKER, generate_file
 from forever.rxp_fr.memory import Memory
 from forever.rxp_fr.names import NameTable, client_layer, questie_layer
@@ -56,7 +57,7 @@ def test_only_files_with_missing_french_guides_are_targets():
 
 
 def test_guard_marker_and_crlf():
-    english, text, _, _ = _generate(Fake())
+    _english, text, _, _ = _generate(Fake())
     lines = text.split("\r\n")
     assert lines[0] == GUARD
     assert lines[1].startswith(MARKER)
