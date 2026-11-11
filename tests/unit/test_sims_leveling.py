@@ -204,3 +204,48 @@ def test_analysis_key_names_the_objective_model(make_deps, tmp_path):
 
     deps = brackets_setup(make_deps, tmp_path)
     assert leveling.MODEL in str(analysis_path(deps, "mage/dps/Fire", "Human"))
+
+
+GEAR_DPS = {501: 2.0, 502: 1.0}  # objet -> dégâts ajoutés (fabriqués)
+GEAR_TAKEN = {502: 0.0}  # objet -> dégâts subis par seconde (fabriqués ; 50 sinon)
+
+
+class GearLevelingSim(LevelingSim):
+    """Leveling avec équipement : DPS = 10 + valeur des objets portés ; dégâts subis 50 par seconde, 0 avec 502."""
+
+    def __call__(self, args, cwd, timeout=None):
+        args = list(args)
+        req = json.loads(Path(args[args.index("--infile") + 1]).read_text(encoding="utf-8"))
+        if req["simOptions"].get("debugFirstIteration"):
+            return super().__call__(args, cwd, timeout)
+        self.requests.append(req)
+        n = req["simOptions"]["iterations"]
+        ids = [i.get("id") for i in req["raid"]["parties"][0]["players"][0]["equipment"]["items"]]
+        taken = min([GEAR_TAKEN[i] for i in ids if i in GEAR_TAKEN] or [50.0])
+        dur = float(req["encounter"]["duration"])
+        player = {"dps": {"avg": 10.0 + sum(GEAR_DPS.get(i, 0.0) for i in ids), "stdev": 0.01},
+                  "tto": {"avg": 99.0}, "secondsOomAvg": 0.0, "chanceOfDeath": 0.0,
+                  "resources": [{"id": {"otherId": "OtherActionDamageTaken"}, "type": "ResourceTypeHealth",
+                                 "gain": -taken * dur * n}]}  # fmt: skip
+        res = {"raidMetrics": {"parties": [{"players": [player]}]}, "iterationsDone": n}
+        Path(args[args.index("--outfile") + 1]).write_text(json.dumps(res), encoding="utf-8")
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+
+def test_gear_is_ranked_by_xp_per_hour_with_rest_when_leveling(make_deps, tmp_path):
+    """Équipement au leveling (demande du 2026-11-11 : « temps d'arrêt… réfléchis ») : chaque objet essayé dans le
+    cycle de leveling (monstre du niveau qui frappe, repos) et classé à l'XP par heure ; l'objet qui supprime les
+    dégâts subis (pas de repos) passe devant celui qui donne plus de DPS. À l'objectif DPS, l'inverse."""
+    from forever.sims.brackets import optimise_gear
+
+    deps = brackets_setup(make_deps, tmp_path)
+    cands = [{"slot": "Head", "item": 501}, {"slot": "Chest", "item": 502}]
+    kw = dict(preset="mage/dps/Fire", race="Human", level=25, equipped={}, candidates=cands, steps=FROST_STEPS,
+              iterations=10)  # fmt: skip
+    lev = optimise_gear(deps, **kw, runner=GearLevelingSim(), objective="leveling", mob_at=lambda level: MOB)
+    assert [r["item"] for r in lev["candidates"]] == [502, 501]
+    assert lev["objective"] == "leveling" and lev["base"]["xp_per_hour"] > 0
+    assert all("xp_per_hour" in r and "xp_gain" in r for r in lev["candidates"])
+    assert lev["candidates"][0]["xp_gain"] > lev["candidates"][1]["xp_gain"] > 0
+    dps = optimise_gear(deps, **kw, runner=GearLevelingSim())
+    assert [r["item"] for r in dps["candidates"]] == [501, 502] and dps["objective"] == "dps"
