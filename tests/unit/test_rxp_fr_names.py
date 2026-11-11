@@ -72,3 +72,13 @@ def test_phrases_of_the_glossary_keep_the_english_slot_numbers():
     assert rxp.phrases["{1}Talk to {2}"] == "{1}Parlez à {2}"
     assert rxp.phrases["Kill {1}. Loot them for their {2}"] == "Tuez les {1}. Dépouillez-les pour leurs {2}"
     assert rxp.phrases["Travel to Test Marsh"] == "Allez jusqu'au Marais d’Essai"
+
+
+def test_a_name_with_brackets_or_codes_is_never_used():
+    """Le client a des noms de développement (« [UNUSED] … ») : entre crochets ils donneraient `[[`, que le Lua 5.1
+    du jeu refuse dans une chaîne longue (fichier entier rejeté, essai du 2026-11-11)."""
+    assert unique_map([("Vial", "[INUTILISÉ] Fiole"), ("Ale", "Bière |cff00|r"), ("Bread", "Pain")]) == {
+        "Bread": "Pain"
+    }
+    table = NameTable([("client", {"item": {"Vial": "[INUTILISÉ] Fiole"}})])
+    assert table.lookup("item", "Vial") is None

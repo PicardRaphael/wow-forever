@@ -155,3 +155,11 @@ def test_a_next_with_a_group_translates_the_group_and_the_name():
     assert validate_file(en2, out, known_names=set()) == []
     broken = out.replace("#next Guide Test Forever (A)\\", "#next Test Forever Guide (A)\\", 1)
     assert any("#next" in e for e in validate_file(en2, broken, known_names=set()))
+
+
+@pytest.mark.parametrize("bad", ["[[INUTILISÉ] Fiole", "x [=[ y", "fin ]=]"])
+def test_the_validator_refuses_long_brackets_that_lua_51_rejects(bad):
+    """Lua 5.1 (le jeu) refuse `[[` dans une chaîne longue ; lupa (Lua 5.5) l'accepte : le validateur doit le voir."""
+    english, text, _, _ = _generate(Fake())
+    broken = text.replace("Brin Chênevaux|r\r\n    .turnin", f"Brin Chênevaux|r {bad}\r\n    .turnin", 1)
+    assert any("[[" in e or "]]" in e for e in validate_file(english, broken, known_names=set()))
