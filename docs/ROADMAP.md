@@ -202,7 +202,7 @@ Dans cet ordre, chaque tranche par le flux habituel (`/tranche`, tests d'abord, 
 - Même règle pour les autres classes (CH1, DE1, PA1, GU1, VO1, PR1, DR1), dans l'ordre de priorité de l'utilisateur
   (décision 232) : chaque classe gagne ce que SIM2 et mes journaux permettent, sans moteur à nous (partie 4).
 
-### FR1 — Guides RestedXP de Forever en français (plan à valider, `tasks/FR1-plan.md`)
+### FR1 — Guides RestedXP de Forever en français (plan validé le 2026-11-11, `tasks/FR1-plan.md`)
 
 `forever rxp traduire` génère en français les guides Forever en clair que RestedXP ne traduit pas encore (198 des
 200 guides de `RestedXP-Skyborne.lua`, invisibles en frFR) : commandes et identifiants intacts, noms officiels lus

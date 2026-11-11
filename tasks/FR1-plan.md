@@ -1,7 +1,7 @@
 # FR1 — Guides RestedXP de Forever en français, générés et tenus à jour
 
 Demande de l'utilisateur du 2026-11-11. Plan seul : aucun code, aucune branche. Exécution dans une nouvelle session,
-sur la branche `fr1`, après validation des questions de la section 9.
+sur la branche `fr1`, plan validé le 2026-11-11 (réponses en section 9).
 
 ## 1. Constat (mesuré le 2026-11-11, RXPGuides v4.11.35-7, lecture seule)
 
@@ -92,7 +92,7 @@ Nouveau module `forever/rxp_fr/` (aucune formule de combat, aucun chiffre de jeu
    Une entrée `manuel` n'est jamais écrasée.
 6. **Traducteur des phrases libres** (`translator.py`) : interface injectée. Phrases traduites depuis la VO
    anglaise. Lot initial : sous-agents de la session d'exécution (un lot de guides par agent, en worktree), qui
-   écrivent dans la mémoire. Mises à jour : selon Q1. Sans traducteur, la phrase reste en anglais et figure au
+   écrivent dans la mémoire. Mises à jour : aucun traducteur automatique (Q1) ; phrases traduites dans une session Claude à la demande de l'utilisateur. Sans traducteur, la phrase reste en anglais et figure au
    rapport. Aucun réseau dans les tests (traducteur factice).
 7. **Assemblage** (`build.py`) : première ligne `if GetLocale() ~= "frFR" then return end`, puis marqueur FR1
    (version du générateur, empreinte de la source anglaise, version de RXPGuides, attribution). Les guides que
@@ -108,7 +108,7 @@ Nouveau module `forever/rxp_fr/` (aucune formule de combat, aucun chiffre de jeu
    N'écrit que sous `RXPGuides/lang/Guides-frFR/forever/`.
 
 Commande `forever rxp traduire` (CLI) : `--simulation` (rapport sans écrire), `--json`, `--annuler`,
-`--manquants` (noms et phrases restés en anglais), `--sans-traducteur`. Sortie : guides générés, recopiés, refusés ;
+`--manquants` (noms et phrases restés en anglais). Sortie : guides générés, recopiés, refusés ;
 phrases venues de la mémoire, des motifs, traduites, restées en anglais ; noms par source ; bloc `provenance`
 (version du jeu, empreinte des données, date, certitude `probable` pour le texte, `certain` pour les noms du client,
 `suppose` pour Questie). Outil MCP : action `rxp_fr` de `forever_route` en lecture seule (rapport), si utile.
@@ -148,8 +148,7 @@ partielle d'1 guide, petites tables de noms frFR inventées pour le test et marq
    l'anglais les phrases restantes et écrit sa part de mémoire (hors dépôt) ; fusion des mémoires, puis génération
    et validation.
 7. Accroche dans la veille, carte « Mis à jour », annulation.
-8. Docs : `docs/USAGE.md`, `docs/DECISIONS.md` (nouvelle décision), `CLAUDE.md` (liste des accès réseau si Q1 =
-   oui), `docs/ROADMAP.md`. Registre des mécaniques : non concerné (aucune mécanique de jeu).
+8. Docs : `docs/USAGE.md`, `docs/DECISIONS.md` (nouvelle décision), `docs/ROADMAP.md`. Registre des mécaniques : non concerné (aucune mécanique de jeu).
 9. `uv run tasks.py quick`, push, CI verte Ubuntu et Windows, fusion fast-forward, suppression de la branche.
 
 ## 7. Procédure d'essai en jeu (client frFR)
@@ -172,18 +171,16 @@ partielle d'1 guide, petites tables de noms frFR inventées pour le test et marq
 - Taille du fichier (environ 150 000 lignes) : même taille que l'anglais, déjà chargé par RestedXP.
 - RestedXP change sa syntaxe : le validateur refuse, rien n'est écrit, le rapport le dit.
 
-## 9. Questions pour l'utilisateur (bloquantes)
+## 9. Réponses de l'utilisateur (2026-11-11)
 
-- **Q1 — Traduction automatique des phrases nouvelles lors des mises à jour.** Recommandé : `forever rxp traduire`
-  et la veille lancent `claude -p` (comme le pont de P06a) pour les seules phrases absentes de la mémoire, sans
-  outil, avec le glossaire et les noms officiels imposés ; nouvel accès réseau (API d'Anthropic), nouvelle décision
-  numérotée et ajout à la liste de `CLAUDE.md`. Sinon : phrases nouvelles laissées en anglais jusqu'à une session
-  Claude lancée à la main.
-- **Q2 — Arguments en nom traduits comme RestedXP** (`.zone`, `.subzone`, `.cast`, `.fly`, `.train`, `.target`,
-  `.mob`, `#name`, `#next`) quand le nom officiel français est connu, plutôt que gardés en anglais comme le dit la
-  consigne « commandes intactes ». Recommandé : oui (sinon validations d'étape et ciblage cassés en frFR).
-- **Q3 — Télécharger aussi `ItemSparse` et `AreaTable` en frFR** dans le cache wago par `forever update` (accès
-  réseau déjà permis, décision 179 ; seule la liste des tables change). Recommandé : oui (noms d'objets et de
-  sous-zones officiels du client Forever, au lieu de Questie Classic).
-- **Q4 — Mémoire de traduction hors dépôt** dans `~/.forever/rxp_fr/` (durable, sauvegardée par `forever backup`),
-  jamais dans le dépôt (décisions 268 et 277). Recommandé : oui.
+- **Q1 — non** : aucune traduction automatique, aucun nouvel accès réseau, `CLAUDE.md` inchangé. Lors d'une mise à
+  jour, la veille régénère le fichier avec la mémoire, les motifs et les noms ; les phrases nouvelles restent en
+  anglais et figurent au rapport (`forever rxp traduire --manquants`) jusqu'à ce que l'utilisateur demande à Claude
+  de les traduire dans une session (entrées `traduit` écrites dans la mémoire, puis régénération).
+- **Q2 — oui** : arguments en nom traduits comme RestedXP (`.zone`, `.subzone`, `.cast`, `.fly`, `.train`,
+  `.target`, `.mob`, `#name`, `#next`) quand le nom officiel français est connu ; commande, identifiants et
+  coordonnées intacts.
+- **Q3 — oui** : `ItemSparse` et `AreaTable` frFR ajoutées aux tables téléchargées par `forever update`
+  (décision 179, seule la liste des tables change).
+- **Q4 — oui** : mémoire de traduction dans `~/.forever/rxp_fr/`, sauvegardée par `forever backup`, jamais dans le
+  dépôt.
