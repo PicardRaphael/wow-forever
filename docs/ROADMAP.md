@@ -202,6 +202,13 @@ Dans cet ordre, chaque tranche par le flux habituel (`/tranche`, tests d'abord, 
 - Même règle pour les autres classes (CH1, DE1, PA1, GU1, VO1, PR1, DR1), dans l'ordre de priorité de l'utilisateur
   (décision 232) : chaque classe gagne ce que SIM2 et mes journaux permettent, sans moteur à nous (partie 4).
 
+### FR1 — Guides RestedXP de Forever en français (plan à valider, `tasks/FR1-plan.md`)
+
+`forever rxp traduire` génère en français les guides Forever en clair que RestedXP ne traduit pas encore (198 des
+200 guides de `RestedXP-Skyborne.lua`, invisibles en frFR) : commandes et identifiants intacts, noms officiels lus
+dans les données, phrases types par motif, phrases libres traduites depuis la VO et gardées dans une mémoire hors
+dépôt ; relancé par la veille quand RestedXP change. Demande du 2026-11-11.
+
 ### RX2 — Routes comme en jeu
 - **Vols et pierre de foyer** (bloc 1d de CJ1 s'il n'est pas fait avant la sortie, RTE3, registre I19) : vols
   connus du personnage (vus par le pont ou gardés au profil), durée des vols du client, foyer et sa recharge ; la
