@@ -1206,6 +1206,18 @@
   ]
  },
  "seen_quests": {
+  "5": {
+   "type": 2,
+   "level": 20,
+   "min_level": 17,
+   "sort_id": 10,
+   "next_quest": 93,
+   "xp_difficulty": 2,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "8": {
    "type": 2,
    "level": 5,
@@ -1350,6 +1362,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "34": {
+   "type": 2,
+   "level": 24,
+   "min_level": 18,
+   "sort_id": 44,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 1700,
+   "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
   "35": {
    "type": 2,
    "level": 10,
@@ -1458,6 +1482,42 @@
    "money_difficulty": 4,
    "money_multiplier": 1.0
   },
+  "55": {
+   "type": 2,
+   "level": 32,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 7,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "56": {
+   "type": 2,
+   "level": 24,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 57,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 1700,
+   "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
+  "57": {
+   "type": 2,
+   "level": 26,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 58,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 2000,
+   "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
   "58": {
    "type": 2,
    "level": 30,
@@ -1537,6 +1597,66 @@
    "sort_id": 40,
    "next_quest": 132,
    "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "66": {
+   "type": 2,
+   "level": 28,
+   "min_level": 22,
+   "sort_id": 10,
+   "next_quest": 67,
+   "xp_difficulty": 1,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "67": {
+   "type": 2,
+   "level": 28,
+   "min_level": 22,
+   "sort_id": 10,
+   "next_quest": 68,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "68": {
+   "type": 2,
+   "level": 28,
+   "min_level": 22,
+   "sort_id": 10,
+   "next_quest": 69,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "69": {
+   "type": 2,
+   "level": 28,
+   "min_level": 22,
+   "sort_id": 10,
+   "next_quest": 70,
+   "xp_difficulty": 2,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "70": {
+   "type": 2,
+   "level": 28,
+   "min_level": 22,
+   "sort_id": 10,
+   "next_quest": 72,
+   "xp_difficulty": 4,
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 0,
@@ -1626,6 +1746,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "90": {
+   "type": 2,
+   "level": 25,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 1800,
+   "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
   "91": {
    "type": 2,
    "level": 23,
@@ -1650,6 +1782,18 @@
    "money_difficulty": 5,
    "money_multiplier": 1.0
   },
+  "93": {
+   "type": 2,
+   "level": 20,
+   "min_level": 17,
+   "sort_id": 10,
+   "next_quest": 240,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "94": {
    "type": 2,
    "level": 21,
@@ -1657,6 +1801,18 @@
    "sort_id": 44,
    "next_quest": 248,
    "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "95": {
+   "type": 2,
+   "level": 25,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 230,
+   "xp_difficulty": 3,
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 0,
@@ -1950,6 +2106,30 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "148": {
+   "type": 2,
+   "level": 24,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 149,
+   "xp_difficulty": 2,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "149": {
+   "type": 2,
+   "level": 24,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 154,
+   "xp_difficulty": 2,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "150": {
    "type": 2,
    "level": 20,
@@ -1998,6 +2178,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "154": {
+   "type": 2,
+   "level": 24,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 157,
+   "xp_difficulty": 1,
+   "xp_multiplier": 1.0,
+   "money": 175,
+   "money_difficulty": 1,
+   "money_multiplier": 1.0
+  },
   "155": {
    "type": 2,
    "level": 18,
@@ -2010,6 +2202,30 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "156": {
+   "type": 2,
+   "level": 24,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 159,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "157": {
+   "type": 2,
+   "level": 24,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 158,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 1300,
+   "money_difficulty": 4,
+   "money_multiplier": 1.0
+  },
   "158": {
    "type": 2,
    "level": 24,
@@ -2020,6 +2236,30 @@
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "163": {
+   "type": 2,
+   "level": 20,
+   "min_level": 17,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 2,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "164": {
+   "type": 2,
+   "level": 23,
+   "min_level": 17,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 800,
+   "money_difficulty": 3,
    "money_multiplier": 1.0
   },
   "166": {
@@ -2094,6 +2334,30 @@
    "money_difficulty": 4,
    "money_multiplier": 1.0
   },
+  "174": {
+   "type": 2,
+   "level": 25,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 175,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "175": {
+   "type": 2,
+   "level": 25,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 177,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "176": {
    "type": 2,
    "level": 11,
@@ -2101,6 +2365,18 @@
    "sort_id": 12,
    "next_quest": 0,
    "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "177": {
+   "type": 2,
+   "level": 25,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 181,
+   "xp_difficulty": 4,
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 0,
@@ -2226,6 +2502,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "219": {
+   "type": 2,
+   "level": 25,
+   "min_level": 19,
+   "sort_id": 44,
+   "next_quest": 0,
+   "xp_difficulty": 6,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "224": {
    "type": 2,
    "level": 12,
@@ -2236,6 +2524,30 @@
    "xp_multiplier": 1.0,
    "money": 500,
    "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
+  "226": {
+   "type": 2,
+   "level": 21,
+   "min_level": 19,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "230": {
+   "type": 2,
+   "level": 25,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 262,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "233": {
@@ -2272,6 +2584,18 @@
    "xp_multiplier": 1.0,
    "money": 200,
    "money_difficulty": 2,
+   "money_multiplier": 1.0
+  },
+  "245": {
+   "type": 2,
+   "level": 21,
+   "min_level": 17,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "246": {
@@ -2718,6 +3042,18 @@
    "money_difficulty": 4,
    "money_multiplier": 1.0
   },
+  "337": {
+   "type": 2,
+   "level": 25,
+   "min_level": 20,
+   "sort_id": 10,
+   "next_quest": 538,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 1400,
+   "money_difficulty": 4,
+   "money_multiplier": 1.0
+  },
   "345": {
    "type": 2,
    "level": 24,
@@ -3124,6 +3460,18 @@
    "xp_multiplier": 1.0,
    "money": 300,
    "money_difficulty": 4,
+   "money_multiplier": 1.0
+  },
+  "434": {
+   "type": 2,
+   "level": 31,
+   "min_level": 16,
+   "sort_id": 1519,
+   "next_quest": 394,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "435": {
@@ -4302,6 +4650,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "914": {
+   "type": 2,
+   "level": 22,
+   "min_level": 10,
+   "sort_id": 718,
+   "next_quest": 0,
+   "xp_difficulty": 6,
+   "xp_multiplier": 1.95,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "917": {
    "type": 2,
    "level": 5,
@@ -4576,6 +4936,18 @@
    "xp_multiplier": 1.95,
    "money": 1000,
    "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
+  "962": {
+   "type": 2,
+   "level": 18,
+   "min_level": 14,
+   "sort_id": 718,
+   "next_quest": 0,
+   "xp_difficulty": 6,
+   "xp_multiplier": 1.95,
+   "money": 2000,
+   "money_difficulty": 6,
    "money_multiplier": 1.0
   },
   "963": {
@@ -4866,6 +5238,30 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "1013": {
+   "type": 2,
+   "level": 26,
+   "min_level": 16,
+   "sort_id": 209,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 2.675,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "1014": {
+   "type": 2,
+   "level": 27,
+   "min_level": 18,
+   "sort_id": 209,
+   "next_quest": 0,
+   "xp_difficulty": 7,
+   "xp_multiplier": 2.675,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "1016": {
    "type": 2,
    "level": 24,
@@ -5068,6 +5464,18 @@
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "1098": {
+   "type": 2,
+   "level": 25,
+   "min_level": 18,
+   "sort_id": 209,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 2.675,
+   "money": 1800,
+   "money_difficulty": 5,
    "money_multiplier": 1.0
   },
   "1102": {
@@ -6076,6 +6484,18 @@
    "xp_multiplier": 1.0,
    "money": 1000,
    "money_difficulty": 6,
+   "money_multiplier": 1.0
+  },
+  "2746": {
+   "type": 2,
+   "level": 31,
+   "min_level": 16,
+   "sort_id": 1519,
+   "next_quest": 0,
+   "xp_difficulty": 2,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "2841": {
@@ -8044,6 +8464,30 @@
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 2,
+   "money_multiplier": 1.0
+  },
+  "79362": {
+   "type": 2,
+   "level": 25,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "79363": {
+   "type": 2,
+   "level": 27,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "79536": {
@@ -10110,6 +10554,42 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "96137": {
+   "type": 2,
+   "level": 25,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "96138": {
+   "type": 2,
+   "level": 30,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "96139": {
+   "type": 2,
+   "level": 23,
+   "min_level": 18,
+   "sort_id": 10,
+   "next_quest": 0,
+   "xp_difficulty": 4,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "96390": {
    "type": 2,
    "level": 13,
@@ -11406,6 +11886,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "98386": {
+   "type": 2,
+   "level": 21,
+   "min_level": 15,
+   "sort_id": 44,
+   "next_quest": 19,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 700,
+   "money_difficulty": 3,
+   "money_multiplier": 1.0
+  },
   "98387": {
    "type": 2,
    "level": 21,
@@ -11538,6 +12030,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "99052": {
+   "type": 2,
+   "level": 11,
+   "min_level": 8,
+   "sort_id": 14,
+   "next_quest": 0,
+   "xp_difficulty": 6,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "99053": {
    "type": 2,
    "level": 10,
@@ -11626,8 +12130,8 @@
  "questcache": {
   "build": 70888,
   "locale": "frFR",
-  "records": 91,
-  "kept_from_base": 841
+  "records": 159,
+  "kept_from_base": 868
  },
  "notes": [
   "quest_xp : XP d'une quête par niveau de quête (clé) et par difficulté (colonne), table QuestXP du client",

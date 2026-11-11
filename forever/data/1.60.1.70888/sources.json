@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70888 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-11-11)",
+      "source": "Client 1.60.1.70888 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-11-11)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70888 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-11-11)",
+      "source": "Client 1.60.1.70888 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-11-11)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -245,7 +245,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 3 (forever install, 2026-11-11)"
+        "installé en révision 4 (forever install, 2026-11-11)"
       ]
     },
     "races.json": {
@@ -337,7 +337,7 @@
       "notes": [
         "familles du Chasseur, capacités et rangs, bonus de famille, régimes, cartes (decode_rules.json, pets) ; écarts internes au client dans observations",
         "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits du masque) et effets de Hunter Pet Scaling : sens probable",
-        "installé en révision 3 (forever install, 2026-11-11)"
+        "installé en révision 4 (forever install, 2026-11-11)"
       ]
     },
     "pet_rules.json": {
@@ -368,7 +368,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 3 (forever install, 2026-11-11)"
+        "installé en révision 4 (forever install, 2026-11-11)"
       ]
     },
     "xp_bonuses.json": {
@@ -396,7 +396,7 @@
       ]
     }
   },
-  "revision": 3,
+  "revision": 4,
   "revised_at": "2026-11-11",
   "hotfixes": {
     "dbcache": {
@@ -404,10 +404,10 @@
       "locale": "frFR",
       "format": 9,
       "build": 70888,
-      "size": 7313392,
-      "sha256": "ac1b120201554201ea926e79a7c014039b1b03d8a1470eac8db99d854ba78dca",
-      "file_date": "2026-11-11T11:20:19Z",
-      "read_at": "2026-11-11T11:20:22Z"
+      "size": 7388557,
+      "sha256": "dba113147a7ec5a91193f1fc572272c0d49f7956bd3e2334682ccaa0c1a407bf",
+      "file_date": "2026-11-11T13:57:31Z",
+      "read_at": "2026-11-11T13:57:34Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -587,7 +587,6 @@
       113191,
       113194,
       113200,
-      113201,
       113202,
       113209,
       113213,
@@ -687,7 +686,6 @@
       113684,
       113687,
       113695,
-      113696,
       113698,
       113702,
       113704,
@@ -703,12 +701,12 @@
       113770,
       113772,
       113774,
-      113775,
       113776,
       113777,
       113778,
       113780,
       113785,
+      113789,
       113791,
       113792,
       113794,
@@ -872,7 +870,6 @@
       "113191": null,
       "113194": null,
       "113200": null,
-      "113201": null,
       "113202": null,
       "113209": null,
       "113213": null,
@@ -972,7 +969,6 @@
       "113684": null,
       "113687": null,
       "113695": null,
-      "113696": null,
       "113698": null,
       "113702": null,
       "113704": null,
@@ -988,12 +984,12 @@
       "113770": null,
       "113772": null,
       "113774": null,
-      "113775": null,
       "113776": null,
       "113777": null,
       "113778": null,
       "113780": null,
       "113785": null,
+      "113789": null,
       "113791": null,
       "113792": null,
       "113794": null,
@@ -56043,16 +56039,16 @@
         "table": "Spell",
         "rec_id": 6785,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
         "table": "Spell",
         "rec_id": 6787,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
@@ -57067,16 +57063,16 @@
         "table": "Spell",
         "rec_id": 9866,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
         "table": "Spell",
         "rec_id": 9867,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
@@ -73195,8 +73191,8 @@
         "table": "SpellEffect",
         "rec_id": 1367117,
         "status": "VALID",
-        "push": 113201,
-        "unique_id": 2316039404,
+        "push": 113150,
+        "unique_id": 129199547,
         "identical": true
       },
       {
@@ -90995,16 +90991,16 @@
         "table": "SpellName",
         "rec_id": 6785,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
         "table": "SpellName",
         "rec_id": 6787,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
@@ -92019,16 +92015,16 @@
         "table": "SpellName",
         "rec_id": 9866,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
         "table": "SpellName",
         "rec_id": 9867,
         "status": "VALID",
-        "push": 113696,
-        "unique_id": 20059138,
+        "push": 112414,
+        "unique_id": 552139426,
         "identical": true
       },
       {
@@ -99843,7 +99839,7 @@
         "table": "SpellShapeshift",
         "rec_id": 39554,
         "status": "VALID",
-        "push": 113775,
+        "push": 113789,
         "unique_id": 42933257,
         "identical": true
       },
@@ -114135,17 +114131,17 @@
         }
       ],
       "dbreply": {
-        "0x021826bb": 2,
-        "ItemSparse": 885,
-        "Spell": 19
+        "0x021826bb": 4,
+        "ItemSparse": 1117,
+        "Spell": 22
       },
       "item_reply": {
-        "0x198e28b5": 5122,
-        "0x5481af88": 5122,
-        "0xb50ca635": 5122,
-        "0xce88edca": 5122,
-        "Item": 5122,
-        "ItemSparse": 5122
+        "0x198e28b5": 5136,
+        "0x5481af88": 5136,
+        "0xb50ca635": 5136,
+        "0xce88edca": 5136,
+        "Item": 5136,
+        "ItemSparse": 5136
       },
       "unknown_hash": {
         "0x0024bced": 1,
@@ -114161,12 +114157,12 @@
         "0x0b685935": 1,
         "0x0e540efd": 2,
         "0x0e82664c": 14,
-        "0x0f992211": 1256,
+        "0x0f992211": 1255,
         "0x1018add5": 1,
         "0x111d4849": 2,
-        "0x12a212a9": 53,
+        "0x12a212a9": 55,
         "0x12a76efd": 2,
-        "0x13c403a5": 146,
+        "0x13c403a5": 145,
         "0x140a5855": 2,
         "0x14320f31": 54,
         "0x15393898": 1,
@@ -114199,21 +114195,21 @@
         "0x37d001ef": 1,
         "0x394c3727": 14,
         "0x39606286": 2,
-        "0x3ac83109": 1256,
+        "0x3ac83109": 1255,
         "0x3b57c0a1": 4,
         "0x3b9e4ca2": 14,
         "0x3cc89c00": 3,
         "0x3e988108": 7,
         "0x3f85abb7": 3,
         "0x42261b89": 329,
-        "0x4553e9f7": 305,
+        "0x4553e9f7": 304,
         "0x45952e6e": 2,
         "0x461fdc45": 11,
         "0x4666ed42": 256,
         "0x490cdd72": 4,
         "0x495495df": 1,
         "0x4ad4429c": 34,
-        "0x4bf2fc04": 413,
+        "0x4bf2fc04": 412,
         "0x4d07e2fc": 9,
         "0x4dabd3fb": 36,
         "0x50d91a78": 2,
@@ -114281,6 +114277,7 @@
         "0xac92e4ad": 1,
         "0xae1ca308": 162,
         "0xaeb11490": 7,
+        "0xafc190d1": 1,
         "0xb2bb19eb": 1,
         "0xb33f3964": 2,
         "0xb3af6eca": 6,
@@ -114289,7 +114286,7 @@
         "0xb5307a56": 25,
         "0xb8ba5fb3": 1,
         "0xb8f96456": 3,
-        "0xb94c2807": 63,
+        "0xb94c2807": 62,
         "0xb99db712": 2,
         "0xbb858355": 7,
         "0xbceab606": 3,
@@ -114301,7 +114298,7 @@
         "0xbfdaf9f1": 10,
         "0xc0a5f8c6": 69,
         "0xc2b150c7": 578,
-        "0xc3062b9a": 11,
+        "0xc3062b9a": 9,
         "0xc5b875a8": 1,
         "0xc638b8d4": 4,
         "0xc67f0d98": 14,
@@ -114309,12 +114306,12 @@
         "0xc74fbdeb": 184,
         "0xc794a036": 40,
         "0xc7ed797d": 1,
-        "0xc842493a": 14,
+        "0xc842493a": 15,
         "0xc9bcb028": 12,
         "0xc9d6b6b3": 328,
-        "0xc9e0a749": 2023,
+        "0xc9e0a749": 2041,
         "0xcc284d0f": 190,
-        "0xccff87ed": 2,
+        "0xccff87ed": 1,
         "0xce88edca": 3721,
         "0xcf156785": 1,
         "0xd055d7b5": 13,
