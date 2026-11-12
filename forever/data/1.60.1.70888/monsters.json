@@ -53,7 +53,8 @@
   "WoWCombatLog-111126_113923.txt",
   "WoWCombatLog-111126_114912.txt",
   "WoWCombatLog-111126_134533.txt",
-  "WoWCombatLog-111126_155318.txt"
+  "WoWCombatLog-111126_155318.txt",
+  "WoWCombatLog-111226_072846.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -68,14 +69,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 664,
-     "fought": false
+     "fought": null
     },
     "25": {
      "max_hp": 927,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 713,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -166,14 +167,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 66 individu(s))",
      "questie_hp": 531,
-     "fought": true
+     "fought": null
     },
     "22": {
      "max_hp": 746,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 59 individu(s))",
      "questie_hp": 573,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -523,14 +524,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 617,
-     "fought": false
+     "fought": null
     },
     "24": {
      "max_hp": 863,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 664,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -544,21 +545,21 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     },
     "22": {
      "max_hp": 746,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 55 individu(s))",
      "questie_hp": 472,
-     "fought": true
+     "fought": null
     },
     "23": {
      "max_hp": 803,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 46 individu(s))",
      "questie_hp": 504,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -572,14 +573,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 950,
-     "fought": true
+     "fought": null
     },
     "30": {
      "max_hp": 1304,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 1003,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -593,14 +594,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 788,
-     "fought": false
+     "fought": null
     },
     "27": {
      "max_hp": 1092,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 840,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -635,7 +636,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 664,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -649,14 +650,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 449,
-     "fought": false
+     "fought": null
     },
     "20": {
      "max_hp": 629,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 484,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -705,7 +706,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 2310,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -761,7 +762,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 12200,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1048,7 +1049,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt, WoWCombatLog-111126_134533.txt (bloc avancé, 2 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1118,7 +1119,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 788,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1174,7 +1175,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 3660,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1230,14 +1231,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 664,
-     "fought": false
+     "fought": null
     },
     "25": {
      "max_hp": 927,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 713,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1251,7 +1252,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 417,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1307,14 +1308,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 494,
-     "fought": true
+     "fought": null
     },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 531,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1328,14 +1329,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 531,
-     "fought": false
+     "fought": null
     },
     "22": {
      "max_hp": 746,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 573,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1349,14 +1350,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 896,
-     "fought": false
+     "fought": null
     },
     "29": {
      "max_hp": 1236,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 950,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1475,14 +1476,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 16 individu(s))",
      "questie_hp": 840,
-     "fought": false
+     "fought": null
     },
     "28": {
      "max_hp": 1164,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 16 individu(s))",
      "questie_hp": 896,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1629,14 +1630,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 664,
-     "fought": true
+     "fought": null
     },
     "25": {
      "max_hp": 927,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 713,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1965,21 +1966,21 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     },
     "28": {
      "max_hp": 1164,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 768,
-     "fought": false
+     "fought": null
     },
     "29": {
      "max_hp": 1236,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 10 individu(s))",
      "questie_hp": 811,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -1993,21 +1994,21 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     },
     "26": {
      "max_hp": 1024,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 684,
-     "fought": false
+     "fought": null
     },
     "27": {
      "max_hp": 1092,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 724,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2140,7 +2141,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2154,7 +2155,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 840,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2168,14 +2169,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 892,
-     "fought": false
+     "fought": null
     },
     "31": {
      "max_hp": 1439,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 935,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2189,14 +2190,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 617,
-     "fought": false
+     "fought": null
     },
     "24": {
      "max_hp": 863,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 664,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2210,14 +2211,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 664,
-     "fought": true
+     "fought": null
     },
     "25": {
      "max_hp": 927,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 713,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2245,14 +2246,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 734,
-     "fought": false
+     "fought": null
     },
     "26": {
      "max_hp": 1024,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 788,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2266,7 +2267,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 734,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -2581,14 +2582,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 840,
-     "fought": false
+     "fought": null
     },
     "28": {
      "max_hp": 1164,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 13 individu(s))",
      "questie_hp": 895,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3330,7 +3331,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 3609,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3386,7 +3387,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 3660,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3400,7 +3401,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 4185,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -3519,14 +3520,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt, WoWCombatLog-111126_134533.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 950,
-     "fought": false
+     "fought": null
     },
     "30": {
      "max_hp": 1304,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1003,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4205,14 +4206,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 53 individu(s))",
      "questie_hp": 42,
-     "fought": false
+     "fought": null
     },
     "2": {
      "max_hp": 55,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 35 individu(s))",
      "questie_hp": 55,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4226,14 +4227,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 39 individu(s))",
      "questie_hp": 55,
-     "fought": false
+     "fought": null
     },
     "3": {
      "max_hp": 71,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 51 individu(s))",
      "questie_hp": 71,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4247,14 +4248,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 51 individu(s))",
      "questie_hp": 71,
-     "fought": false
+     "fought": null
     },
     "4": {
      "max_hp": 86,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 75 individu(s))",
      "questie_hp": 86,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4268,14 +4269,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 9 individu(s))",
      "questie_hp": 55,
-     "fought": false
+     "fought": null
     },
     "3": {
      "max_hp": 71,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 71,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4289,14 +4290,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 37 individu(s))",
      "questie_hp": 71,
-     "fought": false
+     "fought": null
     },
     "4": {
      "max_hp": 86,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 19 individu(s))",
      "questie_hp": 86,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4310,7 +4311,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4322,16 +4323,16 @@
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 5 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 11 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 14 individu(s))",
      "questie_hp": 120,
-     "fought": false
+     "fought": true
     }
    }
   },
@@ -4343,16 +4344,86 @@
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 5 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 9 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 120,
+     "fought": true
+    }
+   }
+  },
+  "2006": {
+   "name": "Ursa Pin-tordu",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 120,
      "fought": false
+    }
+   }
+  },
+  "2007": {
+   "name": "Jardinier Pin-tordu",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 102,
+     "fought": false
+    }
+   }
+  },
+  "2008": {
+   "name": "Guerrier Pin-tordu",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 120,
+     "fought": true
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 137,
+     "fought": true
+    }
+   }
+  },
+  "2022": {
+   "name": "Sylvain",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 28 individu(s))",
+     "questie_hp": 102,
+     "fought": true
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 35 individu(s))",
+     "questie_hp": 120,
+     "fought": true
     }
    }
   },
@@ -4366,7 +4437,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 97 individu(s))",
      "questie_hp": 42,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -4380,6 +4451,20 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 64 individu(s))",
      "questie_hp": 55,
+     "fought": null
+    }
+   }
+  },
+  "2041": {
+   "name": "Ancien Protecteur",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "60": {
+     "max_hp": 21825,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 6104,
      "fought": false
     }
    }
@@ -4392,15 +4477,29 @@
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 102,
-     "fought": false
+     "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 120,
+     "fought": true
+    }
+   }
+  },
+  "2043": {
+   "name": "Rôdeur sabre-de-nuit",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 137,
      "fought": false
     }
    }
@@ -4415,7 +4514,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 590,
-     "fought": true
+     "fought": null
     },
     "26": {
      "max_hp": 1024,
@@ -5619,7 +5718,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -5724,14 +5823,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt (bloc avancé, 150 individu(s))",
      "questie_hp": 42,
-     "fought": true
+     "fought": null
     },
     "2": {
      "max_hp": 55,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 154 individu(s))",
      "questie_hp": 55,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5787,14 +5886,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 158 individu(s))",
      "questie_hp": 69,
-     "fought": true
+     "fought": null
     },
     "4": {
      "max_hp": 86,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 144 individu(s))",
      "questie_hp": 83,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5808,14 +5907,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 35 individu(s))",
      "questie_hp": 72,
-     "fought": true
+     "fought": null
     },
     "4": {
      "max_hp": 86,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 55 individu(s))",
      "questie_hp": 86,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5829,14 +5928,14 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 120,
-     "fought": false
+     "fought": null
     },
     "7": {
      "max_hp": 137,
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 137,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -5885,7 +5984,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 169 individu(s))",
      "questie_hp": 71,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -5941,7 +6040,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 98,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -6663,6 +6762,20 @@
      "source": "journal WoWCombatLog-110626_125830.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 328,
      "fought": null
+    }
+   }
+  },
+  "3569": {
+   "name": "Bogling",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 51,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 48,
+     "fought": true
     }
    }
   },
@@ -9392,7 +9505,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 664,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -9571,6 +9684,41 @@
     }
    }
   },
+  "7234": {
+   "name": "Ferocitas le Mangeur de rêves",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 156,
+     "fought": false
+    }
+   }
+  },
+  "7235": {
+   "name": "Mystique Pin-tordu",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 115,
+     "fought": false
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 131,
+     "fought": false
+    }
+   }
+  },
   "8055": {
    "name": "Thelsamar Mountaineer",
    "zone_id": 0,
@@ -9595,7 +9743,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1536,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -9728,7 +9876,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_114912.txt, WoWCombatLog-111126_134533.txt, WoWCombatLog-111126_155318.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 86,
-     "fought": true
+     "fought": null
     }
    }
   },
@@ -11181,6 +11329,20 @@
     }
    }
   },
+  "265811": {
+   "name": "Lyreena Lamebrune",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "12": {
+     "max_hp": 277,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": false
+    }
+   }
+  },
   "266851": {
    "name": "Fléau-d'Ukor",
    "zone_id": null,
@@ -11191,7 +11353,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_134533.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -11394,7 +11556,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -11408,7 +11570,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-111126_091604.txt (bloc avancé, 4 individu(s))",
      "questie_hp": null,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -11423,6 +11585,27 @@
      "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
      "questie_hp": null,
      "fought": null
+    }
+   }
+  },
+  "275703": {
+   "name": "Jeune pousse de flagellant",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 10 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": null,
+     "fought": false
     }
    }
   },
@@ -11511,19 +11694,19 @@
    "value": 102,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 4
+   "n_npcs": 5
   },
   "6": {
    "value": 120,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 6
+   "n_npcs": 9
   },
   "7": {
    "value": 137,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 8
+   "n_npcs": 10
   },
   "8": {
    "value": 156,
@@ -11669,7 +11852,7 @@
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 102,
    "questie_hp": 1106,
-   "ratio": 1.5680072776510492
+   "ratio": 1.5682618871643261
   },
   "32": {
    "value": 1851,
@@ -11677,7 +11860,7 @@
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 124,
    "questie_hp": 1162,
-   "ratio": 1.592645275973258
+   "ratio": 1.5929169746242915
   },
   "33": {
    "value": 1975,
@@ -11685,7 +11868,7 @@
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 102,
    "questie_hp": 1221,
-   "ratio": 1.6172832742954666
+   "ratio": 1.6175720620842569
   },
   "34": {
    "value": 2100,
@@ -11693,7 +11876,7 @@
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 100,
    "questie_hp": 1279,
-   "ratio": 1.6419212726176753
+   "ratio": 1.6422271495442224
   },
   "35": {
    "value": 2237,
@@ -11701,15 +11884,15 @@
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 315,
    "questie_hp": 1342,
-   "ratio": 1.666559270939884
+   "ratio": 1.666882237004188
   },
   "36": {
-   "value": 2484,
+   "value": 2485,
    "certainty": "probable",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 124,
    "questie_hp": 1469,
-   "ratio": 1.6911972692620927
+   "ratio": 1.6915373244641536
   },
   "37": {
    "value": 2636,
@@ -11717,7 +11900,7 @@
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 140,
    "questie_hp": 1536,
-   "ratio": 1.7158352675843014
+   "ratio": 1.716192411924119
   },
   "38": {
    "value": 2792,
@@ -11725,15 +11908,15 @@
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 125,
    "questie_hp": 1604,
-   "ratio": 1.74047326590651
+   "ratio": 1.7408474993840843
   },
   "39": {
-   "value": 2962,
+   "value": 2963,
    "certainty": "probable",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 96,
    "questie_hp": 1678,
-   "ratio": 1.7651112642287188
+   "ratio": 1.76550258684405
   },
   "40": {
    "value": 3962,
@@ -11742,188 +11925,188 @@
    "n_npcs": 1
   },
   "41": {
-   "value": 3451,
+   "value": 3452,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 111,
    "questie_hp": 1902,
-   "ratio": 1.8143872608731362
+   "ratio": 1.8148127617639809
   },
   "42": {
-   "value": 3643,
+   "value": 3644,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 135,
    "questie_hp": 1981,
-   "ratio": 1.8390252591953449
+   "ratio": 1.8394678492239465
   },
   "43": {
-   "value": 3837,
+   "value": 3838,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 136,
    "questie_hp": 2059,
-   "ratio": 1.8636632575175536
+   "ratio": 1.864122936683912
   },
   "44": {
-   "value": 4037,
+   "value": 4038,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 132,
    "questie_hp": 2138,
-   "ratio": 1.8883012558397623
+   "ratio": 1.8887780241438774
   },
   "45": {
-   "value": 4241,
+   "value": 4242,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 258,
    "questie_hp": 2217,
-   "ratio": 1.912939254161971
+   "ratio": 1.913433111603843
   },
   "46": {
-   "value": 4646,
+   "value": 4648,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 121,
    "questie_hp": 2398,
-   "ratio": 1.9375772524841797
+   "ratio": 1.9380881990638084
   },
   "47": {
-   "value": 4882,
+   "value": 4883,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 101,
    "questie_hp": 2488,
-   "ratio": 1.9622152508063884
+   "ratio": 1.962743286523774
   },
   "48": {
-   "value": 5120,
+   "value": 5122,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 109,
    "questie_hp": 2577,
-   "ratio": 1.986853249128597
+   "ratio": 1.9873983739837393
   },
   "49": {
-   "value": 5375,
+   "value": 5376,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 95,
    "questie_hp": 2672,
-   "ratio": 2.011491247450806
+   "ratio": 2.012053461443705
   },
   "50": {
-   "value": 5636,
+   "value": 5638,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 327,
    "questie_hp": 2768,
-   "ratio": 2.0361292457730142
+   "ratio": 2.0367085489036705
   },
   "51": {
-   "value": 6139,
+   "value": 6141,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 122,
    "questie_hp": 2979,
-   "ratio": 2.0607672440952234
+   "ratio": 2.0613636363636356
   },
   "52": {
-   "value": 6427,
+   "value": 6429,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 154,
    "questie_hp": 3082,
-   "ratio": 2.0854052424174316
+   "ratio": 2.086018723823601
   },
   "53": {
-   "value": 6727,
+   "value": 6729,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 158,
    "questie_hp": 3188,
-   "ratio": 2.110043240739641
+   "ratio": 2.110673811283567
   },
   "54": {
-   "value": 7027,
+   "value": 7030,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 176,
    "questie_hp": 3292,
-   "ratio": 2.134681239061849
+   "ratio": 2.1353288987435324
   },
   "55": {
-   "value": 7337,
+   "value": 7340,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 353,
    "questie_hp": 3398,
-   "ratio": 2.159319237384058
+   "ratio": 2.159983986203498
   },
   "56": {
-   "value": 6482,
+   "value": 6484,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 169,
    "questie_hp": 2968,
-   "ratio": 2.1839572357062664
+   "ratio": 2.1846390736634635
   },
   "57": {
-   "value": 8300,
+   "value": 8303,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 183,
    "questie_hp": 3758,
-   "ratio": 2.2085952340284756
+   "ratio": 2.209294161123429
   },
   "58": {
-   "value": 8334,
+   "value": 8337,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 151,
    "questie_hp": 3732,
-   "ratio": 2.233233232350684
+   "ratio": 2.2339492485833943
   },
   "59": {
-   "value": 8691,
+   "value": 8693,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 123,
    "questie_hp": 3849,
-   "ratio": 2.257871230672893
+   "ratio": 2.25860433604336
   },
   "60": {
-   "value": 7523,
+   "value": 7526,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 475,
    "questie_hp": 3296,
-   "ratio": 2.2825092289951012
+   "ratio": 2.2832594235033254
   },
   "61": {
-   "value": 7833,
+   "value": 7835,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 33,
    "questie_hp": 3395,
-   "ratio": 2.3071472273173104
+   "ratio": 2.3079145109632906
   },
   "62": {
-   "value": 10190,
+   "value": 10193,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 73,
    "questie_hp": 4370,
-   "ratio": 2.3317852256395186
+   "ratio": 2.332569598423256
   },
   "63": {
-   "value": 13540,
+   "value": 13545,
    "certainty": "suppose",
    "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
    "n_npcs": 27,
    "questie_hp": 5746,
-   "ratio": 2.3564232239617278
+   "ratio": 2.3572246858832218
   }
  },
  "conflicts": [],
@@ -13687,6 +13870,12 @@
    "questie": 222
   },
   {
+   "npc_id": 2041,
+   "level": 60,
+   "measured": 21825,
+   "questie": 6104
+  },
+  {
    "npc_id": 2044,
    "level": 25,
    "measured": 954,
@@ -14783,6 +14972,12 @@
    "level": 15,
    "measured": 385,
    "questie": 328
+  },
+  {
+   "npc_id": 3569,
+   "level": 5,
+   "measured": 51,
+   "questie": 48
   },
   {
    "npc_id": 3581,
@@ -16201,6 +16396,18 @@
    "questie": 247
   },
   {
+   "npc_id": 7235,
+   "level": 6,
+   "measured": 120,
+   "questie": 115
+  },
+  {
+   "npc_id": 7235,
+   "level": 7,
+   "measured": 137,
+   "questie": 131
+  },
+  {
    "npc_id": 8055,
    "level": 40,
    "measured": 3962,
@@ -16569,16 +16776,16 @@
     "n_pairs": 4
    },
    "5": {
-    "ratio": 1.0204081632653061,
-    "n_pairs": 4
-   },
-   "6": {
     "ratio": 1.0,
     "n_pairs": 5
    },
-   "7": {
+   "6": {
     "ratio": 1.0,
     "n_pairs": 7
+   },
+   "7": {
+    "ratio": 1.0,
+    "n_pairs": 8
    },
    "8": {
     "ratio": 1.0,
@@ -16678,10 +16885,10 @@
    }
   },
   "fit": {
-   "slope": 0.0246379983222087,
-   "intercept": 0.8042293296625795,
-   "knee_level": 7.945883743362087,
-   "points": 24
+   "slope": 0.024655087459965495,
+   "intercept": 0.8039541759053956,
+   "knee_level": 7.951536347739191,
+   "points": 23
   },
   "range": [
    1,
@@ -17829,6 +18036,18 @@
     "ratio": 1.0
    },
    {
+    "npc_id": 2006,
+    "name": "Ursa Pin-tordu",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 2007,
+    "name": "Jardinier Pin-tordu",
+    "level": 5,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 2031,
     "name": "Jeune sabre-de-nuit",
     "level": 1,
@@ -17841,6 +18060,12 @@
     "ratio": 1.0
    },
    {
+    "npc_id": 2041,
+    "name": "Ancien Protecteur",
+    "level": 60,
+    "ratio": 3.575524246395806
+   },
+   {
     "npc_id": 2042,
     "name": "Sabre-de-nuit sauvage",
     "level": 5,
@@ -17850,6 +18075,12 @@
     "npc_id": 2042,
     "name": "Sabre-de-nuit sauvage",
     "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 2043,
+    "name": "Rôdeur sabre-de-nuit",
+    "level": 7,
     "ratio": 1.0
    },
    {
@@ -18217,6 +18448,12 @@
     "name": "Thomas Miller",
     "level": 15,
     "ratio": 1.173780487804878
+   },
+   {
+    "npc_id": 3569,
+    "name": "Bogling",
+    "level": 5,
+    "ratio": 1.0625
    },
    {
     "npc_id": 3584,
@@ -18639,6 +18876,24 @@
     "ratio": 1.0526315789473684
    },
    {
+    "npc_id": 7234,
+    "name": "Ferocitas le Mangeur de rêves",
+    "level": 8,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 7235,
+    "name": "Mystique Pin-tordu",
+    "level": 6,
+    "ratio": 1.0434782608695652
+   },
+   {
+    "npc_id": 7235,
+    "name": "Mystique Pin-tordu",
+    "level": 7,
+    "ratio": 1.0458015267175573
+   },
+   {
     "npc_id": 8055,
     "name": "Thelsamar Mountaineer",
     "level": 40,
@@ -18805,21 +19060,21 @@
  "inversions": [
   {
    "level": 41,
-   "value": 3451,
+   "value": 3452,
    "previous_level": 40,
    "previous": 3962
   },
   {
    "level": 56,
-   "value": 6482,
+   "value": 6484,
    "previous_level": 55,
-   "previous": 7337
+   "previous": 7340
   },
   {
    "level": 60,
-   "value": 7523,
+   "value": 7526,
    "previous_level": 59,
-   "previous": 8691
+   "previous": 8693
   }
  ],
  "curve_excluded": [
@@ -20157,6 +20412,22 @@
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
+   "npc_id": 2006,
+   "name": "Ursa Pin-tordu",
+   "levels": [
+    6
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 2007,
+   "name": "Jardinier Pin-tordu",
+   "levels": [
+    5
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 2031,
    "name": "Jeune sabre-de-nuit",
    "levels": [
@@ -20173,11 +20444,27 @@
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
+   "npc_id": 2041,
+   "name": "Ancien Protecteur",
+   "levels": [
+    60
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 2042,
    "name": "Sabre-de-nuit sauvage",
    "levels": [
     5,
     6
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 2043,
+   "name": "Rôdeur sabre-de-nuit",
+   "levels": [
+    7
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
@@ -20564,6 +20851,14 @@
     15
    ],
    "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 3569,
+   "name": "Bogling",
+   "levels": [
+    5
+   ],
+   "reason": "hors norme : 51 PV au niveau 5, -50,0 % de la médiane des autres PNJ du niveau (102) ; mesuré, écarté de la courbe (décision 223)"
   },
   {
    "npc_id": 3581,
@@ -21524,6 +21819,23 @@
    "reason": "PNJ nommé de quête (personnage unique) : toujours mesuré, écarté de la courbe des PV par niveau et de la correction (décision 189) ; accord de l'utilisateur du 2026-10-07"
   },
   {
+   "npc_id": 7234,
+   "name": "Ferocitas le Mangeur de rêves",
+   "levels": [
+    8
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 7235,
+   "name": "Mystique Pin-tordu",
+   "levels": [
+    6,
+    7
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 8055,
    "name": "Thelsamar Mountaineer",
    "levels": [
@@ -22176,6 +22488,14 @@
     13
    ],
    "reason": "hors norme : 31 PV au niveau 13, -89,9 % de la médiane des autres PNJ du niveau (307) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 265811,
+   "name": "Lyreena Lamebrune",
+   "levels": [
+    12
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 266851,
