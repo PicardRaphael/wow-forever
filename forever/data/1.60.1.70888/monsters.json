@@ -54,7 +54,8 @@
   "WoWCombatLog-111126_114912.txt",
   "WoWCombatLog-111126_134533.txt",
   "WoWCombatLog-111126_155318.txt",
-  "WoWCombatLog-111226_072846.txt"
+  "WoWCombatLog-111226_072846.txt",
+  "WoWCombatLog-111226_082417.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -1915,7 +1916,7 @@
     "1": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_082417.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1,
      "fought": null
     }
@@ -2125,7 +2126,7 @@
     "5": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111126_155318.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_082417.txt (bloc avancé, 1 individu(s))",
      "questie_hp": null,
      "fought": null
     }
@@ -4323,14 +4324,14 @@
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 11 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 19 individu(s))",
      "questie_hp": 102,
      "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 14 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 24 individu(s))",
      "questie_hp": 120,
      "fought": true
     }
@@ -4344,14 +4345,14 @@
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 8 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 24 individu(s))",
      "questie_hp": 102,
      "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 19 individu(s))",
      "questie_hp": 120,
      "fought": true
     }
@@ -4365,7 +4366,7 @@
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 2 individu(s))",
      "questie_hp": 120,
      "fought": false
     }
@@ -4379,7 +4380,7 @@
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 102,
      "fought": false
     }
@@ -4393,14 +4394,14 @@
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 6 individu(s))",
      "questie_hp": 120,
      "fought": true
     },
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 137,
      "fought": true
     }
@@ -4477,14 +4478,14 @@
     "5": {
      "max_hp": 102,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 8 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 23 individu(s))",
      "questie_hp": 102,
      "fought": true
     },
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 6 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 24 individu(s))",
      "questie_hp": 120,
      "fought": true
     }
@@ -9692,7 +9693,7 @@
     "8": {
      "max_hp": 156,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 15 individu(s))",
      "questie_hp": 156,
      "fought": false
     }
@@ -9706,14 +9707,14 @@
     "6": {
      "max_hp": 120,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 1 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 12 individu(s))",
      "questie_hp": 115,
      "fought": false
     },
     "7": {
      "max_hp": 137,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-111226_072846.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-111226_072846.txt, WoWCombatLog-111226_082417.txt (bloc avancé, 8 individu(s))",
      "questie_hp": 131,
      "fought": false
     }
@@ -10339,6 +10340,20 @@
      "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
      "questie_hp": 137,
      "fought": null
+    }
+   }
+  },
+  "12429": {
+   "name": "Sentinelle Shaya",
+   "zone_id": 141,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-111226_082417.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 137,
+     "fought": false
     }
    }
   },
@@ -19002,6 +19017,12 @@
     "ratio": 1.0
    },
    {
+    "npc_id": 12429,
+    "name": "Sentinelle Shaya",
+    "level": 7,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 12481,
     "name": "Justine Demalier",
     "level": 57,
@@ -22088,6 +22109,14 @@
     7
    ],
    "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 12429,
+   "name": "Sentinelle Shaya",
+   "levels": [
+    7
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 12481,
