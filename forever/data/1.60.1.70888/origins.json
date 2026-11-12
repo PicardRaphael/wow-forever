@@ -1565,13 +1565,13 @@
         "/classes/Priest/spells/holyFire"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 112833",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 112833",
       "certainty": "certain",
       "pushes": [
         112833
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-11T15:53:34Z"
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "classes.json",
@@ -1583,13 +1583,13 @@
         "/classes/Paladin/trees/1/talents/13"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113139",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113139",
       "certainty": "certain",
       "pushes": [
         113139
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-11T15:53:34Z"
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "classes.json",
@@ -1598,13 +1598,13 @@
         "/classes/Shaman/trees/2/talents/15"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113282",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113282",
       "certainty": "certain",
       "pushes": [
         113282
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-11T15:53:34Z"
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "classes.json",
@@ -1616,13 +1616,13 @@
         "/classes/Shaman/spells/lightningBolt"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113380",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113380",
       "certainty": "certain",
       "pushes": [
         113380
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-11T15:53:34Z"
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "classes.json",
@@ -1631,13 +1631,28 @@
         "/classes/Druid/spells/starfire"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113403",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113403",
       "certainty": "certain",
       "pushes": [
         113403
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-11T15:53:34Z"
+      "dbcache_date": "2026-11-12T06:58:32Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Druid/spells/wildGrowth",
+        "/classes/Druid/trees/2/talents/15"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113718",
+      "certainty": "certain",
+      "pushes": [
+        113718
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "classes.json",
@@ -1646,12 +1661,13 @@
         "/classes/Rogue/spells/poised"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113750",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113750",
       "certainty": "certain",
       "pushes": [
         113750
       ],
-      "seen_at": "2026-11-11T08:41:40.859"
+      "seen_at": null,
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "classes.json",
@@ -1662,12 +1678,13 @@
         "/classes/Warlock/trees/2/talents/12"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113766",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113766",
       "certainty": "certain",
       "pushes": [
         113766
       ],
-      "seen_at": "2026-11-11T08:41:40.859"
+      "seen_at": null,
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "classes.json",
@@ -1677,12 +1694,41 @@
         "/classes/Hunter/trees/0/talents/10"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113892",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113892",
       "certainty": "certain",
       "pushes": [
         113892
       ],
-      "seen_at": "2026-11-11T08:41:40.859"
+      "seen_at": null,
+      "dbcache_date": "2026-11-12T06:58:32Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Priest/spells/confoundingFlash"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113958",
+      "certainty": "certain",
+      "pushes": [
+        113958
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-11-12T06:58:32Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Hunter/spells/volley"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113959",
+      "certainty": "certain",
+      "pushes": [
+        113959
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-11-12T06:58:32Z"
     },
     {
       "file": "pets.json",
@@ -1690,13 +1736,27 @@
         "/abilities/great-stamina"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70888, frFR, sha256 23587d9e246b…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113270",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 113270",
       "certainty": "certain",
       "pushes": [
         113270
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-11T15:53:34Z"
+      "dbcache_date": "2026-11-12T06:58:32Z"
+    },
+    {
+      "file": "pvp_items.json",
+      "paths": [
+        "/trinkets/1"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin du client (build 70888, frFR, sha256 60de935a34a6…), dispositions WoWDBDefs 86c0801007bb ; poussée(s) 114010",
+      "certainty": "certain",
+      "pushes": [
+        114010
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-11-12T06:58:32Z"
     }
   ],
   "pending": [],
