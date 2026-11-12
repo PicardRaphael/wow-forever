@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70888 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 9 (forever install, 2026-11-12)",
+      "source": "Client 1.60.1.70888 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 12 (forever install, 2026-11-12)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70888 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 9 (forever install, 2026-11-12)",
+      "source": "Client 1.60.1.70888 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 12 (forever install, 2026-11-12)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -245,7 +245,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 9 (forever install, 2026-11-12)"
+        "installé en révision 12 (forever install, 2026-11-12)"
       ]
     },
     "races.json": {
@@ -262,7 +262,7 @@
       "notes": [
         "bijoux dont le sort d'utilisation rompt un contrôle (decode_rules.json, pvp_trinkets)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 9 (forever install, 2026-11-12)"
+        "installé en révision 12 (forever install, 2026-11-12)"
       ]
     },
     "_seed_racials.json": {
@@ -338,7 +338,7 @@
       "notes": [
         "familles du Chasseur, capacités et rangs, bonus de famille, régimes, cartes (decode_rules.json, pets) ; écarts internes au client dans observations",
         "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits du masque) et effets de Hunter Pet Scaling : sens probable",
-        "installé en révision 9 (forever install, 2026-11-12)"
+        "installé en révision 12 (forever install, 2026-11-12)"
       ]
     },
     "pet_rules.json": {
@@ -369,7 +369,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 9 (forever install, 2026-11-12)"
+        "installé en révision 12 (forever install, 2026-11-12)"
       ]
     },
     "xp_bonuses.json": {
@@ -397,7 +397,7 @@
       ]
     }
   },
-  "revision": 11,
+  "revision": 12,
   "revised_at": "2026-11-12",
   "hotfixes": {
     "dbcache": {
@@ -405,10 +405,10 @@
       "locale": "frFR",
       "format": 9,
       "build": 70888,
-      "size": 7419553,
-      "sha256": "60de935a34a629c1584beda596d177cee35303dd65cd1ee3a283275d770181b6",
-      "file_date": "2026-11-12T06:58:12Z",
-      "read_at": "2026-11-12T06:58:32Z"
+      "size": 7859159,
+      "sha256": "ef80ace0f43c977bbc72375521d89c8f24029a54ccf5452202fa325984855978",
+      "file_date": "2026-11-12T08:18:29Z",
+      "read_at": "2026-11-12T08:18:31Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -765,9 +765,10 @@
       113995,
       114002,
       114010,
-      114015
+      114015,
+      114024
     ],
-    "max_push": 114015,
+    "max_push": 114024,
     "seen_at": {
       "112414": null,
       "112623": null,
@@ -1068,7 +1069,8 @@
       "113995": null,
       "114002": null,
       "114010": null,
-      "114015": null
+      "114015": null,
+      "114024": null
     },
     "counts": {
       "ChrRaces": {
@@ -1122,9 +1124,9 @@
         "identical": 65
       },
       "Spell": {
-        "VALID": 1193,
+        "VALID": 1194,
         "DELETE": 0,
-        "identical": 1184
+        "identical": 1185
       },
       "SpellAuraOptions": {
         "VALID": 70,
@@ -1137,12 +1139,12 @@
         "identical": 13
       },
       "SpellCategories": {
-        "VALID": 87,
+        "VALID": 88,
         "DELETE": 0,
         "identical": 84
       },
       "SpellCategory": {
-        "VALID": 3,
+        "VALID": 4,
         "DELETE": 0,
         "identical": 2
       },
@@ -1152,7 +1154,7 @@
         "identical": 60
       },
       "SpellCooldowns": {
-        "VALID": 62,
+        "VALID": 63,
         "DELETE": 0,
         "identical": 60
       },
@@ -1182,9 +1184,9 @@
         "identical": 1780
       },
       "SpellName": {
-        "VALID": 1193,
+        "VALID": 1194,
         "DELETE": 0,
-        "identical": 1184
+        "identical": 1185
       },
       "SpellPower": {
         "VALID": 54,
@@ -62110,6 +62112,14 @@
       },
       {
         "table": "Spell",
+        "rec_id": 1225469,
+        "status": "VALID",
+        "push": 114024,
+        "unique_id": 2525891301,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 1226814,
         "status": "VALID",
         "push": 112720,
@@ -66597,6 +66607,14 @@
         "identical": false
       },
       {
+        "table": "SpellCategories",
+        "rec_id": 191355,
+        "status": "VALID",
+        "push": 114024,
+        "unique_id": 2525891301,
+        "identical": false
+      },
+      {
         "table": "SpellCategory",
         "rec_id": 411,
         "status": "VALID",
@@ -66618,6 +66636,14 @@
         "status": "VALID",
         "push": 113825,
         "unique_id": 300874272,
+        "identical": false
+      },
+      {
+        "table": "SpellCategory",
+        "rec_id": 2615,
+        "status": "VALID",
+        "push": 114024,
+        "unique_id": 2525891301,
         "identical": false
       },
       {
@@ -67259,6 +67285,14 @@
         "push": 113539,
         "unique_id": 1988021354,
         "identical": true
+      },
+      {
+        "table": "SpellCooldowns",
+        "rec_id": 97019,
+        "status": "VALID",
+        "push": 114024,
+        "unique_id": 2525891301,
+        "identical": false
       },
       {
         "table": "SpellCooldowns",
@@ -97382,6 +97416,14 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 1225469,
+        "status": "VALID",
+        "push": 114024,
+        "unique_id": 2525891301,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 1226814,
         "status": "VALID",
         "push": 112720,
@@ -103723,12 +103765,15 @@
       "SpellAuraOptions 249242",
       "SpellCategories 191236",
       "SpellCategories 191254",
+      "SpellCategories 191355",
       "SpellCategory 2609",
+      "SpellCategory 2615",
       "SpellClassOptions 85378",
       "SpellClassOptions 85379",
       "SpellClassOptions 85380",
       "SpellClassOptions 85381",
       "SpellCooldowns 102510",
+      "SpellCooldowns 97019",
       "SpellEffect 1072563",
       "SpellEffect 1072564",
       "SpellEffect 1072565",
@@ -103843,36 +103888,6 @@
       "invalid": [
         {
           "table": "ItemSparse",
-          "rec_id": 216661,
-          "push": 112709
-        },
-        {
-          "table": "Item",
-          "rec_id": 216661,
-          "push": 112709
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 217296,
-          "push": 112709
-        },
-        {
-          "table": "Item",
-          "rec_id": 217296,
-          "push": 112709
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 217299,
-          "push": 112709
-        },
-        {
-          "table": "Item",
-          "rec_id": 217299,
-          "push": 112709
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 9196,
           "push": 112720
         },
@@ -103965,246 +103980,6 @@
           "table": "SpellEffect",
           "rec_id": 1365142,
           "push": 112789
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2665,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 2665,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 7188,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 7188,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 14557,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 14557,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 18806,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 18806,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 18824,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 18824,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 19134,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 19134,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 19878,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 19878,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 23188,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 23188,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 217294,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 217294,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 221030,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 221030,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 223326,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 223326,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 227952,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 227952,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 227957,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 227957,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228070,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228070,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228254,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228254,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228272,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228272,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228285,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228285,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228591,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228591,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228684,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228684,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 229380,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 229380,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 230248,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 230248,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 230802,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 230802,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 232299,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 232299,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 233209,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 233209,
-          "push": 112864
         },
         {
           "table": "ItemSparse",
@@ -105287,26 +105062,6 @@
           "push": 113351
         },
         {
-          "table": "SpellPower",
-          "rec_id": 315148,
-          "push": 113367
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315149,
-          "push": 113367
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315152,
-          "push": 113367
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315153,
-          "push": 113367
-        },
-        {
           "table": "ItemSparse",
           "rec_id": 278548,
           "push": 113373
@@ -105445,46 +105200,6 @@
           "table": "Item",
           "rec_id": 289555,
           "push": 113596
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287960,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287960,
-          "push": 113605
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287961,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287961,
-          "push": 113605
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287965,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287965,
-          "push": 113605
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287970,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287970,
-          "push": 113605
         },
         {
           "table": "ItemSparse",
@@ -114285,6 +114000,376 @@
           "table": "SpellMisc",
           "rec_id": 876327,
           "push": 113928
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 216661,
+          "push": 112709
+        },
+        {
+          "table": "Item",
+          "rec_id": 216661,
+          "push": 112709
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 217296,
+          "push": 112709
+        },
+        {
+          "table": "Item",
+          "rec_id": 217296,
+          "push": 112709
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 217299,
+          "push": 112709
+        },
+        {
+          "table": "Item",
+          "rec_id": 217299,
+          "push": 112709
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 2665,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 2665,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 7188,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 7188,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 14557,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 14557,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 18806,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 18806,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 18824,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 18824,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 19134,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 19134,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 19878,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 19878,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 23188,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 23188,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 217294,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 217294,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 221030,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 221030,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 223326,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 223326,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 227952,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 227952,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 227955,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 227955,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 227957,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 227957,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 227961,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 227961,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228070,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228070,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228254,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228254,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228272,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228272,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228285,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228285,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228591,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228591,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228684,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228684,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 229380,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 229380,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 230248,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 230248,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 230802,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 230802,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 232299,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 232299,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 233209,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 233209,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 288506,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 288506,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 288619,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 288619,
+          "push": 112864
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 315148,
+          "push": 113367
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 315149,
+          "push": 113367
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 315152,
+          "push": 113367
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 315153,
+          "push": 113367
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287960,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287960,
+          "push": 113605
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287961,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287961,
+          "push": 113605
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287965,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287965,
+          "push": 113605
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287970,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287970,
+          "push": 113605
         }
       ],
       "notpublic": [
@@ -115075,8 +115160,8 @@
         }
       ],
       "dbreply": {
-        "0x021826bb": 4,
-        "ItemSparse": 3646
+        "0x021826bb": 5,
+        "ItemSparse": 15535
       },
       "item_reply": {
         "0x198e28b5": 5167,
@@ -115100,17 +115185,17 @@
         "0x0b685935": 1,
         "0x0e540efd": 2,
         "0x0e82664c": 14,
-        "0x0f992211": 1206,
+        "0x0f992211": 1256,
         "0x1018add5": 1,
         "0x111d4849": 2,
-        "0x12a212a9": 53,
+        "0x12a212a9": 61,
         "0x12a76efd": 2,
         "0x13c403a5": 147,
         "0x140a5855": 2,
         "0x14320f31": 54,
         "0x15393898": 1,
         "0x15ff1ecc": 2,
-        "0x198e28b5": 3724,
+        "0x198e28b5": 3733,
         "0x1a6b0c40": 1,
         "0x1cf9216d": 69,
         "0x1d53eb74": 30,
@@ -115138,14 +115223,14 @@
         "0x37d001ef": 1,
         "0x394c3727": 14,
         "0x39606286": 2,
-        "0x3ac83109": 1206,
+        "0x3ac83109": 1256,
         "0x3b57c0a1": 4,
         "0x3b9e4ca2": 14,
         "0x3cc89c00": 3,
         "0x3e988108": 7,
         "0x3f85abb7": 3,
         "0x42261b89": 329,
-        "0x4553e9f7": 304,
+        "0x4553e9f7": 308,
         "0x45952e6e": 2,
         "0x461fdc45": 11,
         "0x4666ed42": 256,
@@ -115158,8 +115243,8 @@
         "0x50d91a78": 2,
         "0x5139503a": 1,
         "0x51a28350": 16,
-        "0x5481af88": 3724,
-        "0x550e7513": 10,
+        "0x5481af88": 3733,
+        "0x550e7513": 11,
         "0x588de300": 16,
         "0x59f2eb50": 3,
         "0x5c4bbb1f": 10,
@@ -115179,7 +115264,7 @@
         "0x6d100dcb": 12,
         "0x6f771411": 12,
         "0x6fe05ae9": 21,
-        "0x7253eb43": 73,
+        "0x7253eb43": 74,
         "0x758e7bcc": 7,
         "0x76c04c97": 2,
         "0x7b03245c": 2,
@@ -115226,7 +115311,7 @@
         "0xb33f3964": 2,
         "0xb3af6eca": 6,
         "0xb4b5e047": 2,
-        "0xb50ca635": 3724,
+        "0xb50ca635": 3733,
         "0xb5307a56": 25,
         "0xb8ba5fb3": 1,
         "0xb8f96456": 3,
@@ -115238,7 +115323,7 @@
         "0xbd84cd62": 5,
         "0xbe1eca27": 2,
         "0xbe6aed26": 2,
-        "0xbf0bc27a": 157,
+        "0xbf0bc27a": 160,
         "0xbfdaf9f1": 10,
         "0xc0a5f8c6": 69,
         "0xc2b150c7": 578,
@@ -115252,11 +115337,11 @@
         "0xc7ed797d": 1,
         "0xc842493a": 15,
         "0xc9bcb028": 12,
-        "0xc9d6b6b3": 327,
+        "0xc9d6b6b3": 328,
         "0xc9e0a749": 2029,
         "0xcc284d0f": 190,
         "0xccff87ed": 1,
-        "0xce88edca": 3724,
+        "0xce88edca": 3733,
         "0xcf156785": 1,
         "0xd055d7b5": 13,
         "0xd2ee2ca7": 1,
@@ -127040,6 +127125,10 @@
           },
           {
             "table": "Spell",
+            "rec_id": 1225469
+          },
+          {
+            "table": "Spell",
             "rec_id": 1226814
           },
           {
@@ -131773,6 +131862,10 @@
           {
             "table": "SpellName",
             "rec_id": 1225435
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 1225469
           },
           {
             "table": "SpellName",
@@ -138305,7 +138398,7 @@
         "reason": "disposition 6FCC3191 validée : 2722 entrée(s) décodée(s), 1517 comparée(s), 99% des valeurs égales au build, 74/74 références résolues",
         "decoded": 2722,
         "compared": 1517,
-        "equal_ratio": 0.9915851640590316,
+        "equal_ratio": 0.9919360516092697,
         "references_ok": true
       },
       "ItemXItemEffect": {
@@ -138334,9 +138427,9 @@
       },
       "Spell": {
         "ok": true,
-        "reason": "disposition E3D134FB validée : 1193 entrée(s) décodée(s) à la taille et à l'identifiant attendus ; textes en frFR non comparés (noms de cette langue absents)",
-        "decoded": 1193,
-        "compared": 1184,
+        "reason": "disposition E3D134FB validée : 1194 entrée(s) décodée(s) à la taille et à l'identifiant attendus ; textes en frFR non comparés (noms de cette langue absents)",
+        "decoded": 1194,
+        "compared": 1185,
         "equal_ratio": null,
         "references_ok": null
       },
@@ -138358,16 +138451,16 @@
       },
       "SpellCategories": {
         "ok": true,
-        "reason": "disposition 679EF94C validée : 87 entrée(s) décodée(s), 85 comparée(s), 100% des valeurs égales au build, 187/187 références résolues",
-        "decoded": 87,
+        "reason": "disposition 679EF94C validée : 88 entrée(s) décodée(s), 85 comparée(s), 100% des valeurs égales au build, 189/189 références résolues",
+        "decoded": 88,
         "compared": 85,
         "equal_ratio": 0.9988235294117647,
         "references_ok": true
       },
       "SpellCategory": {
         "ok": true,
-        "reason": "disposition B79B78E1 validée : 3 entrée(s) décodée(s), 2 comparée(s), 100% des valeurs égales au build",
-        "decoded": 3,
+        "reason": "disposition B79B78E1 validée : 4 entrée(s) décodée(s), 2 comparée(s), 100% des valeurs égales au build",
+        "decoded": 4,
         "compared": 2,
         "equal_ratio": 1.0,
         "references_ok": null
@@ -138382,10 +138475,10 @@
       },
       "SpellCooldowns": {
         "ok": true,
-        "reason": "disposition DC945B8C validée : 62 entrée(s) décodée(s), 60 comparée(s), 100% des valeurs égales au build, 62/62 références résolues",
-        "decoded": 62,
-        "compared": 60,
-        "equal_ratio": 1.0,
+        "reason": "disposition DC945B8C validée : 63 entrée(s) décodée(s), 61 comparée(s), 99% des valeurs égales au build, 63/63 références résolues",
+        "decoded": 63,
+        "compared": 61,
+        "equal_ratio": 0.994535519125683,
         "references_ok": true
       },
       "SpellDuration": {
@@ -138430,10 +138523,10 @@
       },
       "SpellName": {
         "ok": true,
-        "reason": "disposition 782EE721 validée : 1193 entrée(s) décodée(s), 1184 comparée(s), 97% des valeurs égales au build",
-        "decoded": 1193,
-        "compared": 1184,
-        "equal_ratio": 0.9746621621621622,
+        "reason": "disposition 782EE721 validée : 1194 entrée(s) décodée(s), 1185 comparée(s), 97% des valeurs égales au build",
+        "decoded": 1194,
+        "compared": 1185,
+        "equal_ratio": 0.9746835443037974,
         "references_ok": null
       },
       "SpellPower": {
