@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 
 from forever.errors import InvalidArgumentError
@@ -95,3 +96,47 @@ def restore_originals(addons: Path, cache_dir: Path) -> list[str]:
             _atomic(target, path.read_bytes())
             done.append(rel)
     return done
+
+
+# --- français réactivé dans RestedXP (accord de l'utilisateur du 2026-11-13) ------------------------------------
+
+LOCALE_FILE = ("RXPGuides", "RXPGuides.lua")
+_TABLE = re.compile(r"addon\.enabledLocale\s*=\s*\{(?P<body>[^}]*)\}")
+_COMMENTED = re.compile(r'^([ \t]*)--[ \t]*(\["frFR"\][ \t]*=[ \t]*true)', re.MULTILINE)
+_ACTIVE = re.compile(r'^[ \t]*\["frFR"\][ \t]*=[ \t]*true', re.MULTILINE)
+
+
+def enable_french(addons: Path, cache_dir: Path, *, simulate: bool = False) -> str:
+    """Réactive `["frFR"] = true` dans `addon.enabledLocale` de `RXPGuides.lua` : depuis RestedXP v4.11.36 la ligne
+    est en commentaire et les guides anglais se chargent en plus des guides français. Seule cette ligne change, après
+    une copie du fichier de RestedXP. Rend « réactivé », « à réactiver » (simulation), « déjà actif » ou « absent »."""
+    path = addons.joinpath(*LOCALE_FILE)
+    if not path.is_file():
+        return "absent"
+    raw = path.read_bytes()
+    text = raw.decode("utf-8", errors="surrogateescape")
+    table = _TABLE.search(text)
+    if table is None:
+        return "absent"
+    body = table.group("body")
+    if _ACTIVE.search(body):
+        return "déjà actif"
+    if not _COMMENTED.search(body):
+        return "absent"
+    if simulate:
+        return "à réactiver"
+    _atomic(backup_root(cache_dir) / "restedxp" / f"RXPGuides.lua.{hashlib.sha256(raw).hexdigest()[:12]}", raw)
+    new_body = _COMMENTED.sub(r"\1\2", body, count=1)
+    start, end = table.span("body")
+    _atomic(path, (text[:start] + new_body + text[end:]).encode("utf-8", errors="surrogateescape"))
+    return "réactivé"
+
+
+def restore_locale(addons: Path, cache_dir: Path) -> bool:
+    """Remet le `RXPGuides.lua` de RestedXP sauvegardé avant la dernière réactivation du français (`--annuler`)."""
+    saved = sorted((backup_root(cache_dir) / "restedxp").glob("RXPGuides.lua.*"), key=lambda p: p.stat().st_mtime)
+    path = addons.joinpath(*LOCALE_FILE)
+    if not saved or not path.is_file() or path.read_bytes() == saved[-1].read_bytes():
+        return False
+    _atomic(path, saved[-1].read_bytes())
+    return True

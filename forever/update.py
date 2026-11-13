@@ -1901,7 +1901,9 @@ def _rxp_fr(run: _Run, data: dict[str, Any]) -> str:
         return f" ; guides RestedXP en français non régénérés : {exc}"
     if doc is None:
         return ""
-    data["rxp_fr"] = {k: doc[k] for k in ("written", "errors", "write_id", "phrases") if k in doc}
+    data["rxp_fr"] = {k: doc[k] for k in ("written", "errors", "write_id", "phrases", "french") if k in doc}
+    # RestedXP v4.11.36 : `["frFR"] = true` remis dans RXPGuides.lua, sinon l'anglais se charge aussi en frFR
+    french = " ; français réactivé dans RestedXP (RXPGuides.lua)" if doc.get("french") == "réactivé" else ""
     if doc["errors"]:
         return (
             f" ; guides RestedXP en français : validation en échec, rien n'est écrit ({len(doc['errors'])} erreur(s))"
@@ -1913,8 +1915,8 @@ def _rxp_fr(run: _Run, data: dict[str, Any]) -> str:
         return (
             f" ; guides RestedXP en français régénérés : {', '.join(doc['written'])} ({english} phrase(s) restées en "
             f"anglais, `forever rxp traduire --manquants`) ; annuler : forever update undo {doc['write_id']}"
-        )
-    return ""
+        ) + french
+    return french
 
 
 def _step_guides(run: _Run) -> Step:

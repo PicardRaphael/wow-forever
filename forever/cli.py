@@ -5492,6 +5492,7 @@ def _cmd_rxp(deps: Deps, args: argparse.Namespace) -> int:
         "Phrases : " + ", ".join(f"{k} {v}" for k, v in sorted(phrases.items())) if phrases else "Phrases : aucune"
     )
     lines.append("Noms traduits : " + (", ".join(f"{k} {v}" for k, v in sorted(doc["names"].items())) or "aucun"))
+    lines.append(f"Français dans RestedXP (RXPGuides.lua) : {doc['french']}")
     if doc["imported"] is not None:
         lines.append(f"Lot importé : {doc['imported']['accepted']} accepté(s), {doc['imported']['refused']} refusé(s)")
     if doc["errors"]:

@@ -13,7 +13,14 @@ from typing import Any
 from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.rxp_fr.build import GENERATOR_VERSION, generate_file, marker_info, source_sha
-from forever.rxp_fr.install import originals, restore_originals, write_guides
+from forever.rxp_fr.install import (
+    LOCALE_FILE,
+    enable_french,
+    originals,
+    restore_locale,
+    restore_originals,
+    write_guides,
+)
 from forever.rxp_fr.memory import Memory, memory_path
 from forever.rxp_fr.names import NameTable, client_layer, questie_layer
 from forever.rxp_fr.source import (
@@ -204,11 +211,14 @@ def translate_addons(
                 written.append(rel)
     if not simulate:
         memory.save(mem_file)
+    # RestedXP v4.11.36 : sans `["frFR"] = true`, les guides anglais se chargent aussi en frFR (accord du 2026-11-13)
+    french = enable_french(addons, deps.cache_dir, simulate=simulate or bool(errors))
     from forever.provenance import local_provenance
 
     return {
         "files": rows,
         "written": written,
+        "french": french,
         "errors": errors,
         "simulation": simulate,
         "write_id": write_id,
@@ -231,6 +241,8 @@ def cancel(deps: Deps) -> dict[str, Any]:
 
     addons = addons_dir(deps)
     restored = restore_originals(addons, deps.cache_dir)
+    if restore_locale(addons, deps.cache_dir):
+        restored.append("/".join(LOCALE_FILE))
     return {
         "restored": restored,
         "provenance": local_provenance(deps, certainty="certain", assumptions=["fichiers de RestedXP remis"]),
@@ -263,7 +275,14 @@ def watch(deps: Deps, *, dry_run: bool) -> dict[str, Any] | None:
 
     need = stale(deps)
     if not need:
-        return None
+        wow = deps.wow_dir
+        addons = wow / "Interface" / "AddOns" if wow is not None else None
+        if addons is None or not addons.joinpath(*EN_DIR).is_dir():
+            return None
+        french = enable_french(addons, deps.cache_dir, simulate=dry_run)
+        if french not in ("réactivé", "à réactiver"):
+            return None
+        return {"written": [], "errors": [], "phrases": {}, "write_id": None, "french": french}
     doc = translate_addons(deps, simulate=dry_run)
     if doc["written"] and not dry_run:
         generated = sum(r["generated"] for r in doc["files"])
