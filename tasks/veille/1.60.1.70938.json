@@ -1,0 +1,106 @@
+{
+  "a": "1.60.1.70888",
+  "b": "/home/runner/.cache/forever/candidates/1.60.1.70938",
+  "changes": [
+    {
+      "kind": "file",
+      "key": "_seed_spells.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "_seed_talents.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "_source_gunba_mage_tree.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "confirmed_changes.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "revisions.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "talent",
+      "key": "wakeOfFire",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "talent",
+      "key": "hotStreak",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "talent",
+      "key": "improvedFireBlast",
+      "change": "added",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "talent",
+      "key": "heatingUp",
+      "change": "added",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "spell",
+      "key": "frost_blast",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    }
+  ],
+  "counts": {
+    "talent": 4,
+    "spell": 1,
+    "file": 5
+  },
+  "provenance": {
+    "game_version": "1.60.1.70938",
+    "data_sha": "930f679709d9",
+    "data_revision": 14,
+    "generated_at": "2026-11-13T14:33:01Z",
+    "freshness": "unknown",
+    "certainty": "suppose",
+    "assumptions": [
+      "fraîcheur jamais vérifiée (lancer `forever status`)",
+      "1.60.1.70938 : version candidate non installée (/home/runner/.cache/forever/candidates/1.60.1.70938)",
+      "1.60.1.70938 : fichiers hérités d'une version antérieure (_seed_racials.json, character_scaling.json, classes.json, decode_rules.json, leveling.json, mechanics.json, meta.json, monsters.json, origins.json, overrides.json, pet_rules.json, pets.json, pvp_items.json, pvp_rules.json, quest_rewards.json, races.json, respec.json, xp_bonuses.json)",
+      "comparaison 1.60.1.70888 (données c106fb25577c) -> /home/runner/.cache/forever/candidates/1.60.1.70938 (données 930f679709d9)"
+    ],
+    "registry_coverage": "80/152"
+  }
+}
