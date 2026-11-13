@@ -1,5 +1,5 @@
 {
-  "game_version": "1.60.1.70888",
+  "game_version": "1.60.1.70938",
   "schema_version": 1,
   "versions": {
     "1.60.1.70009": {
@@ -465,6 +465,47 @@
       "product": "wowf",
       "revised_at": "2026-11-13",
       "revision": 14,
+      "version_prefix": "1.60."
+    },
+    "1.60.1.70938": {
+      "collected_at": "2026-11-13",
+      "data_sha": "3b1b5a0620af",
+      "data_sha256": "3b1b5a0620aff41032bee5c889419c16f92ed93cab04c8d1764d670aa3651ddd",
+      "files": {
+        "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
+        "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
+        "_seed_talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb",
+        "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
+        "character_scaling.json": "adadf1c8ab661f694005e590a9300f541da54476dd23cc1abdaa1f991c93e1a5",
+        "classes.json": "c27e3b57a9cf040d4982a46d7d703c41b9da5542ac71cbd623e2bcbd70c12ade",
+        "confirmed_changes.json": "010570d0604685999a9c873530993f3f2eb6a71b8aba621df6ef915edc97d679",
+        "decode_rules.json": "27adbdd41e7e90eb3ad3bcd8f0e1f29864fe54ef9d6fb11b41f13bd454911fe7",
+        "dungeons.json": "07dd4553d7a450789ca4ea21bccbdb86a83876a77f854f4090a99c99db423c9a",
+        "leveling.json": "72cd0b81e154b710d0bad1f207b395b79a66eea946b895b281a68c360c1f85bc",
+        "mechanics.json": "bf235f72677118a22b58e1c4a78cf0dabc33c6902f683df0675326907bf13281",
+        "meta.json": "28b434ad9e168692bde9e349debf52aa51907c41bc41efc78aec5a93ca8c547f",
+        "monsters.json": "1a6e071ffdb9819f398dd52e92bf67f3a158e1fcb32aa14c7ff5f834b010c653",
+        "origins.json": "91d3783968ae434dcc531c6afc0a7a2a56f0e88799469a60417a0c0066cf7e1f",
+        "overrides.json": "d2f9a7064284354030e34559b57be13aa4362bddfa61d14a95257591a78195f0",
+        "pet_rules.json": "5e0e68bf48e86596873548f929c00d94f190fe3cad6c5a634da04ef7c6af2f4c",
+        "pets.json": "f5754f2d6e766a76a986cc18c1c523b18dc75cf7474badf71e1bfbffdf7f4633",
+        "pvp_items.json": "0db723a178863a5316c00a32846824243fb2390d0e033a536332bca13617533f",
+        "pvp_rules.json": "715d10843cff886ad1d4db0e1c2bb672d43cf2bb221d52b8df76f5b76a002448",
+        "quest_rewards.json": "aa6f25942076a5f603e7085c751904d05b719043006d95cda36a8a87d1cd875e",
+        "races.json": "49662cde9e41365f6d2964965cd9c8e9094b5d435919426efbb7b1370be92d0f",
+        "respec.json": "33406e9d5187b3245e62e647e4ac186f901d25fca511b88295730c63fc7cc908",
+        "revisions.json": "3ae9a9a4d57c846b6feb152bb9eb9c67f5da49bca88d907e093ad7ff9a7eba9a",
+        "sources.json": "f11081ba3988c4023a43acdbac32b7720fd0c056016d62b5885f1dca50f3a377",
+        "spell_scaling.json": "f52c4e23dcb827a08928183c117598df15029b2c7939cfc87544170e86e4945e",
+        "spells.json": "dd45904807d879886ae12c3291dbec46acbbabddf91cdb4004bb70f96322e589",
+        "talents.json": "7a53780a67214b1aba87c936bf790fbd4bb53cf96869bb925401c5cc65ead890",
+        "travel.json": "df511e53045c40f7627e99049d3d6d4b645d687f74c342331a190f2be9e56317",
+        "xp_bonuses.json": "fdeff84620864fc3ce0a9cb1a1f0ea04d112ce89baf34fd8910012dc55bdf6ec"
+      },
+      "hotfixes": [],
+      "product": "wowf",
+      "revised_at": "2026-11-13",
+      "revision": 1,
       "version_prefix": "1.60."
     }
   }
