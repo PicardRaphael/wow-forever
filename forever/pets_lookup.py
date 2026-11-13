@@ -371,6 +371,26 @@ def render_pets(payload: dict[str, Any]) -> list[str]:
         lines.append(f"Recoupement : {len(payload['gaps'])} écart(s)")
         lines += [f"- {g['kind']} {g['subject']} {g['field'] or ''} : {g['values']}" for g in payload["gaps"]]
     elif kind == "pets_measure":
+        for cur in payload.get("current", []):
+            pet = cur["pet"]
+            lines.append(
+                f"Familier de {cur['character']} ({cur['localtime']}) : {_value(pet.get('name'))}, "
+                f"{_value(pet.get('family'))} niveau {_value(pet.get('level'))}"
+            )
+            spells = ", ".join(
+                f"{s.get('name', '?')}{' (' + s['sub'] + ')' if s.get('sub') else ''}" for s in cur["spells"]
+            )
+            lines.append(f"- grimoire : {spells or 'non relevé'}")
+            lines += [
+                f"- liste du jeu : {_value(p.get('name'))}, loyauté {_value(p.get('loyaltyName'))}, "
+                f"capacités {p.get('abilities', [])}"
+                for p in cur["stable"]
+            ]
+            if cur["unavailable"]:
+                missing = ", ".join(f"{k} ({v})" for k, v in sorted(cur["unavailable"].items()))
+                lines.append(f"- API sans réponse : {missing}")
+        if payload.get("unknown_events"):
+            lines.append(f"Événements refusés par le client : {', '.join(payload['unknown_events'])}")
         for r in payload["training"]:
             lines.append(
                 f"- {r['ability']} rang {r['rank']} ({r['family']}) : observé {r['observed']}, client {r['client']}, "

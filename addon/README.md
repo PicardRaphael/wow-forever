@@ -32,6 +32,7 @@ ForeverLoggerDB = {
   schema = 2,  -- 2 depuis 0.4.0 (T04d) ; les anciennes listes gardent leur forme
   seq,          -- compteur commun des entrées numérotées (ordre entre gains, états et quêtes)
   errors = { [événement] = { count, last } },  -- erreurs des gestionnaires, jamais remontées au joueur
+  unknown_events = { … },  -- abonnements refusés par le client (événement inconnu), réécrits à chaque chargement
   characters = {
     ["<GUID du personnage>"] = {
       name, realm, class, race,
@@ -54,7 +55,10 @@ ForeverLoggerDB = {
                           pet = { family, name, level, health_max, armor = {…}, attack_speed, attack_power = {…},
                                   loyalty, happiness = {…}, training_points = {…}, diet = {…} },
                           hunter = { stamina = {…}, armor = {…}, attack_power = {…}, ranged_attack_power = {…},
-                                     crit, ranged_crit } }, … },
+                                     crit, ranged_crit },
+                          spells = { { name, sub, spell_id, icon }, … },        -- grimoire du familier (C_SpellBook)
+                          stable = { { name, level, familyName, creatureID, loyaltyName, abilities = {…}, … }, … },
+                          unavailable = { [API] = "absente" | "vide" } }, … },  -- API du familier sans réponse
       training = { { time, localtime, skill_line, family, pet_level,
                      entries = { { name, rank, type, cost, level }, … } }, … },
     },

@@ -838,7 +838,9 @@ def tame_guide(
 def measure_pets(pets: Mapping[str, Any], rules: Mapping[str, Any], db: Any) -> dict[str, Any]:
     """Relevés de ForeverLogger comparés au client : coût et niveau requis observés dans la fenêtre Beast Training,
     régime observé, PV du familier par point d'Endurance du Chasseur par paire d'instantanés (même familier, même
-    niveau), vitesse d'attaque par famille ; chaque mesure avec `n`. Rien n'est écrit dans les données."""
+    niveau), vitesse d'attaque par famille ; chaque mesure avec `n` ; dernier relevé du familier de chaque Chasseur
+    (grimoire, familiers listés par le jeu, API absentes ou muettes) et abonnements refusés par le client. Rien n'est
+    écrit dans les données."""
     aliases: Mapping[str, str] = pets.get("aliases", {})
     families: Mapping[str, Any] = pets.get("families", {})
     abilities: Mapping[str, Any] = pets.get("abilities", {})
@@ -860,7 +862,21 @@ def measure_pets(pets: Mapping[str, Any], rules: Mapping[str, Any], db: Any) -> 
     speeds: dict[str, list[float]] = {}
     pairs: list[dict[str, Any]] = []
     armor_pairs: list[dict[str, Any]] = []
+    current: list[dict[str, Any]] = []
     for character in getattr(db, "characters", {}).values():
+        if character.pet_snapshots:
+            last = character.pet_snapshots[-1]
+            current.append(
+                {
+                    "character": character.name,
+                    "localtime": last.localtime.isoformat() if last.localtime else None,
+                    "hunter_level": last.level,
+                    "pet": last.pet,
+                    "spells": last.spells,
+                    "stable": last.stable,
+                    "unavailable": last.unavailable,
+                }
+            )
         for window in character.training:
             fam = fam_key(window.family)
             for entry in window.entries:
@@ -927,6 +943,8 @@ def measure_pets(pets: Mapping[str, Any], rules: Mapping[str, Any], db: Any) -> 
         return rule.get(key, {}).get("value")
 
     return {
+        "current": current,
+        "unknown_events": list(getattr(db, "unknown_events", [])),
         "training": training,
         "diet": diet_rows,
         "inheritance": {
