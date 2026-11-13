@@ -1,0 +1,2821 @@
+{
+ "schema_version": 1,
+ "version": "1.60.1.70938",
+ "revisions": [
+  {
+   "revision": 1,
+   "date": "2026-11-13",
+   "motif": "nouvelle version 1.60.1.70938 (forever update)",
+   "command": "forever update --auto",
+   "candidate": {
+    "path": "<cache>/candidates/1.60.1.70938",
+    "data_sha": "6a3cb701c6b3"
+   },
+   "report": null,
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 53,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 69,
+    "added_file": 0,
+    "replaced_file": 0,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 0,
+    "rules": 0,
+    "review": 0
+   },
+   "changes": [
+    {
+     "file": "talents.json",
+     "path": "wandSpecialization.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "wandSpecialization.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       6057
+      ],
+      "client_desc": "Increases your damage with Wands by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       6057
+      ],
+      "client_desc": "Increases your damage with Wands by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedChanneling.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedChanneling.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11237
+      ],
+      "client_desc": "Gives your Arcane Missiles spell a $m1% chance and your Arcane Blast and Arcane Wrath spells a $m2% chance to not lose casting time when you take damage."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11237
+      ],
+      "client_desc": "Gives your Arcane Missiles spell a $m1% chance and your Arcane Blast and Arcane Wrath spells a $m2% chance to not lose casting time when you take damage."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "missileBarrage.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "missileBarrage.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       400588
+      ],
+      "client_desc": "Gives your Arcane Blast spell a $m1% chance, and your Arcane Wrath, Fireball, Frostbolt, and Frostfire Bolt spells a ${$m1/2}% chance to reduce the channeled duration of your next Arcane Missiles spell by $400589s1%, reduce the Mana cost by $400589s3%, and missiles fire every ${$m2/10}.1 sec."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       400588
+      ],
+      "client_desc": "Gives your Arcane Blast spell a $m1% chance, and your Arcane Wrath, Fireball, Frostbolt, and Frostfire Bolt spells a ${$m1/2}% chance to reduce the channeled duration of your next Arcane Missiles spell by $400589s1%, reduce the Mana cost by $400589s3%, and missiles fire every ${$m2/10}.1 sec."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneSubtlety.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneSubtlety.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11210
+      ],
+      "client_desc": "Reduces your target's resistance to all your spells by $s2 and reduces the threat caused by your Arcane spells by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11210
+      ],
+      "client_desc": "Reduces your target's resistance to all your spells by $s2 and reduces the threat caused by your Arcane spells by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "magicAbsorption.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "magicAbsorption.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       29441
+      ],
+      "client_desc": "Increases all your resistances by $s2 and causes all spells you fully resist to restore $s1% of your total mana. Cannot trigger more often than 1 time per sec."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       29441
+      ],
+      "client_desc": "Increases all your resistances by $s2 and causes all spells you fully resist to restore $s1% of your total mana. Cannot trigger more often than 1 time per sec."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneConcentration.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneConcentration.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11213
+      ],
+      "client_desc": "Gives you a $m1% chance of entering a Clearcasting state after any damage spell hits a target.  The Clearcasting state reduces the mana cost of your next damage spell by $/10;12536s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11213
+      ],
+      "client_desc": "Gives you a $m1% chance of entering a Clearcasting state after any damage spell hits a target.  The Clearcasting state reduces the mana cost of your next damage spell by $/10;12536s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneResilience.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneResilience.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       28574
+      ],
+      "client_desc": "Increases your Armor by an amount equal to $s1% of your Intellect."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       28574
+      ],
+      "client_desc": "Increases your Armor by an amount equal to $s1% of your Intellect."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneGeometry.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneGeometry.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11247
+      ],
+      "client_desc": "Increases the range of your Arcane spells by $m1 yards."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11247
+      ],
+      "client_desc": "Increases the range of your Arcane spells by $m1 yards."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneImpact.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneImpact.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11242
+      ],
+      "client_desc": "Increases the critical strike chance of your Arcane spells by $m1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11242
+      ],
+      "client_desc": "Increases the critical strike chance of your Arcane spells by $m1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneBlast.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneBlast.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       400574
+      ],
+      "client_desc": "Blasts the target with energy, dealing $s1 Arcane damage. Each time you cast Arcane Blast, you gain $400573s1% of your Intellect as Spell Damage and the mana cost of Arcane Blast is increased by $400573s2%. Effect stacks up to $400573u times and lasts $400573d from time of initial application."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       400574
+      ],
+      "client_desc": "Blasts the target with energy, dealing $s1 Arcane damage. Each time you cast Arcane Blast, you gain $400573s1% of your Intellect as Spell Damage and the mana cost of Arcane Blast is increased by $400573s2%. Effect stacks up to $400573u times and lasts $400573d from time of initial application."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneShielding.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneShielding.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11252
+      ],
+      "client_desc": "Decreases the Mana lost per point of damage taken when your Mana Shield spell is active by $m1% and increases the resistances granted by your Mage Armor spell by $m2%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11252
+      ],
+      "client_desc": "Decreases the Mana lost per point of damage taken when your Mana Shield spell is active by $m1% and increases the resistances granted by your Mage Armor spell by $m2%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedCounterspell.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedCounterspell.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11255
+      ],
+      "client_desc": "Your Counterspell also Silences the target for ${$m1/1000} sec."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11255
+      ],
+      "client_desc": "Your Counterspell also Silences the target for ${$m1/1000} sec."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneMeditation.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneMeditation.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       18462
+      ],
+      "client_desc": "Allows $s1% of your Mana regeneration to continue while casting."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       18462
+      ],
+      "client_desc": "Allows $s1% of your Mana regeneration to continue while casting."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneWrath.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneWrath.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       1326079
+      ],
+      "client_desc": "Launches a projectile of pure Arcane energy at the enemy target, causing $s1 Arcane damage. This spell gains additional Spell Damage equal to $s2% of your maximum Mana."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       1326079
+      ],
+      "client_desc": "Launches a projectile of pure Arcane energy at the enemy target, causing $s1 Arcane damage. This spell gains additional Spell Damage equal to $s2% of your maximum Mana."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "presenceOfMind.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "presenceOfMind.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       12043
+      ],
+      "client_desc": "When activated, your next Mage spell with a casting time less than 10 sec becomes an instant cast spell."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       12043
+      ],
+      "client_desc": "When activated, your next Mage spell with a casting time less than 10 sec becomes an instant cast spell."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneMind.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneMind.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11232
+      ],
+      "client_desc": "Increases your Intellect by $m1% and increases the critical strike damage bonus of your Arcane spells by $m2%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11232
+      ],
+      "client_desc": "Increases your Intellect by $m1% and increases the critical strike damage bonus of your Arcane spells by $m2%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneInstability.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcaneInstability.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       15058
+      ],
+      "client_desc": "Increases the damage done by your spells by $m1% and your critical strike chance by $m2%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       15058
+      ],
+      "client_desc": "Increases the damage done by your spells by $m1% and your critical strike chance by $m2%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcanePower.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcanePower.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       12042
+      ],
+      "client_desc": "For the next $d, your spells deal $s1% more damage while costing $s2% more mana to cast."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       12042
+      ],
+      "client_desc": "For the next $d, your spells deal $s1% more damage while costing $s2% more mana to cast."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "incineration.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "incineration.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       18459
+      ],
+      "client_desc": "Increases the critical strike chance of your Fire Blast, Ice Lance, Arcane Blast, and Scorch spells by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       18459
+      ],
+      "client_desc": "Increases the critical strike chance of your Fire Blast, Ice Lance, Arcane Blast, and Scorch spells by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "accelerant.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "accelerant.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11069
+      ],
+      "client_desc": "Reduces the casting time of your Fireball, Frostfire Bolt, and Arcane Wrath spells by $/1000;S1 sec."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11069
+      ],
+      "client_desc": "Reduces the casting time of your Fireball, Frostfire Bolt, and Arcane Wrath spells by $/1000;S1 sec."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "ignite.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "ignite.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11119
+      ],
+      "client_desc": "Your critical strikes from Fire damage spells cause the target to burn for an additional $m1% of your spell's damage over $412538d."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11119
+      ],
+      "client_desc": "Your critical strikes from Fire damage spells cause the target to burn for an additional $m1% of your spell's damage over $412538d."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "flameThrowing.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "flameThrowing.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11100
+      ],
+      "client_desc": "Increases the range of your Fire spells by $s1 yards."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11100
+      ],
+      "client_desc": "Increases the range of your Fire spells by $s1 yards."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "impact.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "impact.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11103
+      ],
+      "client_desc": "Gives your Fire spells a $m1% chance to stun the target for $12355d."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11103
+      ],
+      "client_desc": "Gives your Fire spells a $m1% chance to stun the target for $12355d."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "burningSoul.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "burningSoul.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11083
+      ],
+      "client_desc": "Gives your Fire spells a $s1% chance to not lose casting time when you take damage and reduces the threat caused by your Fire spells by $s2%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11083
+      ],
+      "client_desc": "Gives your Fire spells a $s1% chance to not lose casting time when you take damage and reduces the threat caused by your Fire spells by $s2%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFlamestrike.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFlamestrike.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11108
+      ],
+      "client_desc": "Increases the critical strike chance of your Flamestrike spell by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11108
+      ],
+      "client_desc": "Increases the critical strike chance of your Flamestrike spell by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "pyroblast.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "pyroblast.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11366
+      ],
+      "client_desc": "Hurls an immense fiery boulder that causes $s1 Fire damage and an additional $o2 Fire damage over $d."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11366
+      ],
+      "client_desc": "Hurls an immense fiery boulder that causes $s1 Fire damage and an additional $o2 Fire damage over $d."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "wakeOfFire.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "wakeOfFire.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards.",
+      "client_key": "improvedFireBlast"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedScorch.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedScorch.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11095
+      ],
+      "client_desc": "Your Scorch spell has a $m1% chance to cause your target to be vulnerable to Fire damage. This vulnerability increases all Fire damage you deal to your target by $22959s1% and lasts $22959d, stacking up to $22959u times."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11095
+      ],
+      "client_desc": "Your Scorch spell has a $m1% chance to cause your target to be vulnerable to Fire damage. This vulnerability increases all Fire damage you deal to your target by $22959s1% and lasts $22959d, stacking up to $22959u times."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFireWard.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFireWard.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11094
+      ],
+      "client_desc": "Causes your Fire Ward to have a $s1% chance to reflect Fire spells while active."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11094
+      ],
+      "client_desc": "Causes your Fire Ward to have a $s1% chance to reflect Fire spells while active."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "hotStreak.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "hotStreak.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage.",
+      "client_key": "heatingUp"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "masterOfElements.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "masterOfElements.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       29074
+      ],
+      "client_desc": "Your Fire and Frost critical strikes will refund $s1% of their base mana cost."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       29074
+      ],
+      "client_desc": "Your Fire and Frost critical strikes will refund $s1% of their base mana cost."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "criticalMass.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "criticalMass.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11115
+      ],
+      "client_desc": "Increases the critical strike chance of your Fire spells by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11115
+      ],
+      "client_desc": "Increases the critical strike chance of your Fire spells by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "blastWave.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "blastWave.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11113
+      ],
+      "client_desc": "A wave of flame radiates outward from the caster, damaging all enemies caught within the blast for $s1 Fire damage, and Dazing them for $s2% reduced movement speed for $d."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11113
+      ],
+      "client_desc": "A wave of flame radiates outward from the caster, damaging all enemies caught within the blast for $s1 Fire damage, and Dazing them for $s2% reduced movement speed for $d."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "firePower.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "firePower.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11124
+      ],
+      "client_desc": "Increases the damage done by your Fire spells by $s1% per your Fire effects on the target, up to a maximum increase of ${$s1*4}%. Effects which mix multiple schools of magic do not qualify."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11124
+      ],
+      "client_desc": "Increases the damage done by your Fire spells by $s1% per your Fire effects on the target, up to a maximum increase of ${$s1*4}%. Effects which mix multiple schools of magic do not qualify."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "combustion.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "combustion.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11129
+      ],
+      "client_desc": "When activated, this spell causes each of your Fire damage spell hits to increase your critical strike chance with Fire damage spells by $28682s1%.  This effect lasts until you have caused $n non-periodic critical strikes with Fire spells."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11129
+      ],
+      "client_desc": "When activated, this spell causes each of your Fire damage spell hits to increase your critical strike chance with Fire damage spells by $28682s1%.  This effect lasts until you have caused $n non-periodic critical strikes with Fire spells."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "frostWarding.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "frostWarding.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11189
+      ],
+      "client_desc": "Increases the Armor and resistances granted by your Frost Armor and Ice Armor spells by $s1%, gives your Frost Ward a $s2% chance to negate the warded damage spell, and increases the amount absorbed by your Ice Barrier and Frost Ward by $s3%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11189
+      ],
+      "client_desc": "Increases the Armor and resistances granted by your Frost Armor and Ice Armor spells by $s1%, gives your Frost Ward a $s2% chance to negate the warded damage spell, and increases the amount absorbed by your Ice Barrier and Frost Ward by $s3%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFrostbolt.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFrostbolt.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11070
+      ],
+      "client_desc": "Reduces the casting time of your Frostbolt spell by $/1000;S1 sec."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11070
+      ],
+      "client_desc": "Reduces the casting time of your Frostbolt spell by $/1000;S1 sec."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "precision.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "precision.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       29438
+      ],
+      "client_desc": "Improves your chance to hit with all spells by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       29438
+      ],
+      "client_desc": "Improves your chance to hit with all spells by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceShards.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceShards.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11207
+      ],
+      "client_desc": "Increases the critical strike damage bonus of your Frost spells by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11207
+      ],
+      "client_desc": "Increases the critical strike damage bonus of your Frost spells by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "frostbite.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "frostbite.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11071
+      ],
+      "client_desc": "Gives your Chill effects a $s1% chance to Freeze the target for $12494d."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11071
+      ],
+      "client_desc": "Gives your Chill effects a $s1% chance to Freeze the target for $12494d."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFrostNova.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedFrostNova.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11165
+      ],
+      "client_desc": "Reduces the cooldown of your Frost Nova spell by $/1000;s1 sec."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11165
+      ],
+      "client_desc": "Reduces the cooldown of your Frost Nova spell by $/1000;s1 sec."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "permafrost.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "permafrost.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11175
+      ],
+      "client_desc": "Increases the duration of your Chill effects by $s1% and reduces the target's speed by an additional $s2%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11175
+      ],
+      "client_desc": "Increases the duration of your Chill effects by $s1% and reduces the target's speed by an additional $s2%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "frostChanneling.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "frostChanneling.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11160
+      ],
+      "client_desc": "Reduces the mana cost of your Frost spells by $s1% and reduces the threat caused by your Frost spells by $s2%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11160
+      ],
+      "client_desc": "Reduces the mana cost of your Frost spells by $s1% and reduces the threat caused by your Frost spells by $s2%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedBlizzard.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedBlizzard.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11185
+      ],
+      "client_desc": "Adds a Chill effect to your Blizzard spell. This effect lowers the target's movement speed by $m1% for $12484d."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11185
+      ],
+      "client_desc": "Adds a Chill effect to your Blizzard spell. This effect lowers the target's movement speed by $m1% for $12484d."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceLance.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceLance.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       1312002
+      ],
+      "client_desc": "Deals $s1 Frost damage to an enemy target. Deals $s2% increased damage to Frozen targets."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       1312002
+      ],
+      "client_desc": "Deals $s1 Frost damage to an enemy target. Deals $s2% increased damage to Frozen targets."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcticReach.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "arcticReach.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       16757
+      ],
+      "client_desc": "Increases the range of your Frostbolt, Ice Lance, and Blizzard spells and the radius of your Frost Nova and Cone of Cold spells by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       16757
+      ],
+      "client_desc": "Increases the range of your Frostbolt, Ice Lance, and Blizzard spells and the radius of your Frost Nova and Cone of Cold spells by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceBlock.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceBlock.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11958
+      ],
+      "client_desc": "You become encased in a block of ice, protecting you from all physical attacks and spells for $d, but during that time you cannot attack, move, or cast spells."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11958
+      ],
+      "client_desc": "You become encased in a block of ice, protecting you from all physical attacks and spells for $d, but during that time you cannot attack, move, or cast spells."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "shatter.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "shatter.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11170
+      ],
+      "client_desc": "Increases the critical strike chance of all your spells against Frozen targets by $m1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11170
+      ],
+      "client_desc": "Increases the critical strike chance of all your spells against Frozen targets by $m1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedConeOfCold.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "improvedConeOfCold.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11190
+      ],
+      "client_desc": "Increases the damage dealt by your Cone of Cold spell by $s1%."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11190
+      ],
+      "client_desc": "Increases the damage dealt by your Cone of Cold spell by $s1%."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "coldSnap.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "coldSnap.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       12472
+      ],
+      "client_desc": "Finishes the remaining cooldown on all your other Frost spells."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       12472
+      ],
+      "client_desc": "Finishes the remaining cooldown on all your other Frost spells."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "fingersOfFrost.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "fingersOfFrost.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       400647
+      ],
+      "client_desc": "Gives your Chill effects a $s2% chance to grant you the Fingers of Frost effect, which treats your next $m1 $lspell:spells; cast as if the target were Frozen. Lasts $400669d."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       400647
+      ],
+      "client_desc": "Gives your Chill effects a $s2% chance to grant you the Fingers of Frost effect, which treats your next $m1 $lspell:spells; cast as if the target were Frozen. Lasts $400669d."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "wintersChill.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "wintersChill.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11180
+      ],
+      "client_desc": "Gives your Frostbolt and Fingers of Frost empowered Ice Lance spells a $m2% chance to apply Winter's Chill, increasing the target's damage taken from your next Cone of Cold by $12579s1% and it gains an additional $s3% of your spell damage, stacking up to $s1 times."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11180
+      ],
+      "client_desc": "Gives your Frostbolt and Fingers of Frost empowered Ice Lance spells a $m2% chance to apply Winter's Chill, increasing the target's damage taken from your next Cone of Cold by $12579s1% and it gains an additional $s3% of your spell damage, stacking up to $s1 times."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceBarrier.certainty",
+     "before": "FC-70888",
+     "after": "FC-70938",
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "certainty"
+    },
+    {
+     "file": "talents.json",
+     "path": "iceBarrier.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-12",
+      "client_spell_ids": [
+       11426
+      ],
+      "client_desc": "Shield yourself, absorbing ${$s1+($SPFR*0.1)*($11189s3/100+1)} damage and increasing your Frost damage by $1326891s1% for $d. While shielded, your Frost damage is increased by an additional $s2% and you do not lose casting time when you take damage."
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-11-13",
+      "client_spell_ids": [
+       11426
+      ],
+      "client_desc": "Shield yourself, absorbing ${$s1+($SPFR*0.1)*($11189s3/100+1)} damage and increasing your Frost damage by $1326891s1% for $d. While shielded, your Frost damage is increased by an additional $s2% and you do not lose casting time when you take damage."
+     },
+     "source": "client 1.60.1.70938, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "frostbolt.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       116,
+       205,
+       837,
+       7322,
+       8406,
+       8407,
+       8408,
+       10179,
+       10180,
+       10181,
+       25304
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       116,
+       205,
+       837,
+       7322,
+       8406,
+       8407,
+       8408,
+       10179,
+       10180,
+       10181,
+       25304
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "fireball.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       133,
+       143,
+       145,
+       3140,
+       8400,
+       8401,
+       8402,
+       10148,
+       10149,
+       10150,
+       10151,
+       25306
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       133,
+       143,
+       145,
+       3140,
+       8400,
+       8401,
+       8402,
+       10148,
+       10149,
+       10150,
+       10151,
+       25306
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "fire_blast.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       2136,
+       2137,
+       2138,
+       8412,
+       8413,
+       10197,
+       10199
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       2136,
+       2137,
+       2138,
+       8412,
+       8413,
+       10197,
+       10199
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "scorch.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       2948,
+       8444,
+       8445,
+       8446,
+       10205,
+       10206,
+       10207
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       2948,
+       8444,
+       8445,
+       8446,
+       10205,
+       10206,
+       10207
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "pyroblast.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       11366,
+       12505,
+       12522,
+       12523,
+       12524,
+       12525,
+       12526,
+       18809
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       11366,
+       12505,
+       12522,
+       12523,
+       12524,
+       12525,
+       12526,
+       18809
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "frostfire_bolt.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       401502,
+       1237312,
+       1237313
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       401502,
+       1237312,
+       1237313
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "ice_lance.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       1312002,
+       400640,
+       1240044,
+       1240045,
+       1240046,
+       1240047
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       1312002,
+       400640,
+       1240044,
+       1240045,
+       1240046,
+       1240047
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "arcane_blast.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       400574,
+       1239696,
+       1239697,
+       1239699,
+       1239700
+      ],
+      "mana": "SpellPower.ManaCost",
+      "mana_pct_base": "SpellPower.PowerCostPct"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       400574,
+       1239696,
+       1239697,
+       1239699,
+       1239700
+      ],
+      "mana": "SpellPower.ManaCost",
+      "mana_pct_base": "SpellPower.PowerCostPct"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "arcane_missiles.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       5143,
+       5144,
+       5145,
+       8416,
+       8417,
+       10211,
+       10212,
+       25345
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       5143,
+       5144,
+       5145,
+       8416,
+       8417,
+       10211,
+       10212,
+       25345
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "frost_nova.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       122,
+       865,
+       6131,
+       10230
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       122,
+       865,
+       6131,
+       10230
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "cone_of_cold.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       120,
+       8492,
+       10159,
+       10160,
+       10161
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       120,
+       8492,
+       10159,
+       10160,
+       10161
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "arcane_explosion.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       1449,
+       8437,
+       8438,
+       8439,
+       10201,
+       10202
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       1449,
+       8437,
+       8438,
+       8439,
+       10201,
+       10202
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "blizzard.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       10,
+       6141,
+       8427,
+       10185,
+       10186,
+       10187
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       10,
+       6141,
+       8427,
+       10185,
+       10186,
+       10187
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "flamestrike.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       2120,
+       2121,
+       8422,
+       8423,
+       10215,
+       10216
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       2120,
+       2121,
+       8422,
+       8423,
+       10215,
+       10216
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "blast_wave.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       11113,
+       13018,
+       13019,
+       13020,
+       13021
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       11113,
+       13018,
+       13019,
+       13020,
+       13021
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spells.json",
+     "path": "arcane_wrath.source",
+     "before": {
+      "build": "1.60.1.70888",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-12",
+      "rank_spell_ids": [
+       1326079,
+       1326080,
+       1326081,
+       1326082
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "after": {
+      "build": "1.60.1.70938",
+      "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+      "read_at": "2026-11-13",
+      "rank_spell_ids": [
+       1326079,
+       1326080,
+       1326081,
+       1326082
+      ],
+      "mana": "SpellPower.ManaCost"
+     },
+     "source": "client 1.60.1.70938, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 30,
+     "source": "observation",
+     "certainty": "certain",
+     "carried": true,
+     "carried_from": "révision 14",
+     "date": "2026-10-02",
+     "revision": 1
+    }
+   },
+   "hotfixes": [
+    112414,
+    112623,
+    112624,
+    112635,
+    112640,
+    112641,
+    112686,
+    112687,
+    112694,
+    112695,
+    112707,
+    112709,
+    112713,
+    112720,
+    112724,
+    112726,
+    112727,
+    112740,
+    112741,
+    112742,
+    112753,
+    112758,
+    112765,
+    112766,
+    112770,
+    112771,
+    112775,
+    112791,
+    112819,
+    112831,
+    112833,
+    112838,
+    112839,
+    112840,
+    112843,
+    112844,
+    112845,
+    112852,
+    112858,
+    112863,
+    112864,
+    112875,
+    112878,
+    112887,
+    112890,
+    112900,
+    112901,
+    112918,
+    112919,
+    112920,
+    112922,
+    112934,
+    112935,
+    112947,
+    112948,
+    112949,
+    112952,
+    112953,
+    112957,
+    112961,
+    112964,
+    112965,
+    112976,
+    112980,
+    112985,
+    112992,
+    112994,
+    112996,
+    113000,
+    113004,
+    113005,
+    113007,
+    113008,
+    113011,
+    113015,
+    113016,
+    113020,
+    113027,
+    113030,
+    113038,
+    113040,
+    113042,
+    113043,
+    113044,
+    113046,
+    113051,
+    113061,
+    113069,
+    113070,
+    113081,
+    113082,
+    113085,
+    113088,
+    113091,
+    113092,
+    113093,
+    113096,
+    113099,
+    113106,
+    113108,
+    113121,
+    113124,
+    113127,
+    113131,
+    113134,
+    113136,
+    113139,
+    113141,
+    113149,
+    113150,
+    113156,
+    113161,
+    113162,
+    113163,
+    113164,
+    113170,
+    113185,
+    113186,
+    113187,
+    113191,
+    113194,
+    113200,
+    113201,
+    113202,
+    113205,
+    113209,
+    113213,
+    113214,
+    113217,
+    113221,
+    113223,
+    113224,
+    113257,
+    113269,
+    113270,
+    113271,
+    113272,
+    113273,
+    113276,
+    113277,
+    113278,
+    113279,
+    113280,
+    113282,
+    113283,
+    113284,
+    113285,
+    113292,
+    113293,
+    113311,
+    113320,
+    113323,
+    113325,
+    113326,
+    113329,
+    113330,
+    113335,
+    113336,
+    113340,
+    113341,
+    113343,
+    113344,
+    113348,
+    113349,
+    113350,
+    113351,
+    113365,
+    113367,
+    113368,
+    113375,
+    113380,
+    113382,
+    113388,
+    113392,
+    113396,
+    113403,
+    113413,
+    113414,
+    113428,
+    113440,
+    113443,
+    113448,
+    113449,
+    113450,
+    113455,
+    113463,
+    113465,
+    113481,
+    113483,
+    113486,
+    113492,
+    113496,
+    113498,
+    113500,
+    113503,
+    113527,
+    113530,
+    113531,
+    113534,
+    113537,
+    113538,
+    113539,
+    113542,
+    113548,
+    113557,
+    113570,
+    113571,
+    113574,
+    113596,
+    113601,
+    113611,
+    113623,
+    113643,
+    113649,
+    113650,
+    113654,
+    113658,
+    113659,
+    113664,
+    113669,
+    113670,
+    113672,
+    113676,
+    113684,
+    113687,
+    113695,
+    113696,
+    113698,
+    113702,
+    113704,
+    113707,
+    113710,
+    113718,
+    113722,
+    113726,
+    113732,
+    113738,
+    113747,
+    113750,
+    113758,
+    113766,
+    113769,
+    113770,
+    113772,
+    113774,
+    113776,
+    113777,
+    113778,
+    113780,
+    113785,
+    113789,
+    113791,
+    113792,
+    113794,
+    113796,
+    113797,
+    113804,
+    113805,
+    113810,
+    113811,
+    113814,
+    113817,
+    113820,
+    113823,
+    113825,
+    113826,
+    113828,
+    113833,
+    113837,
+    113844,
+    113845,
+    113846,
+    113853,
+    113854,
+    113860,
+    113862,
+    113863,
+    113864,
+    113885,
+    113886,
+    113887,
+    113888,
+    113891,
+    113892,
+    113907,
+    113908,
+    113910,
+    113922,
+    113931,
+    113940,
+    113944,
+    113954,
+    113955,
+    113956,
+    113958,
+    113959,
+    113970,
+    113980,
+    113991,
+    113994,
+    113995,
+    114002,
+    114008,
+    114010,
+    114015,
+    114021,
+    114024,
+    114026,
+    114036,
+    114052,
+    114056,
+    114060
+   ],
+   "renamed_in_classes": [
+    {
+     "class": "Mage",
+     "client_key": "improvedFireBlast",
+     "key": "wakeOfFire"
+    },
+    {
+     "class": "Mage",
+     "client_key": "heatingUp",
+     "key": "hotStreak"
+    },
+    {
+     "class": "Warrior",
+     "client_key": "improvedWhirlwind",
+     "key": "ragingBlows"
+    },
+    {
+     "class": "Paladin",
+     "client_key": "unsealedWrath",
+     "key": "twistOfLight"
+    },
+    {
+     "class": "Rogue",
+     "client_key": "coupDeGrace",
+     "key": "improvedEviscerate"
+    },
+    {
+     "class": "Rogue",
+     "client_key": "efficientStrikes",
+     "key": "improvedSinisterStrike"
+    },
+    {
+     "class": "Rogue",
+     "client_key": "quickGetaway",
+     "key": "quietus"
+    },
+    {
+     "class": "Shaman",
+     "client_key": "trialByFire",
+     "key": "improvedFireNova"
+    },
+    {
+     "class": "Shaman",
+     "client_key": "lightningMastery",
+     "key": "elementalMastery"
+    },
+    {
+     "class": "Mage",
+     "client_key": "accelerant",
+     "key": "improvedFireball"
+    },
+    {
+     "class": "Mage",
+     "client_key": "precision",
+     "key": "elementalPrecision"
+    },
+    {
+     "class": "Druid",
+     "client_key": "naturalInstinct",
+     "key": "predatoryInstincts"
+    }
+   ],
+   "automated": true,
+   "rule": {
+    "clauses": {
+     "verify": true,
+     "install": true,
+     "manual": true,
+     "inputs": true,
+     "hotfixes": true
+    },
+    "carry": {
+     "gardé": 174,
+     "réappliqué": 0,
+     "remplacé": 0,
+     "perdu": 0
+    },
+    "inputs": {
+     "mage_leveling": true,
+     "pvp_dr": false
+    }
+   }
+  }
+ ]
+}

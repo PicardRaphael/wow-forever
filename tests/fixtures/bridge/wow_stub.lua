@@ -526,3 +526,26 @@ GetLootSourceInfo = api("GetLootSourceInfo", function(slot)
 	local l = Stub.loot[slot]
 	if l and l.sources then return unpack(l.sources) end
 end)
+
+-- Grimoire du familier (C_SpellBook, banque Enum.SpellBookSpellBank.Pet) et liste des familiers du jeu
+-- (C_StableInfo.GetActivePetList). Stub.pet_spells = { { name, subName, spellID, iconID } } ;
+-- Stub.stable = { { name, level, familyName, creatureID, petNumber, slotID, loyaltyName, abilities = { … } } }.
+-- Valeurs synthétiques posées par les tests, aucune règle de jeu.
+Stub.pet_spells = {}
+Stub.stable = {}
+Enum = Enum or {}
+Enum.SpellBookSpellBank = { Player = 0, Pet = 1 }
+C_SpellBook = {
+	HasPetSpells = api("C_SpellBook.HasPetSpells", function()
+		local n = #Stub.pet_spells
+		if n > 0 then return n, "PET" end
+		return nil
+	end),
+	GetSpellBookItemInfo = api("C_SpellBook.GetSpellBookItemInfo", function(index, bank)
+		if bank ~= Enum.SpellBookSpellBank.Pet then return nil end
+		return Stub.pet_spells[index]
+	end),
+}
+C_StableInfo = {
+	GetActivePetList = api("C_StableInfo.GetActivePetList", function() return Stub.stable end),
+}

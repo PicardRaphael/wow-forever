@@ -160,6 +160,9 @@ class PetSnapshot(NamedTuple):
     level: int | None  # niveau du Chasseur
     pet: dict[str, Any]  # famille, niveau, PV maximaux, armure, vitesse, puissance d'attaque, loyauté, régime…
     hunter: dict[str, Any]  # Endurance, armure, puissance d'attaque (mêlée, distance), critique
+    spells: list[dict[str, Any]] = []  # noqa: RUF012 : grimoire du familier (nom, texte du rang, sort, icône)
+    stable: list[dict[str, Any]] = []  # noqa: RUF012 : familiers actifs listés par le jeu (loyauté, capacités)
+    unavailable: dict[str, str] = {}  # noqa: RUF012 : API du familier « absente » ou « vide »
 
 
 class TrainingWindow(NamedTuple):
@@ -229,6 +232,7 @@ class Character(NamedTuple):
 class LoggerDB(NamedTuple):
     schema: int | None
     characters: dict[str, Character]
+    unknown_events: list[str] = []  # noqa: RUF012 : abonnements refusés par le client
 
     def level_at(self, guid: str, when: datetime) -> int | None:
         """Niveau du dernier instantané de ce personnage pris avant `when` (heure locale) ; None sinon."""
@@ -505,6 +509,9 @@ def read_logger_db(path: Path) -> LoggerDB:
                 level=_opt_int(s.get("level")),
                 pet=_state(s.get("pet")),
                 hunter=_state(s.get("hunter")),
+                spells=[_table(r) for r in _list(s.get("spells")) if isinstance(r, dict)],
+                stable=[_table(r) for r in _list(s.get("stable")) if isinstance(r, dict)],
+                unavailable={str(k): v for k, v in _table(s.get("unavailable")).items() if isinstance(v, str)},
             )
             for s in _list(c.get("pet_snapshots"))
             if isinstance(s, dict)
@@ -538,4 +545,5 @@ def read_logger_db(path: Path) -> LoggerDB:
             [_run(r) for r in _list(c.get("runs")) if isinstance(r, dict)],
             [_loot(x) for x in _list(c.get("loot")) if isinstance(x, dict)],
         )
-    return LoggerDB(_opt_int(raw.get("schema")), characters)
+    unknown = [e for e in _list(raw.get("unknown_events")) if isinstance(e, str)]
+    return LoggerDB(_opt_int(raw.get("schema")), characters, unknown)

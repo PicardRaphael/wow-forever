@@ -36,7 +36,17 @@
      "mechanic_name": "fleeing"
     }
    ],
-   "certainty": "FC-1.60.1.70888"
+   "certainty": "FC-1.60.1.70888",
+   "hotfix": {
+    "pushes": [
+     114010
+    ],
+    "rows": [
+     "Item 10418"
+    ],
+    "first_logged_at": null,
+    "dbcache_date": "2026-11-12T08:18:31Z"
+   }
   },
   {
    "item_id": 18637,

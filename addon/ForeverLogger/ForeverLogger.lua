@@ -16,6 +16,9 @@
 -- SIM2 (0.8.0) : attributs du personnage (les quatre retours de UnitStat : valeur, effectif, bonus, malus) dans
 -- chaque instantané, et gains de la montée de niveau transmis par PLAYER_LEVEL_UP (gains) : statistiques de base
 -- par niveau pour les simulateurs, calculées hors du jeu.
+-- Familier complet (0.8.0, sans changement de schéma) : grimoire du familier (C_SpellBook), familiers listés par le
+-- jeu (C_StableInfo : loyauté, capacités), API du familier absentes ou muettes (unavailable) ; abonnements refusés
+-- par le client (unknown_events).
 --
 -- Règles (docs/ADDON.md) :
 -- * ForeverLoggerDB est initialisée dans ADDON_LOADED, jamais d'alias local au niveau du fichier ;
@@ -583,6 +586,105 @@ local function hunterState()
   }
 end
 
+-- Valeur simple d'une table de l'API (texte, nombre, booléen), nil si secrète.
+local function plain(value)
+  local kind = type(value)
+  if (kind == "string" or kind == "number" or kind == "boolean") and not isSecret(value) then
+    return value
+  end
+  return nil
+end
+
+-- Grimoire du familier (banque du familier de C_SpellBook) : nom, texte du rang, sort, icône ; nil sans grimoire.
+local function petSpells()
+  local book = C_SpellBook
+  local bank = type(Enum) == "table" and type(Enum.SpellBookSpellBank) == "table" and Enum.SpellBookSpellBank.Pet
+  if type(book) ~= "table" or bank == nil or type(book.GetSpellBookItemInfo) ~= "function" then
+    return nil
+  end
+  local count = safe(book.HasPetSpells)
+  if type(count) ~= "number" or count <= 0 then
+    return nil
+  end
+  local rows = {}
+  for index = 1, count do
+    local ok, info = pcall(book.GetSpellBookItemInfo, index, bank)
+    if ok and type(info) == "table" and not isSecret(info) then
+      local sub = plain(info.subName)
+      table.insert(rows, {
+        name = plain(info.name),
+        sub = sub ~= "" and sub or nil,
+        spell_id = plain(info.spellID) or plain(info.actionID),
+        icon = plain(info.iconID),
+      })
+    end
+  end
+  return rows
+end
+
+-- Familiers actifs listés par le jeu (C_StableInfo) : champs simples (loyauté, créature…) et capacités.
+local function stablePets()
+  local stable = C_StableInfo
+  if type(stable) ~= "table" then
+    return nil
+  end
+  local list = safe(stable.GetActivePetList)
+  if type(list) ~= "table" then
+    return nil
+  end
+  local rows = {}
+  for _, pet in ipairs(list) do
+    if type(pet) == "table" and not isSecret(pet) then
+      local row = {}
+      for key, value in pairs(pet) do
+        if type(key) == "string" then
+          if key == "abilities" and type(value) == "table" and not isSecret(value) then
+            row.abilities = {}
+            for _, spell in ipairs(value) do
+              table.insert(row.abilities, plain(spell))
+            end
+          else
+            row[key] = plain(value)
+          end
+        end
+      end
+      table.insert(rows, row)
+    end
+  end
+  return rows
+end
+
+-- API du familier absentes du client (« absente ») ou présentes sans rien rendre (« vide ») : nil si toutes répondent.
+local PET_FUNCTIONS = { "GetPetLoyalty", "GetPetHappiness", "GetPetTrainingPoints", "GetPetFoodTypes", "GetNumCrafts" }
+local PET_FIELDS = {
+  GetPetLoyalty = "loyalty",
+  GetPetHappiness = "happiness",
+  GetPetTrainingPoints = "training_points",
+  GetPetFoodTypes = "diet",
+}
+
+local function unavailablePetApis(pet, spells, stable)
+  local out = {}
+  for _, name in ipairs(PET_FUNCTIONS) do
+    local field = PET_FIELDS[name]
+    local value = field and pet[field]
+    if type(_G[name]) ~= "function" then
+      out[name] = "absente"
+    elseif field and (value == nil or (type(value) == "table" and next(value) == nil)) then
+      out[name] = "vide"
+    end
+  end
+  for _, pair in ipairs({ { "C_SpellBook", spells }, { "C_StableInfo", stable } }) do
+    local name, rows = pair[1], pair[2]
+    if type(_G[name]) ~= "table" then
+      out[name] = "absente"
+    elseif rows == nil or #rows == 0 then
+      out[name] = "vide"
+    end
+  end
+  return next(out) and out or nil
+end
+
 local function snapshotPet(reason)
   if safe(InCombatLockdown) then
     pendingPet = true -- repris à la sortie du combat (PLAYER_REGEN_ENABLED)
@@ -596,12 +698,18 @@ local function snapshotPet(reason)
   if not entry then
     return
   end
+  local pet = petState()
+  local spells = petSpells()
+  local stable = stablePets()
   entry.pet_snapshots = entry.pet_snapshots or {}
   push(entry.pet_snapshots, stamp({
     reason = reason,
     level = safe(UnitLevel, "player"),
-    pet = petState(),
+    pet = pet,
     hunter = hunterState(),
+    spells = spells,
+    stable = stable,
+    unavailable = unavailablePetApis(pet, spells, stable),
   }))
 end
 
@@ -647,6 +755,7 @@ local function enableCombatLog()
 end
 
 local handlers = {}
+local refusedEvents = {} -- abonnements refusés par le client (événement inconnu), recopiés au chargement
 
 function handlers.ADDON_LOADED(name)
   if name ~= ADDON_NAME then
@@ -656,6 +765,11 @@ function handlers.ADDON_LOADED(name)
   ForeverLoggerDB = ForeverLoggerDB or {}
   ForeverLoggerDB.schema = SCHEMA
   ForeverLoggerDB.characters = ForeverLoggerDB.characters or {}
+  local refused = {}
+  for _, event in ipairs(refusedEvents) do
+    table.insert(refused, event)
+  end
+  ForeverLoggerDB.unknown_events = refused
 end
 
 function handlers.PLAYER_LOGIN()
@@ -905,5 +1019,7 @@ end
 
 -- Un événement inconnu du client lève une erreur : chaque abonnement est protégé.
 for event in pairs(handlers) do
-  pcall(frame.RegisterEvent, frame, event)
+  if not pcall(frame.RegisterEvent, frame, event) then
+    table.insert(refusedEvents, event)
+  end
 end

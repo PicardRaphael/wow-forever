@@ -3714,6 +3714,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "476": {
+   "type": 2,
+   "level": 6,
+   "min_level": 4,
+   "sort_id": 141,
+   "next_quest": 483,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 125,
+   "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
   "477": {
    "type": 2,
    "level": 14,
@@ -3772,6 +3784,18 @@
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "483": {
+   "type": 2,
+   "level": 9,
+   "min_level": 4,
+   "sort_id": 141,
+   "next_quest": 486,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 300,
+   "money_difficulty": 5,
    "money_multiplier": 1.0
   },
   "484": {
@@ -11790,6 +11814,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "97938": {
+   "type": 2,
+   "level": 6,
+   "min_level": 4,
+   "sort_id": -666,
+   "next_quest": 0,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "97940": {
    "type": 2,
    "level": 6,
@@ -11803,6 +11839,18 @@
    "money_multiplier": 1.0
   },
   "97942": {
+   "type": 2,
+   "level": 6,
+   "min_level": 4,
+   "sort_id": -666,
+   "next_quest": 0,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "97948": {
    "type": 2,
    "level": 6,
    "min_level": 4,
@@ -12270,6 +12318,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "98403": {
+   "type": 2,
+   "level": 12,
+   "min_level": 4,
+   "sort_id": 141,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "98407": {
    "type": 2,
    "level": 17,
@@ -12376,6 +12436,18 @@
    "xp_multiplier": 1.95,
    "money": 6000,
    "money_difficulty": 6,
+   "money_multiplier": 1.0
+  },
+  "99046": {
+   "type": 2,
+   "level": 9,
+   "min_level": 4,
+   "sort_id": 141,
+   "next_quest": 99047,
+   "xp_difficulty": 1,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "99048": {
@@ -12502,8 +12574,8 @@
  "questcache": {
   "build": 70888,
   "locale": "frFR",
-  "records": 208,
-  "kept_from_base": 910
+  "records": 91,
+  "kept_from_base": 945
  },
  "notes": [
   "quest_xp : XP d'une quête par niveau de quête (clé) et par difficulté (colonne), table QuestXP du client",
