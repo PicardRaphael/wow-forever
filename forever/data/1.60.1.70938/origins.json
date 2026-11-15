@@ -1565,13 +1565,13 @@
         "/classes/Priest/spells/holyFire"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 112833",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 112833",
       "certainty": "certain",
       "pushes": [
         112833
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1583,13 +1583,13 @@
         "/classes/Paladin/trees/1/talents/13"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113139",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113139",
       "certainty": "certain",
       "pushes": [
         113139
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1598,13 +1598,13 @@
         "/classes/Shaman/trees/2/talents/15"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113282",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113282",
       "certainty": "certain",
       "pushes": [
         113282
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1616,13 +1616,13 @@
         "/classes/Shaman/spells/lightningBolt"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113380",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113380",
       "certainty": "certain",
       "pushes": [
         113380
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1631,13 +1631,13 @@
         "/classes/Druid/spells/starfire"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113403",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113403",
       "certainty": "certain",
       "pushes": [
         113403
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1646,13 +1646,14 @@
         "/classes/Druid/trees/2/talents/15"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113718",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113718, 114075",
       "certainty": "certain",
       "pushes": [
-        113718
+        113718,
+        114075
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1663,13 +1664,13 @@
         "/classes/Shaman/trees/1/talents/4"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113722",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113722",
       "certainty": "certain",
       "pushes": [
         113722
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1678,13 +1679,13 @@
         "/classes/Warlock/trees/0/talents/16"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113766",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 113766",
       "certainty": "certain",
       "pushes": [
         113766
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     },
     {
       "file": "classes.json",
@@ -1692,13 +1693,13 @@
         "/classes/Warrior/spells/berserkerRage"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70938, frFR, sha256 739bf76b6734…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 114052",
+      "source": "DBCache.bin du client (build 70938, frFR, sha256 f571a62b7e5c…), dispositions WoWDBDefs fe771f93091b ; poussée(s) 114052",
       "certainty": "certain",
       "pushes": [
         114052
       ],
       "seen_at": null,
-      "dbcache_date": "2026-11-13T18:43:24Z"
+      "dbcache_date": "2026-11-15T09:10:48Z"
     }
   ],
   "pending": [],
