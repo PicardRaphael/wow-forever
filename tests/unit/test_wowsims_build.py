@@ -95,3 +95,26 @@ def test_failed_build_keeps_the_previous_pin(tmp_path):
         update_wowsims(tmp_path, runner=Tools(tmp_path, commit=NEXT, fail=["go", "build"]))
     assert pinned(tmp_path) == first
     assert json.loads((tmp_path / "third_party" / "wowsims" / "pin.json").read_text(encoding="utf-8")) == first
+
+
+def test_old_binary_still_running_keeps_the_new_pin(tmp_path, monkeypatch):
+    """Cas réel du 2026-11-16 : une analyse en cours utilisait l'ancien binaire ; Windows refuse de le supprimer.
+    Le nouvel épinglage reste, l'ancien binaire est laissé (retiré à la mise à jour suivante)."""
+    from pathlib import Path
+
+    first = update_wowsims(tmp_path, runner=Tools(tmp_path))
+    old = tmp_path / "third_party" / "wowsims" / first["binary"]
+    real_unlink = Path.unlink
+
+    def busy(self, missing_ok=False):
+        if self == old:
+            raise PermissionError("[WinError 32] fichier utilisé par un autre processus")
+        return real_unlink(self, missing_ok=missing_ok)
+
+    monkeypatch.setattr(Path, "unlink", busy)
+    pin = update_wowsims(tmp_path, runner=Tools(tmp_path, commit=NEXT))
+    assert pin["commit"] == NEXT and pinned(tmp_path) == pin
+    assert old.is_file()
+    monkeypatch.setattr(Path, "unlink", real_unlink)
+    third = update_wowsims(tmp_path, runner=Tools(tmp_path, commit="c" * 40))
+    assert not old.is_file() and third["commit"] == "c" * 40
