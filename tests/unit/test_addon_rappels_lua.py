@@ -421,3 +421,20 @@ def test_saved_variable_rule_follows_the_toc_of_each_addon(tmp_path):
     (folder / "Autre.lua").write_text("local db = AutreDB\n", encoding="utf-8")
     errors = check_addon.check_addon(folder)
     assert any("alias local de AutreDB" in e for e in errors)
+
+
+# --- Après la revue : entrée en combat sur un client qui masque déjà les auras, son du familier -----------------
+
+
+def test_auras_hidden_while_combat_starts_raise_no_false_alarm():
+    game = Game(auras=(HAWK,), hidden_in_combat=True)
+    game.stub.combat = True
+    game.fire("PLAYER_REGEN_DISABLED")
+    assert not game.shown()
+
+
+def test_out_of_combat_reminder_plays_no_sound():
+    game = Game()
+    game.no_pet()
+    assert game.shown()
+    assert game.kits() == 0
