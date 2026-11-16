@@ -102,6 +102,10 @@ def equipment_from_picks(picks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     return {"items": items}
 
 
+# version de la règle des candidats d'équipement, dans la clé des analyses gardées (2 : objets sans niveau requis
+# jugés par leur source, 2026-11-16)
+CANDIDATES = "candidats-2"
+
 DATABASE = ("assets", "database")  # base d'objets de wowsims (db.json et leftover_db.json, chargées par son binaire)
 
 

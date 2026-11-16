@@ -26,10 +26,13 @@ def _version(deps: Deps) -> tuple[str, str]:
     pin = pinned(deps.cache_dir) or {}
     commit = str(pin.get("commit") or "sans-wowsims")[:12]
     patches = str((pin.get("patches") or {}).get("sha256") or "")[:8]
+    from forever.sims.brackets import CANDIDATES
     from forever.sims.leveling import MODEL
 
-    # modèle de l'objectif (SIM2 §10) dans la clé : une analyse faite au DPS seul est périmée, la veille la relance
-    return load_version(deps).game_version, f"{commit}-{patches}-{MODEL}" if patches else f"{commit}-{MODEL}"
+    # modèle de l'objectif (SIM2 §10) et règle des candidats d'équipement dans la clé : une analyse faite avec une
+    # autre règle est périmée, la veille la relance
+    model = f"{MODEL}-{CANDIDATES}"
+    return load_version(deps).game_version, f"{commit}-{patches}-{model}" if patches else f"{commit}-{model}"
 
 
 def analysis_path(deps: Deps, preset: str, race: str) -> Path:
