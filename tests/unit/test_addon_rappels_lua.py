@@ -46,6 +46,7 @@ function FakeW:SectionHeader(parent, text, y) return row("header", text) end
 function FakeW:Toggle(parent, text, y, get, set) return row("toggle", text, get, set) end
 function FakeW:Slider(parent, text, y, lo, hi, step, get, set) return row("slider", text, get, set, { lo, hi, step }) end
 function FakeW:Button(parent, text, y, onClick) return row("button", text, nil, onClick) end
+EllesmereUI.Widgets = FakeW
 """
 
 
