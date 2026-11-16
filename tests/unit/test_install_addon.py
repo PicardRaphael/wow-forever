@@ -128,3 +128,40 @@ def test_main_dry_run(tmp_path, capsys, monkeypatch):
     assert install_addon.main(["--wow-dir", str(wow), "--dry-run"]) == 0
     assert "[simulation]" in capsys.readouterr().out
     assert install_addon.main(["--wow-dir", str(tmp_path / "absent")]) == 2
+
+
+# --- RA1 : ForeverRappels, données générées à l'installation ---------------------------------------------------
+
+RAPPELS = REPO_ROOT / "addon" / "ForeverRappels"
+
+
+def test_rappels_install_writes_the_generated_data_over_the_placeholder(tmp_path):
+    wow = fake_wow(tmp_path, with_old=False)
+    generated = 'ForeverRappelsData = { game_version = "9.9.9.1", groups = {} }\n'
+    actions = install_addon.install(
+        RAPPELS, wow, dry_run=False, now=NOW, backup_dir=backups(tmp_path), extra={"RappelsData.lua": generated}
+    )
+    dest = wow / "Interface" / "AddOns" / "ForeverRappels"
+    assert (dest / "RappelsData.lua").read_text(encoding="utf-8") == generated
+    assert (dest / "ForeverRappels.lua").read_bytes() == (RAPPELS / "ForeverRappels.lua").read_bytes()
+    assert (RAPPELS / "RappelsData.lua").read_text(encoding="utf-8") != generated
+    assert any("RappelsData.lua" in a for a in actions)
+
+
+def test_rappels_dry_run_names_the_generated_file_and_writes_nothing(tmp_path):
+    wow = fake_wow(tmp_path, with_old=False)
+    actions = install_addon.install(
+        RAPPELS, wow, dry_run=True, now=NOW, backup_dir=backups(tmp_path), extra={"RappelsData.lua": "x"}
+    )
+    assert not (wow / "Interface" / "AddOns" / "ForeverRappels").exists()
+    assert any(a.startswith("[simulation]") and "RappelsData.lua" in a for a in actions)
+
+
+def test_main_installs_rappels_with_data_from_the_installed_version(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("FOREVER_CACHE_DIR", str(tmp_path / "cache"))
+    monkeypatch.setattr(install_addon, "rappels_data", lambda: "ForeverRappelsData = { groups = {} } -- généré\n")
+    wow = fake_wow(tmp_path, with_old=False)
+    assert install_addon.main(["--wow-dir", str(wow), "--addon", "ForeverRappels"]) == 0
+    data = wow / "Interface" / "AddOns" / "ForeverRappels" / "RappelsData.lua"
+    assert data.read_text(encoding="utf-8").endswith("-- généré\n")
+    assert not (wow / "Interface" / "AddOns" / "ForeverLogger").exists()
