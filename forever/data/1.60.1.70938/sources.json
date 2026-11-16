@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70938 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 6 (forever install, 2026-11-16)",
+      "source": "Client 1.60.1.70938 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 8 (forever install, 2026-11-16)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70938 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 6 (forever install, 2026-11-16)",
+      "source": "Client 1.60.1.70938 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 8 (forever install, 2026-11-16)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -252,7 +252,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 6 (forever install, 2026-11-16)"
+        "installé en révision 8 (forever install, 2026-11-16)"
       ]
     },
     "races.json": {
@@ -378,7 +378,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 6 (forever install, 2026-11-16)"
+        "installé en révision 8 (forever install, 2026-11-16)"
       ]
     },
     "xp_bonuses.json": {
@@ -406,7 +406,7 @@
       ]
     }
   },
-  "revision": 7,
+  "revision": 8,
   "revised_at": "2026-11-16",
   "hotfixes": {
     "dbcache": {
@@ -414,10 +414,10 @@
       "locale": "frFR",
       "format": 9,
       "build": 70938,
-      "size": 7766610,
-      "sha256": "f4bfb59b52715a474ce48b46e3df94379bd6797c8c07d183f5bc0fcf5c52d789",
-      "file_date": "2026-11-13T08:29:55Z",
-      "read_at": "2026-11-16T06:25:25Z"
+      "size": 8392495,
+      "sha256": "a5fe5ccec7a20fe7ce7641c3a731fd5a92ce3c4633b18b4d9675497df0039555",
+      "file_date": "2026-11-16T16:17:32Z",
+      "read_at": "2026-11-16T16:17:39Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -606,6 +606,7 @@
       113217,
       113221,
       113223,
+      113224,
       113257,
       113269,
       113270,
@@ -668,6 +669,7 @@
       113496,
       113498,
       113500,
+      113503,
       113527,
       113530,
       113531,
@@ -753,6 +755,7 @@
       113864,
       113885,
       113886,
+      113887,
       113888,
       113891,
       113892,
@@ -761,6 +764,7 @@
       113910,
       113922,
       113931,
+      113934,
       113940,
       113944,
       113954,
@@ -777,11 +781,30 @@
       114008,
       114010,
       114015,
+      114021,
+      114022,
       114024,
       114026,
-      114036
+      114030,
+      114036,
+      114052,
+      114056,
+      114060,
+      114061,
+      114062,
+      114063,
+      114064,
+      114065,
+      114068,
+      114073,
+      114075,
+      114078,
+      114082,
+      114089,
+      114091,
+      114102
     ],
-    "max_push": 114036,
+    "max_push": 114102,
     "seen_at": {
       "112414": null,
       "112623": null,
@@ -914,6 +937,7 @@
       "113217": null,
       "113221": null,
       "113223": null,
+      "113224": null,
       "113257": null,
       "113269": null,
       "113270": null,
@@ -976,6 +1000,7 @@
       "113496": null,
       "113498": null,
       "113500": null,
+      "113503": null,
       "113527": null,
       "113530": null,
       "113531": null,
@@ -1061,6 +1086,7 @@
       "113864": null,
       "113885": null,
       "113886": null,
+      "113887": null,
       "113888": null,
       "113891": null,
       "113892": null,
@@ -1069,6 +1095,7 @@
       "113910": null,
       "113922": null,
       "113931": null,
+      "113934": null,
       "113940": null,
       "113944": null,
       "113954": null,
@@ -1085,9 +1112,28 @@
       "114008": null,
       "114010": null,
       "114015": null,
+      "114021": null,
+      "114022": null,
       "114024": null,
       "114026": null,
-      "114036": null
+      "114030": null,
+      "114036": null,
+      "114052": null,
+      "114056": null,
+      "114060": null,
+      "114061": null,
+      "114062": null,
+      "114063": null,
+      "114064": null,
+      "114065": null,
+      "114068": null,
+      "114073": null,
+      "114075": null,
+      "114078": null,
+      "114082": null,
+      "114089": null,
+      "114091": null,
+      "114102": null
     },
     "counts": {
       "ChrRaces": {
@@ -1111,19 +1157,19 @@
         "identical": 1
       },
       "Item": {
-        "VALID": 2744,
+        "VALID": 2766,
         "DELETE": 0,
-        "identical": 2744
+        "identical": 2766
       },
       "ItemEffect": {
-        "VALID": 56,
+        "VALID": 57,
         "DELETE": 0,
         "identical": 56
       },
       "ItemSparse": {
-        "VALID": 2744,
+        "VALID": 2766,
         "DELETE": 0,
-        "identical": 1523
+        "identical": 1542
       },
       "ItemXItemEffect": {
         "VALID": 40,
@@ -1140,15 +1186,20 @@
         "DELETE": 0,
         "identical": 65
       },
-      "Spell": {
-        "VALID": 1205,
+      "SkillRaceClassInfo": {
+        "VALID": 1,
         "DELETE": 0,
-        "identical": 1205
+        "identical": 1
+      },
+      "Spell": {
+        "VALID": 1248,
+        "DELETE": 0,
+        "identical": 1247
       },
       "SpellAuraOptions": {
-        "VALID": 70,
-        "DELETE": 0,
-        "identical": 70
+        "VALID": 72,
+        "DELETE": 23,
+        "identical": 72
       },
       "SpellAuraRestrictions": {
         "VALID": 13,
@@ -1156,12 +1207,12 @@
         "identical": 13
       },
       "SpellCategories": {
-        "VALID": 88,
+        "VALID": 134,
         "DELETE": 0,
-        "identical": 88
+        "identical": 128
       },
       "SpellCategory": {
-        "VALID": 4,
+        "VALID": 5,
         "DELETE": 0,
         "identical": 4
       },
@@ -1171,7 +1222,7 @@
         "identical": 64
       },
       "SpellCooldowns": {
-        "VALID": 63,
+        "VALID": 69,
         "DELETE": 0,
         "identical": 62
       },
@@ -1181,9 +1232,9 @@
         "identical": 1
       },
       "SpellEffect": {
-        "VALID": 969,
-        "DELETE": 0,
-        "identical": 847
+        "VALID": 989,
+        "DELETE": 3,
+        "identical": 851
       },
       "SpellInterrupts": {
         "VALID": 43,
@@ -1196,14 +1247,14 @@
         "identical": 84
       },
       "SpellMisc": {
-        "VALID": 1806,
+        "VALID": 1947,
         "DELETE": 0,
-        "identical": 1806
+        "identical": 1938
       },
       "SpellName": {
-        "VALID": 1205,
+        "VALID": 1248,
         "DELETE": 0,
-        "identical": 1205
+        "identical": 1247
       },
       "SpellPower": {
         "VALID": 54,
@@ -1212,7 +1263,7 @@
       },
       "SpellShapeshift": {
         "VALID": 20,
-        "DELETE": 0,
+        "DELETE": 1,
         "identical": 20
       },
       "TraitDefinition": {
@@ -21977,6 +22028,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 14557,
+        "status": "VALID",
+        "push": 112864,
+        "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 14560,
         "status": "VALID",
         "push": 113672,
@@ -26921,6 +26980,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 217727,
+        "status": "VALID",
+        "push": 114078,
+        "unique_id": 1326341844,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 221324,
         "status": "VALID",
         "push": 113571,
@@ -27405,6 +27472,14 @@
         "status": "VALID",
         "push": 113845,
         "unique_id": 1899846493,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 250725,
+        "status": "VALID",
+        "push": 114030,
+        "unique_id": 3472104446,
         "identical": true
       },
       {
@@ -28481,6 +28556,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 260212,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 260217,
         "status": "VALID",
         "push": 113271,
@@ -28493,6 +28576,14 @@
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 262803,
+        "status": "VALID",
+        "push": 114061,
+        "unique_id": 3751737306,
         "identical": true
       },
       {
@@ -28621,6 +28712,14 @@
         "status": "VALID",
         "push": 113891,
         "unique_id": 1838784786,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 266252,
+        "status": "VALID",
+        "push": 114089,
+        "unique_id": 1622663914,
         "identical": true
       },
       {
@@ -29201,6 +29300,22 @@
       },
       {
         "table": "Item",
+        "rec_id": 271913,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271915,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 271921,
         "status": "VALID",
         "push": 113672,
@@ -29265,6 +29380,38 @@
       },
       {
         "table": "Item",
+        "rec_id": 272068,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 272069,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 272070,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 272071,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 272076,
         "status": "VALID",
         "push": 113672,
@@ -29309,6 +29456,22 @@
         "status": "VALID",
         "push": 113672,
         "unique_id": 2781748618,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 272406,
+        "status": "VALID",
+        "push": 114062,
+        "unique_id": 99261287,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 272407,
+        "status": "VALID",
+        "push": 114062,
+        "unique_id": 99261287,
         "identical": true
       },
       {
@@ -30361,6 +30524,22 @@
       },
       {
         "table": "Item",
+        "rec_id": 272936,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 272973,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 273031,
         "status": "VALID",
         "push": 113368,
@@ -30753,6 +30932,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 273642,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 273654,
         "status": "VALID",
         "push": 112624,
@@ -30765,6 +30952,22 @@
         "status": "VALID",
         "push": 113005,
         "unique_id": 2908040649,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 273772,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 273799,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
         "identical": true
       },
       {
@@ -30805,6 +31008,14 @@
         "status": "VALID",
         "push": 113672,
         "unique_id": 2781748618,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 274162,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
         "identical": true
       },
       {
@@ -31165,6 +31376,14 @@
         "status": "VALID",
         "push": 113891,
         "unique_id": 1838784786,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 274749,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
         "identical": true
       },
       {
@@ -31917,6 +32136,14 @@
         "status": "VALID",
         "push": 113672,
         "unique_id": 2781748618,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 284097,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
         "identical": true
       },
       {
@@ -32726,6 +32953,14 @@
         "push": 113672,
         "unique_id": 2781748618,
         "identical": true
+      },
+      {
+        "table": "ItemEffect",
+        "rec_id": 214572,
+        "status": "VALID",
+        "push": 114030,
+        "unique_id": 3472104446,
+        "identical": false
       },
       {
         "table": "ItemEffect",
@@ -44377,6 +44612,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 14557,
+        "status": "VALID",
+        "push": 112864,
+        "unique_id": 956664938,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 14560,
         "status": "VALID",
         "push": 113672,
@@ -49321,6 +49564,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 217727,
+        "status": "VALID",
+        "push": 114078,
+        "unique_id": 1326341844,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 221324,
         "status": "VALID",
         "push": 113571,
@@ -49805,6 +50056,14 @@
         "status": "VALID",
         "push": 113845,
         "unique_id": 1899846493,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 250725,
+        "status": "VALID",
+        "push": 114030,
+        "unique_id": 3472104446,
         "identical": true
       },
       {
@@ -50881,6 +51140,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 260212,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 260217,
         "status": "VALID",
         "push": 113271,
@@ -50893,6 +51160,14 @@
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 262803,
+        "status": "VALID",
+        "push": 114061,
+        "unique_id": 3751737306,
         "identical": true
       },
       {
@@ -51021,6 +51296,14 @@
         "status": "VALID",
         "push": 113891,
         "unique_id": 1838784786,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 266252,
+        "status": "VALID",
+        "push": 114089,
+        "unique_id": 1622663914,
         "identical": true
       },
       {
@@ -51601,6 +51884,22 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 271913,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271915,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 271921,
         "status": "VALID",
         "push": 113672,
@@ -51665,6 +51964,38 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 272068,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 272069,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 272070,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 272071,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 272076,
         "status": "VALID",
         "push": 113672,
@@ -51710,6 +52041,22 @@
         "push": 113672,
         "unique_id": 2781748618,
         "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 272406,
+        "status": "VALID",
+        "push": 114062,
+        "unique_id": 99261287,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 272407,
+        "status": "VALID",
+        "push": 114062,
+        "unique_id": 99261287,
+        "identical": true
       },
       {
         "table": "ItemSparse",
@@ -52761,6 +53108,22 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 272936,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 272973,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 273031,
         "status": "VALID",
         "push": 113368,
@@ -53153,6 +53516,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 273642,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 273654,
         "status": "VALID",
         "push": 112624,
@@ -53165,6 +53536,22 @@
         "status": "VALID",
         "push": 113005,
         "unique_id": 2908040649,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 273772,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 273799,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
         "identical": true
       },
       {
@@ -53206,6 +53593,14 @@
         "push": 113672,
         "unique_id": 2781748618,
         "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 274162,
+        "status": "VALID",
+        "push": 114060,
+        "unique_id": 3541725693,
+        "identical": true
       },
       {
         "table": "ItemSparse",
@@ -53565,6 +53960,14 @@
         "status": "VALID",
         "push": 113891,
         "unique_id": 1838784786,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 274749,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
         "identical": true
       },
       {
@@ -54317,6 +54720,14 @@
         "status": "VALID",
         "push": 113672,
         "unique_id": 2781748618,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 284097,
+        "status": "VALID",
+        "push": 114063,
+        "unique_id": 257757565,
         "identical": false
       },
       {
@@ -56000,6 +56411,14 @@
         "identical": true
       },
       {
+        "table": "SkillRaceClassInfo",
+        "rec_id": 2538,
+        "status": "VALID",
+        "push": 113934,
+        "unique_id": 506412783,
+        "identical": true
+      },
+      {
         "table": "Spell",
         "rec_id": 10,
         "status": "VALID",
@@ -57153,6 +57572,14 @@
       },
       {
         "table": "Spell",
+        "rec_id": 6998,
+        "status": "VALID",
+        "push": 114021,
+        "unique_id": 1638538843,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 7068,
         "status": "VALID",
         "push": 112720,
@@ -57857,10 +58284,26 @@
       },
       {
         "table": "Spell",
+        "rec_id": 8512,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 8515,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 8516,
         "status": "VALID",
-        "push": 112864,
-        "unique_id": 956664938,
+        "push": 114091,
+        "unique_id": 3001153286,
         "identical": true
       },
       {
@@ -58483,16 +58926,48 @@
         "table": "Spell",
         "rec_id": 10608,
         "status": "VALID",
-        "push": 112864,
-        "unique_id": 956664938,
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10609,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
         "table": "Spell",
         "rec_id": 10610,
         "status": "VALID",
-        "push": 112864,
-        "unique_id": 956664938,
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10612,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10613,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10614,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -58501,6 +58976,46 @@
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10667,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10668,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10669,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10692,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 10693,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -58645,6 +59160,14 @@
         "status": "VALID",
         "push": 113483,
         "unique_id": 623733544,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 11374,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -59441,6 +59964,14 @@
       },
       {
         "table": "Spell",
+        "rec_id": 15279,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 15464,
         "status": "VALID",
         "push": 113040,
@@ -59539,8 +60070,56 @@
         "table": "Spell",
         "rec_id": 16321,
         "status": "VALID",
-        "push": 112758,
-        "unique_id": 1227347469,
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 16322,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 16323,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 16325,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 16326,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 16327,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 16329,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -59675,8 +60254,8 @@
         "table": "Spell",
         "rec_id": 17038,
         "status": "VALID",
-        "push": 112758,
-        "unique_id": 1227347469,
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -59865,10 +60444,42 @@
       },
       {
         "table": "Spell",
+        "rec_id": 18125,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 18135,
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 18141,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 18192,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 18194,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -60185,6 +60796,30 @@
       },
       {
         "table": "Spell",
+        "rec_id": 20188,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 20285,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 20286,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 20287,
         "status": "VALID",
         "push": 112709,
@@ -60237,6 +60872,38 @@
         "status": "VALID",
         "push": 113139,
         "unique_id": 1745638289,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 20300,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 20301,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 20302,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 20303,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -60457,6 +61124,14 @@
       },
       {
         "table": "Spell",
+        "rec_id": 21183,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 21512,
         "status": "VALID",
         "push": 113837,
@@ -60553,10 +61228,34 @@
       },
       {
         "table": "Spell",
+        "rec_id": 22730,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 22747,
         "status": "VALID",
         "push": 113837,
         "unique_id": 3110291212,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 22789,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 22790,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -60613,6 +61312,14 @@
         "status": "VALID",
         "push": 113837,
         "unique_id": 3110291212,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 22920,
+        "status": "VALID",
+        "push": 114073,
+        "unique_id": 1814969416,
         "identical": true
       },
       {
@@ -60785,10 +61492,34 @@
       },
       {
         "table": "Spell",
+        "rec_id": 24382,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 24383,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 24407,
         "status": "VALID",
         "push": 112758,
         "unique_id": 1227347469,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 24417,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -60937,10 +61668,26 @@
       },
       {
         "table": "Spell",
+        "rec_id": 25661,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 25780,
         "status": "VALID",
         "push": 113139,
         "unique_id": 1745638289,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 25804,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -61405,6 +62152,14 @@
         "status": "VALID",
         "push": 113837,
         "unique_id": 3110291212,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 31906,
+        "status": "VALID",
+        "push": 114021,
+        "unique_id": 1638538843,
         "identical": true
       },
       {
@@ -64035,8 +64790,8 @@
         "table": "Spell",
         "rec_id": 1311703,
         "status": "VALID",
-        "push": 113139,
-        "unique_id": 1745638289,
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -65640,6 +66395,22 @@
         "identical": true
       },
       {
+        "table": "Spell",
+        "rec_id": 1331408,
+        "status": "VALID",
+        "push": 113503,
+        "unique_id": 2151805129,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 120083,
+        "status": "DELETE",
+        "push": 114021,
+        "unique_id": 1638538843,
+        "identical": false
+      },
+      {
         "table": "SpellAuraOptions",
         "rec_id": 123565,
         "status": "VALID",
@@ -65657,6 +66428,22 @@
       },
       {
         "table": "SpellAuraOptions",
+        "rec_id": 123865,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 124158,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": true
+      },
+      {
+        "table": "SpellAuraOptions",
         "rec_id": 124202,
         "status": "VALID",
         "push": 113134,
@@ -65665,11 +66452,123 @@
       },
       {
         "table": "SpellAuraOptions",
+        "rec_id": 124296,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 124312,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 124342,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 124422,
+        "status": "DELETE",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 124477,
+        "status": "DELETE",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
         "rec_id": 124609,
         "status": "VALID",
         "push": 113530,
         "unique_id": 3980537205,
         "identical": true
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 125053,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 127179,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 127854,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 128137,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 128314,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 128315,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 128599,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 128600,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 129081,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
       },
       {
         "table": "SpellAuraOptions",
@@ -65702,6 +66601,14 @@
         "push": 112844,
         "unique_id": 3929648399,
         "identical": true
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 130866,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
       },
       {
         "table": "SpellAuraOptions",
@@ -65742,6 +66649,46 @@
         "push": 113139,
         "unique_id": 1745638289,
         "identical": true
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 133805,
+        "status": "DELETE",
+        "push": 114073,
+        "unique_id": 1814969416,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 134260,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 134448,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 135477,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 136184,
+        "status": "DELETE",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": false
       },
       {
         "table": "SpellAuraOptions",
@@ -65801,10 +66748,26 @@
       },
       {
         "table": "SpellAuraOptions",
+        "rec_id": 246431,
+        "status": "DELETE",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
         "rec_id": 247421,
         "status": "VALID",
         "push": 113542,
         "unique_id": 60489635,
+        "identical": true
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 247745,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -66377,6 +67340,14 @@
       },
       {
         "table": "SpellCategories",
+        "rec_id": 75599,
+        "status": "VALID",
+        "push": 114064,
+        "unique_id": 3545243805,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
         "rec_id": 75788,
         "status": "VALID",
         "push": 113069,
@@ -66401,10 +67372,306 @@
       },
       {
         "table": "SpellCategories",
+        "rec_id": 76027,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76028,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76053,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76065,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76158,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76203,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76246,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76253,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76285,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76315,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76316,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76317,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76330,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76334,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76345,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76369,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76375,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76389,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76390,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76391,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76395,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76423,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76424,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76461,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76511,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
         "rec_id": 76514,
         "status": "VALID",
         "push": 113069,
         "unique_id": 545416128,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76518,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76533,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76543,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76556,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76568,
+        "status": "VALID",
+        "push": 114022,
+        "unique_id": 976594459,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76573,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76574,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76575,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76611,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76612,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76738,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 76739,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -66430,6 +67697,54 @@
         "push": 113440,
         "unique_id": 4054489472,
         "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 150689,
+        "status": "VALID",
+        "push": 114075,
+        "unique_id": 1698686993,
+        "identical": false
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 172911,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 172912,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 172913,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 173189,
+        "status": "VALID",
+        "push": 114075,
+        "unique_id": 1698686993,
+        "identical": false
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 173190,
+        "status": "VALID",
+        "push": 114075,
+        "unique_id": 1698686993,
+        "identical": false
       },
       {
         "table": "SpellCategories",
@@ -66525,6 +67840,22 @@
         "status": "VALID",
         "push": 113139,
         "unique_id": 1745638289,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 187639,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellCategories",
+        "rec_id": 187641,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -67038,6 +68369,14 @@
         "push": 114024,
         "unique_id": 2525891301,
         "identical": true
+      },
+      {
+        "table": "SpellCategory",
+        "rec_id": 2619,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
       },
       {
         "table": "SpellClassOptions",
@@ -67609,6 +68948,14 @@
       },
       {
         "table": "SpellCooldowns",
+        "rec_id": 84777,
+        "status": "VALID",
+        "push": 114075,
+        "unique_id": 1698686993,
+        "identical": false
+      },
+      {
+        "table": "SpellCooldowns",
         "rec_id": 84834,
         "status": "VALID",
         "push": 113282,
@@ -67622,6 +68969,22 @@
         "push": 113282,
         "unique_id": 3416623319,
         "identical": true
+      },
+      {
+        "table": "SpellCooldowns",
+        "rec_id": 94542,
+        "status": "VALID",
+        "push": 114075,
+        "unique_id": 1698686993,
+        "identical": false
+      },
+      {
+        "table": "SpellCooldowns",
+        "rec_id": 94543,
+        "status": "VALID",
+        "push": 114075,
+        "unique_id": 1698686993,
+        "identical": false
       },
       {
         "table": "SpellCooldowns",
@@ -68056,6 +69419,30 @@
         "identical": true
       },
       {
+        "table": "SpellCooldowns",
+        "rec_id": 102592,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellCooldowns",
+        "rec_id": 102593,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellCooldowns",
+        "rec_id": 102594,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
         "table": "SpellDuration",
         "rec_id": 427,
         "status": "VALID",
@@ -68465,6 +69852,14 @@
       },
       {
         "table": "SpellEffect",
+        "rec_id": 683912,
+        "status": "VALID",
+        "push": 114021,
+        "unique_id": 1638538843,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
         "rec_id": 684005,
         "status": "VALID",
         "push": 113557,
@@ -68558,6 +69953,22 @@
         "push": 113403,
         "unique_id": 542096764,
         "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 685411,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 685412,
+        "status": "DELETE",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
       },
       {
         "table": "SpellEffect",
@@ -69169,6 +70580,38 @@
       },
       {
         "table": "SpellEffect",
+        "rec_id": 689101,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 689102,
+        "status": "DELETE",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 689167,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 689168,
+        "status": "DELETE",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
         "rec_id": 689319,
         "status": "VALID",
         "push": 113134,
@@ -69701,6 +71144,14 @@
         "status": "VALID",
         "push": 112844,
         "unique_id": 3929648399,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 695864,
+        "status": "VALID",
+        "push": 114052,
+        "unique_id": 4140228479,
         "identical": true
       },
       {
@@ -70353,6 +71804,22 @@
       },
       {
         "table": "SpellEffect",
+        "rec_id": 700609,
+        "status": "VALID",
+        "push": 114073,
+        "unique_id": 1814969416,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 700610,
+        "status": "VALID",
+        "push": 114073,
+        "unique_id": 1814969416,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
         "rec_id": 700934,
         "status": "VALID",
         "push": 113557,
@@ -70870,6 +72337,14 @@
         "push": 113277,
         "unique_id": 3082324242,
         "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 704789,
+        "status": "VALID",
+        "push": 114021,
+        "unique_id": 1638538843,
+        "identical": false
       },
       {
         "table": "SpellEffect",
@@ -71689,6 +73164,14 @@
       },
       {
         "table": "SpellEffect",
+        "rec_id": 1255911,
+        "status": "VALID",
+        "push": 114030,
+        "unique_id": 3472104446,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
         "rec_id": 1258162,
         "status": "VALID",
         "push": 112949,
@@ -71789,6 +73272,14 @@
         "status": "VALID",
         "push": 114002,
         "unique_id": 2003331523,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1273551,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
         "identical": true
       },
       {
@@ -71942,6 +73433,14 @@
         "push": 113276,
         "unique_id": 2460934573,
         "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1290061,
+        "status": "VALID",
+        "push": 114082,
+        "unique_id": 3422895573,
+        "identical": false
       },
       {
         "table": "SpellEffect",
@@ -72133,6 +73632,14 @@
         "status": "VALID",
         "push": 113534,
         "unique_id": 2616835892,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1326293,
+        "status": "VALID",
+        "push": 114065,
+        "unique_id": 845547599,
         "identical": true
       },
       {
@@ -75816,6 +77323,70 @@
         "identical": true
       },
       {
+        "table": "SpellEffect",
+        "rec_id": 1371582,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1371583,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1371584,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1371917,
+        "status": "VALID",
+        "push": 113503,
+        "unique_id": 2151805129,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1372182,
+        "status": "VALID",
+        "push": 114052,
+        "unique_id": 4140228479,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1372308,
+        "status": "VALID",
+        "push": 114068,
+        "unique_id": 678574364,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1372309,
+        "status": "VALID",
+        "push": 114068,
+        "unique_id": 678574364,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1372310,
+        "status": "VALID",
+        "push": 114068,
+        "unique_id": 678574364,
+        "identical": false
+      },
+      {
         "table": "SpellInterrupts",
         "rec_id": 124171,
         "status": "VALID",
@@ -78433,6 +80004,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 315485,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 315489,
         "status": "VALID",
         "push": 113341,
@@ -79633,6 +81212,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 318631,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 318642,
         "status": "VALID",
         "push": 113341,
@@ -80377,6 +81964,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 319777,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 319780,
         "status": "VALID",
         "push": 113341,
@@ -80525,6 +82120,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 319981,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -80689,6 +82292,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 320372,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 320386,
         "status": "VALID",
         "push": 113341,
@@ -80813,6 +82424,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 320482,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -80961,10 +82580,42 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 320606,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 320607,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 320620,
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 320624,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 320648,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -80981,6 +82632,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 320658,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -81113,6 +82772,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 320811,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 320812,
         "status": "VALID",
         "push": 113341,
@@ -81165,6 +82832,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 320875,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -81833,6 +83508,38 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 321500,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 321501,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 321502,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 321503,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 321505,
         "status": "VALID",
         "push": 113341,
@@ -82089,6 +83796,22 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 321660,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 321661,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 321666,
         "status": "VALID",
         "push": 113341,
@@ -82101,6 +83824,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 321674,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -82433,6 +84164,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 321906,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 321908,
         "status": "VALID",
         "push": 113341,
@@ -82477,6 +84216,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 321926,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -82865,10 +84612,26 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 322173,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 322177,
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 322179,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -82957,6 +84720,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 322270,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -83265,6 +85036,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 322563,
+        "status": "VALID",
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 322575,
         "status": "VALID",
         "push": 113341,
@@ -83301,6 +85080,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 322617,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -83369,6 +85156,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 322701,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 322708,
         "status": "VALID",
         "push": 113341,
@@ -83385,6 +85180,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 322717,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 322723,
         "status": "VALID",
         "push": 113341,
@@ -83397,6 +85200,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 322747,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -83553,6 +85364,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 322827,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 322830,
         "status": "VALID",
         "push": 113341,
@@ -83633,10 +85452,34 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 322882,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 322883,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 322884,
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 322894,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -83945,6 +85788,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 323285,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 323307,
         "status": "VALID",
         "push": 113341,
@@ -84041,10 +85892,26 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 323390,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 323396,
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 323405,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -84137,6 +86004,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 323458,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 323466,
         "status": "VALID",
         "push": 113341,
@@ -84181,6 +86056,22 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 323484,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 323485,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -84289,6 +86180,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 323580,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 323584,
         "status": "VALID",
         "push": 113341,
@@ -84325,6 +86224,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 323643,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -84629,6 +86536,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 324258,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -85217,6 +87132,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 325584,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 325745,
         "status": "VALID",
         "push": 113341,
@@ -85253,6 +87176,14 @@
         "status": "VALID",
         "push": 113209,
         "unique_id": 2993893426,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 325920,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -85321,6 +87252,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 326259,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 326277,
         "status": "VALID",
         "push": 113341,
@@ -85349,6 +87288,22 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 326542,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 326549,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -85401,6 +87356,22 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 326719,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 326720,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 326761,
         "status": "VALID",
         "push": 113341,
@@ -85445,6 +87416,22 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 327004,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 327005,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -85537,6 +87524,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 327486,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 327515,
         "status": "VALID",
         "push": 113341,
@@ -85593,6 +87588,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 327551,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 327587,
         "status": "VALID",
         "push": 113341,
@@ -85625,6 +87628,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 327702,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 327707,
         "status": "VALID",
         "push": 113341,
@@ -85645,6 +87656,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 327819,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -85777,10 +87796,34 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 328096,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 328123,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 328125,
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 328127,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -85897,6 +87940,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 328480,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 328495,
         "status": "VALID",
         "push": 113341,
@@ -85953,6 +88004,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 328576,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 328577,
         "status": "VALID",
         "push": 113341,
@@ -85965,6 +88024,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 328625,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -86065,6 +88132,22 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 328801,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 328802,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 328843,
         "status": "VALID",
         "push": 113341,
@@ -86097,6 +88180,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 328869,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 328874,
         "status": "VALID",
         "push": 113341,
@@ -86109,6 +88200,30 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 328935,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 328936,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 328937,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -86201,6 +88316,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 329156,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 329178,
         "status": "VALID",
         "push": 113341,
@@ -86261,6 +88384,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 329271,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -86537,6 +88668,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 329731,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 329735,
         "status": "VALID",
         "push": 113341,
@@ -86549,6 +88688,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 329749,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -87289,6 +89436,22 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 331331,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 331332,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 331414,
         "status": "VALID",
         "push": 113341,
@@ -87301,6 +89464,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 331464,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -87337,6 +89508,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 331716,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 331863,
         "status": "VALID",
         "push": 113341,
@@ -87366,6 +89545,22 @@
         "push": 113341,
         "unique_id": 4057675750,
         "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 332209,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 332210,
+        "status": "VALID",
+        "push": 114073,
+        "unique_id": 1814969416,
+        "identical": false
       },
       {
         "table": "SpellMisc",
@@ -87401,6 +89596,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 332522,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 332579,
         "status": "VALID",
         "push": 113341,
@@ -87425,10 +89628,50 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 332660,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 332665,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 332724,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 332731,
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 332853,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 332961,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -87657,6 +89900,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 333828,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 333830,
         "status": "VALID",
         "push": 113341,
@@ -87685,6 +89936,22 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 333882,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 334012,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -87753,6 +90020,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 334589,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 334623,
         "status": "VALID",
         "push": 113139,
@@ -87765,6 +90040,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 334787,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -88129,6 +90412,38 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 780303,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 780304,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 780305,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 780307,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 790385,
         "status": "VALID",
         "push": 113341,
@@ -88377,6 +90692,134 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 798515,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 802546,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 802560,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 802561,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 802562,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 802874,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 803750,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 803751,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 803752,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 803754,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 804110,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 804129,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 804130,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 805398,
+        "status": "VALID",
+        "push": 114030,
+        "unique_id": 3472104446,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 805476,
+        "status": "VALID",
+        "push": 114030,
+        "unique_id": 3472104446,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 805478,
+        "status": "VALID",
+        "push": 114030,
+        "unique_id": 3472104446,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 807563,
         "status": "VALID",
         "push": 113330,
@@ -88521,6 +90964,198 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 815985,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 815988,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 815990,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 815992,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 815995,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816004,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816010,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816012,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816015,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816019,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816045,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816046,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816048,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816055,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816066,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816073,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816076,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816077,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816079,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816084,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816085,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816086,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816088,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 816089,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 816092,
         "status": "VALID",
         "push": 113311,
@@ -88587,9 +91222,25 @@
         "table": "SpellMisc",
         "rec_id": 820363,
         "status": "VALID",
-        "push": 112875,
-        "unique_id": 2400767404,
-        "identical": true
+        "push": 113224,
+        "unique_id": 2241028671,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 820365,
+        "status": "VALID",
+        "push": 113224,
+        "unique_id": 2241028671,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 820366,
+        "status": "VALID",
+        "push": 113224,
+        "unique_id": 2241028671,
+        "identical": false
       },
       {
         "table": "SpellMisc",
@@ -88945,6 +91596,14 @@
       },
       {
         "table": "SpellMisc",
+        "rec_id": 831023,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
         "rec_id": 836055,
         "status": "VALID",
         "push": 113038,
@@ -88989,6 +91648,14 @@
         "status": "VALID",
         "push": 112819,
         "unique_id": 791439363,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 838852,
+        "status": "VALID",
+        "push": 114102,
+        "unique_id": 508502161,
         "identical": true
       },
       {
@@ -89077,6 +91744,14 @@
         "status": "VALID",
         "push": 112952,
         "unique_id": 565740153,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 841425,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -89189,6 +91864,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 849152,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -89493,6 +92176,14 @@
         "status": "VALID",
         "push": 113341,
         "unique_id": 4057675750,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 865090,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -91280,6 +93971,14 @@
         "identical": true
       },
       {
+        "table": "SpellMisc",
+        "rec_id": 876445,
+        "status": "VALID",
+        "push": 113503,
+        "unique_id": 2151805129,
+        "identical": false
+      },
+      {
         "table": "SpellName",
         "rec_id": 10,
         "status": "VALID",
@@ -92433,6 +95132,14 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 6998,
+        "status": "VALID",
+        "push": 114021,
+        "unique_id": 1638538843,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 7068,
         "status": "VALID",
         "push": 112720,
@@ -93137,10 +95844,26 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 8512,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 8515,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 8516,
         "status": "VALID",
-        "push": 112864,
-        "unique_id": 956664938,
+        "push": 114091,
+        "unique_id": 3001153286,
         "identical": true
       },
       {
@@ -93763,16 +96486,48 @@
         "table": "SpellName",
         "rec_id": 10608,
         "status": "VALID",
-        "push": 112864,
-        "unique_id": 956664938,
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10609,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
         "table": "SpellName",
         "rec_id": 10610,
         "status": "VALID",
-        "push": 112864,
-        "unique_id": 956664938,
+        "push": 114091,
+        "unique_id": 3001153286,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10612,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10613,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10614,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -93781,6 +96536,46 @@
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10667,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10668,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10669,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10692,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 10693,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -93925,6 +96720,14 @@
         "status": "VALID",
         "push": 113483,
         "unique_id": 623733544,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 11374,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -94721,6 +97524,14 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 15279,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 15464,
         "status": "VALID",
         "push": 113040,
@@ -94819,8 +97630,56 @@
         "table": "SpellName",
         "rec_id": 16321,
         "status": "VALID",
-        "push": 112758,
-        "unique_id": 1227347469,
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 16322,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 16323,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 16325,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 16326,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 16327,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 16329,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -94955,8 +97814,8 @@
         "table": "SpellName",
         "rec_id": 17038,
         "status": "VALID",
-        "push": 112758,
-        "unique_id": 1227347469,
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -95145,10 +98004,42 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 18125,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 18135,
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 18141,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 18192,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 18194,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -95465,6 +98356,30 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 20188,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 20285,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 20286,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 20287,
         "status": "VALID",
         "push": 112709,
@@ -95517,6 +98432,38 @@
         "status": "VALID",
         "push": 113139,
         "unique_id": 1745638289,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 20300,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 20301,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 20302,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 20303,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -95737,6 +98684,14 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 21183,
+        "status": "VALID",
+        "push": 113887,
+        "unique_id": 751156214,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 21512,
         "status": "VALID",
         "push": 113837,
@@ -95833,10 +98788,34 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 22730,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 22747,
         "status": "VALID",
         "push": 113837,
         "unique_id": 3110291212,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 22789,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 22790,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -95893,6 +98872,14 @@
         "status": "VALID",
         "push": 113837,
         "unique_id": 3110291212,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 22920,
+        "status": "VALID",
+        "push": 114073,
+        "unique_id": 1814969416,
         "identical": true
       },
       {
@@ -96065,10 +99052,34 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 24382,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 24383,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 24407,
         "status": "VALID",
         "push": 112758,
         "unique_id": 1227347469,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 24417,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -96217,10 +99228,26 @@
       },
       {
         "table": "SpellName",
+        "rec_id": 25661,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
         "rec_id": 25780,
         "status": "VALID",
         "push": 113139,
         "unique_id": 1745638289,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 25804,
+        "status": "VALID",
+        "push": 114056,
+        "unique_id": 3281917506,
         "identical": true
       },
       {
@@ -96685,6 +99712,14 @@
         "status": "VALID",
         "push": 113837,
         "unique_id": 3110291212,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 31906,
+        "status": "VALID",
+        "push": 114021,
+        "unique_id": 1638538843,
         "identical": true
       },
       {
@@ -99315,8 +102350,8 @@
         "table": "SpellName",
         "rec_id": 1311703,
         "status": "VALID",
-        "push": 113139,
-        "unique_id": 1745638289,
+        "push": 113887,
+        "unique_id": 751156214,
         "identical": true
       },
       {
@@ -100920,6 +103955,14 @@
         "identical": true
       },
       {
+        "table": "SpellName",
+        "rec_id": 1331408,
+        "status": "VALID",
+        "push": 113503,
+        "unique_id": 2151805129,
+        "identical": false
+      },
+      {
         "table": "SpellPower",
         "rec_id": 169329,
         "status": "VALID",
@@ -101366,6 +104409,14 @@
         "push": 113413,
         "unique_id": 752476830,
         "identical": true
+      },
+      {
+        "table": "SpellShapeshift",
+        "rec_id": 39509,
+        "status": "DELETE",
+        "push": 114021,
+        "unique_id": 1638538843,
+        "identical": false
       },
       {
         "table": "SpellShapeshift",
@@ -102992,7 +106043,7 @@
         "identical": true
       }
     ],
-    "entities": 23,
+    "entities": 24,
     "unattributed": [
       "CurvePoint 371098",
       "CurvePoint 371368",
@@ -103017,6 +106068,7 @@
       "CurvePoint 372618",
       "CurvePoint 372619",
       "CurvePoint 372620",
+      "ItemEffect 214572",
       "ItemSparse 10058",
       "ItemSparse 10060",
       "ItemSparse 10063",
@@ -103375,6 +106427,7 @@
       "ItemSparse 14539",
       "ItemSparse 14545",
       "ItemSparse 14554",
+      "ItemSparse 14557",
       "ItemSparse 14560",
       "ItemSparse 14563",
       "ItemSparse 14564",
@@ -103680,6 +106733,7 @@
       "ItemSparse 20521",
       "ItemSparse 20530",
       "ItemSparse 2140",
+      "ItemSparse 217727",
       "ItemSparse 22247",
       "ItemSparse 22301",
       "ItemSparse 22302",
@@ -103784,6 +106838,7 @@
       "ItemSparse 283361",
       "ItemSparse 284065",
       "ItemSparse 284086",
+      "ItemSparse 284097",
       "ItemSparse 284187",
       "ItemSparse 284192",
       "ItemSparse 284199",
@@ -104238,6 +107293,37 @@
       "ItemSparse 9967",
       "ItemSparse 9969",
       "ItemSparse 9970",
+      "Spell 1331408",
+      "SpellAuraOptions 120083",
+      "SpellAuraOptions 123865",
+      "SpellAuraOptions 124296",
+      "SpellAuraOptions 124312",
+      "SpellAuraOptions 124342",
+      "SpellAuraOptions 124422",
+      "SpellAuraOptions 124477",
+      "SpellAuraOptions 125053",
+      "SpellAuraOptions 127179",
+      "SpellAuraOptions 127854",
+      "SpellAuraOptions 128137",
+      "SpellAuraOptions 128314",
+      "SpellAuraOptions 128315",
+      "SpellAuraOptions 128599",
+      "SpellAuraOptions 128600",
+      "SpellAuraOptions 129081",
+      "SpellAuraOptions 130866",
+      "SpellAuraOptions 133805",
+      "SpellAuraOptions 134260",
+      "SpellAuraOptions 134448",
+      "SpellAuraOptions 135477",
+      "SpellAuraOptions 136184",
+      "SpellAuraOptions 246431",
+      "SpellCategories 172911",
+      "SpellCategories 172912",
+      "SpellCategories 172913",
+      "SpellCategory 2619",
+      "SpellCooldowns 102592",
+      "SpellCooldowns 102593",
+      "SpellCooldowns 102594",
       "SpellEffect 1072563",
       "SpellEffect 1072564",
       "SpellEffect 1072565",
@@ -104255,6 +107341,7 @@
       "SpellEffect 1129612",
       "SpellEffect 1129613",
       "SpellEffect 1160802",
+      "SpellEffect 1255911",
       "SpellEffect 1258162",
       "SpellEffect 1259704",
       "SpellEffect 1273645",
@@ -104263,6 +107350,7 @@
       "SpellEffect 1281268",
       "SpellEffect 1281771",
       "SpellEffect 1282064",
+      "SpellEffect 1290061",
       "SpellEffect 1297148",
       "SpellEffect 1297208",
       "SpellEffect 1297522",
@@ -104283,16 +107371,43 @@
       "SpellEffect 1366834",
       "SpellEffect 1368143",
       "SpellEffect 1371198",
+      "SpellEffect 1371582",
+      "SpellEffect 1371583",
+      "SpellEffect 1371584",
+      "SpellEffect 1371917",
+      "SpellEffect 1372308",
+      "SpellEffect 1372309",
+      "SpellEffect 1372310",
       "SpellEffect 681913",
+      "SpellEffect 683912",
+      "SpellEffect 685411",
+      "SpellEffect 685412",
       "SpellEffect 685570",
       "SpellEffect 685571",
       "SpellEffect 685572",
       "SpellEffect 687183",
+      "SpellEffect 689101",
+      "SpellEffect 689102",
+      "SpellEffect 689167",
+      "SpellEffect 689168",
+      "SpellEffect 700610",
       "SpellEffect 702218",
       "SpellEffect 702501",
       "SpellEffect 703021",
       "SpellEffect 703755",
-      "SpellEffect 704970"
+      "SpellEffect 704789",
+      "SpellEffect 704970",
+      "SpellMisc 319777",
+      "SpellMisc 322827",
+      "SpellMisc 322882",
+      "SpellMisc 332210",
+      "SpellMisc 805398",
+      "SpellMisc 820363",
+      "SpellMisc 820365",
+      "SpellMisc 820366",
+      "SpellMisc 876445",
+      "SpellName 1331408",
+      "SpellShapeshift 39509"
     ],
     "listed": {
       "invalid": [
@@ -114313,16 +117428,6 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 14557,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 14557,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 18806,
           "push": 112864
         },
@@ -115420,48 +118525,50 @@
         }
       ],
       "dbreply": {
-        "0x021826bb": 22,
-        "ItemSparse": 9987
+        "0x021826bb": 32,
+        "ItemSparse": 23178,
+        "Spell": 6
       },
       "item_reply": {
-        "0x198e28b5": 5226,
-        "0x5481af88": 5226,
-        "0xb50ca635": 5226,
-        "0xce88edca": 5226,
-        "Item": 5226,
-        "ItemSparse": 5226
+        "0x198e28b5": 5332,
+        "0x5481af88": 5332,
+        "0xb50ca635": 5332,
+        "0xce88edca": 5332,
+        "Item": 5332,
+        "ItemSparse": 5332
       },
       "unknown_hash": {
         "0x0024bced": 1,
-        "0x01325ca0": 40,
+        "0x01325ca0": 43,
         "0x01476a10": 2,
         "0x017faea0": 2,
         "0x021826bb": 130,
-        "0x02e18f32": 36,
+        "0x02e18f32": 37,
         "0x08014697": 15,
         "0x09626fb2": 1,
         "0x0a5df5fa": 2,
         "0x0ad67ebf": 151,
         "0x0b685935": 1,
-        "0x0e540efd": 2,
+        "0x0e540efd": 3,
         "0x0e82664c": 14,
-        "0x0f992211": 1306,
+        "0x0f992211": 1312,
         "0x1018add5": 1,
         "0x111d4849": 2,
-        "0x12a212a9": 61,
+        "0x12a212a9": 64,
         "0x12a76efd": 2,
-        "0x13c403a5": 148,
+        "0x13c403a5": 163,
         "0x140a5855": 2,
-        "0x14320f31": 54,
+        "0x14320f31": 85,
         "0x15393898": 1,
+        "0x15f55b6d": 1,
         "0x15ff1ecc": 2,
-        "0x198e28b5": 3740,
+        "0x198e28b5": 3761,
         "0x1a6b0c40": 1,
         "0x1cf9216d": 69,
-        "0x1d53eb74": 30,
+        "0x1d53eb74": 31,
         "0x1edacea1": 6,
         "0x208ab51d": 2,
-        "0x211e2def": 40,
+        "0x211e2def": 41,
         "0x23cbe682": 49,
         "0x240d864e": 4,
         "0x253a9b6b": 2,
@@ -115483,36 +118590,36 @@
         "0x37d001ef": 1,
         "0x394c3727": 14,
         "0x39606286": 2,
-        "0x3ac83109": 1306,
+        "0x3ac83109": 1312,
         "0x3b57c0a1": 4,
         "0x3b9e4ca2": 14,
         "0x3cc89c00": 3,
         "0x3e988108": 8,
         "0x3f85abb7": 3,
-        "0x42261b89": 329,
-        "0x4553e9f7": 312,
+        "0x42261b89": 343,
+        "0x4553e9f7": 319,
         "0x45952e6e": 2,
         "0x461fdc45": 11,
-        "0x4666ed42": 257,
+        "0x4666ed42": 258,
         "0x490cdd72": 4,
         "0x495495df": 1,
-        "0x4ad4429c": 34,
+        "0x4ad4429c": 35,
         "0x4bf2fc04": 412,
         "0x4d07e2fc": 9,
         "0x4dabd3fb": 36,
         "0x50d91a78": 2,
-        "0x5139503a": 1,
+        "0x5139503a": 2,
         "0x51a28350": 16,
-        "0x5481af88": 3740,
+        "0x5481af88": 3761,
         "0x550e7513": 11,
         "0x588de300": 16,
         "0x59f2eb50": 3,
-        "0x5c4bbb1f": 11,
+        "0x5c4bbb1f": 12,
         "0x5ccaa0ba": 85,
         "0x5ce8b5e8": 14,
         "0x6046b96b": 13,
         "0x60c46e9d": 4,
-        "0x61025756": 48,
+        "0x61025756": 68,
         "0x61431a65": 4,
         "0x639e429e": 3,
         "0x6613bed3": 1,
@@ -115521,21 +118628,21 @@
         "0x681d0f3d": 18,
         "0x6ab0078f": 98,
         "0x6c93f9b1": 1,
-        "0x6d100dcb": 19,
+        "0x6d100dcb": 24,
         "0x6f771411": 12,
-        "0x6fe05ae9": 21,
+        "0x6fe05ae9": 22,
         "0x7253eb43": 74,
         "0x758e7bcc": 7,
         "0x76c04c97": 2,
         "0x7b03245c": 2,
         "0x7bba1eb1": 1,
         "0x7e319a3d": 458,
-        "0x7e692d56": 71,
-        "0x7ea08450": 93,
+        "0x7e692d56": 74,
+        "0x7ea08450": 99,
         "0x7f695fa5": 5,
         "0x803704b6": 1,
         "0x8318900a": 2,
-        "0x83467feb": 724,
+        "0x83467feb": 726,
         "0x84b0bdd7": 637,
         "0x85df9e8e": 1,
         "0x8645bb79": 28,
@@ -115547,6 +118654,7 @@
         "0x8fb55fd4": 76,
         "0x90204b0a": 1,
         "0x91c188c0": 4,
+        "0x9265f70d": 2,
         "0x936188f9": 9,
         "0x94a4ed3b": 1,
         "0x94f0d5cc": 1,
@@ -115554,7 +118662,7 @@
         "0x96232523": 2,
         "0x96737a41": 1,
         "0x96fb48d9": 3,
-        "0x986f8cd0": 136,
+        "0x986f8cd0": 167,
         "0x9b1bee48": 4,
         "0xa161e42c": 26,
         "0xa50f8a31": 2,
@@ -115564,20 +118672,20 @@
         "0xab66c99f": 6,
         "0xab7e4841": 1,
         "0xac92e4ad": 1,
-        "0xae1ca308": 164,
+        "0xae1ca308": 166,
         "0xaeb11490": 7,
         "0xafc190d1": 1,
         "0xb2bb19eb": 1,
         "0xb33f3964": 2,
         "0xb3af6eca": 7,
         "0xb4b5e047": 2,
-        "0xb50ca635": 3740,
+        "0xb50ca635": 3761,
         "0xb5307a56": 25,
         "0xb8ba5fb3": 1,
         "0xb8f96456": 3,
-        "0xb94c2807": 62,
+        "0xb94c2807": 67,
         "0xb99db712": 2,
-        "0xbb858355": 7,
+        "0xbb858355": 8,
         "0xbceab606": 3,
         "0xbd3635ff": 1,
         "0xbd84cd62": 5,
@@ -115597,41 +118705,41 @@
         "0xc7ed797d": 1,
         "0xc842493a": 15,
         "0xc9bcb028": 12,
-        "0xc9d6b6b3": 341,
-        "0xc9e0a749": 2050,
-        "0xcc284d0f": 192,
+        "0xc9d6b6b3": 347,
+        "0xc9e0a749": 2064,
+        "0xcc284d0f": 194,
         "0xccff87ed": 1,
-        "0xce88edca": 3740,
+        "0xce88edca": 3761,
         "0xcf156785": 1,
         "0xd055d7b5": 13,
         "0xd2ee2ca7": 1,
-        "0xd4e75aa2": 11,
-        "0xd5a4e33a": 422,
+        "0xd4e75aa2": 13,
+        "0xd5a4e33a": 428,
         "0xd8a1d70c": 2,
         "0xd94c9544": 256,
-        "0xda728027": 16,
+        "0xda728027": 18,
         "0xda82d96c": 6862,
         "0xdc886e69": 12,
         "0xe05ac589": 9,
-        "0xe064a75c": 131,
+        "0xe064a75c": 161,
         "0xe3c5b7d1": 2,
-        "0xe44abbd4": 66,
+        "0xe44abbd4": 70,
         "0xe491ac55": 256,
         "0xe4cdb5cf": 15,
         "0xe5945573": 2,
         "0xe5e988bc": 356,
         "0xe849437c": 9,
         "0xe9becb23": 5,
-        "0xef23dc80": 8,
-        "0xf07194c3": 132,
+        "0xef23dc80": 9,
+        "0xf07194c3": 133,
         "0xf35af3db": 167,
         "0xf3d3e512": 1,
         "0xf3d99f2d": 12,
-        "0xf483eadb": 108,
+        "0xf483eadb": 109,
         "0xf5fa849b": 6,
         "0xf66e0076": 2,
         "0xf6bc85df": 15,
-        "0xf72496d9": 74,
+        "0xf72496d9": 75,
         "0xf952b945": 5,
         "0xfb6e72fc": 6,
         "0xfc2a0dff": 2,
@@ -117166,6 +120274,11 @@
           "push": 113016
         },
         {
+          "table": "SpellCooldowns",
+          "rec_id": 102533,
+          "push": 113887
+        },
+        {
           "table": "SpellEffect",
           "rec_id": 704765,
           "push": 113557
@@ -117307,6 +120420,11 @@
         },
         {
           "table": "SpellEffect",
+          "rec_id": 1366858,
+          "push": 113132
+        },
+        {
+          "table": "SpellEffect",
           "rec_id": 1367102,
           "push": 113139
         },
@@ -117404,6 +120522,36 @@
           "table": "SpellLevels",
           "rec_id": 154225,
           "push": 113139
+        },
+        {
+          "table": "SpellMisc",
+          "rec_id": 816001,
+          "push": 114102
+        },
+        {
+          "table": "SpellMisc",
+          "rec_id": 816050,
+          "push": 114102
+        },
+        {
+          "table": "SpellMisc",
+          "rec_id": 816059,
+          "push": 114102
+        },
+        {
+          "table": "SpellMisc",
+          "rec_id": 816060,
+          "push": 114102
+        },
+        {
+          "table": "SpellMisc",
+          "rec_id": 816065,
+          "push": 114102
+        },
+        {
+          "table": "SpellMisc",
+          "rec_id": 816072,
+          "push": 114102
         },
         {
           "table": "SpellMisc",
@@ -117852,6 +121000,26 @@
         },
         {
           "table": "SpellPower",
+          "rec_id": 173543,
+          "push": 114021
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 181314,
+          "push": 114056
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 181597,
+          "push": 114056
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 182059,
+          "push": 114056
+        },
+        {
+          "table": "SpellPower",
           "rec_id": 183042,
           "push": 113548
         },
@@ -117874,6 +121042,16 @@
           "table": "SpellPower",
           "rec_id": 186088,
           "push": 113325
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 187265,
+          "push": 114073
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 188937,
+          "push": 114056
         },
         {
           "table": "SpellPower",
@@ -122049,6 +125227,10 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 250725
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 250976
           },
           {
@@ -122581,7 +125763,15 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 260212
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 260820
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 262803
           },
           {
             "table": "ItemSparse",
@@ -122646,6 +125836,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 265840
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 266252
           },
           {
             "table": "ItemSparse",
@@ -122861,7 +126055,39 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 271913
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 271915
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 272028
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 272068
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 272069
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 272070
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 272071
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 272406
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 272407
           },
           {
             "table": "ItemSparse",
@@ -123389,6 +126615,14 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 272936
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 272973
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 273096
           },
           {
@@ -123569,11 +126803,23 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 273642
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 273654
           },
           {
             "table": "ItemSparse",
             "rec_id": 273659
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 273772
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 273799
           },
           {
             "table": "ItemSparse",
@@ -123586,6 +126832,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 274035
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 274162
           },
           {
             "table": "ItemSparse",
@@ -123750,6 +127000,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 274706
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 274749
           },
           {
             "table": "ItemSparse",
@@ -124809,6 +128063,10 @@
           },
           {
             "table": "Spell",
+            "rec_id": 6998
+          },
+          {
+            "table": "Spell",
             "rec_id": 7068
           },
           {
@@ -125161,6 +128419,14 @@
           },
           {
             "table": "Spell",
+            "rec_id": 8512
+          },
+          {
+            "table": "Spell",
+            "rec_id": 8515
+          },
+          {
+            "table": "Spell",
             "rec_id": 8516
           },
           {
@@ -125477,11 +128743,47 @@
           },
           {
             "table": "Spell",
+            "rec_id": 10609
+          },
+          {
+            "table": "Spell",
             "rec_id": 10610
           },
           {
             "table": "Spell",
+            "rec_id": 10612
+          },
+          {
+            "table": "Spell",
+            "rec_id": 10613
+          },
+          {
+            "table": "Spell",
+            "rec_id": 10614
+          },
+          {
+            "table": "Spell",
             "rec_id": 10654
+          },
+          {
+            "table": "Spell",
+            "rec_id": 10667
+          },
+          {
+            "table": "Spell",
+            "rec_id": 10668
+          },
+          {
+            "table": "Spell",
+            "rec_id": 10669
+          },
+          {
+            "table": "Spell",
+            "rec_id": 10692
+          },
+          {
+            "table": "Spell",
+            "rec_id": 10693
           },
           {
             "table": "Spell",
@@ -125554,6 +128856,10 @@
           {
             "table": "Spell",
             "rec_id": 11297
+          },
+          {
+            "table": "Spell",
+            "rec_id": 11374
           },
           {
             "table": "Spell",
@@ -125953,6 +129259,10 @@
           },
           {
             "table": "Spell",
+            "rec_id": 15279
+          },
+          {
+            "table": "Spell",
             "rec_id": 15464
           },
           {
@@ -126002,6 +129312,30 @@
           {
             "table": "Spell",
             "rec_id": 16321
+          },
+          {
+            "table": "Spell",
+            "rec_id": 16322
+          },
+          {
+            "table": "Spell",
+            "rec_id": 16323
+          },
+          {
+            "table": "Spell",
+            "rec_id": 16325
+          },
+          {
+            "table": "Spell",
+            "rec_id": 16326
+          },
+          {
+            "table": "Spell",
+            "rec_id": 16327
+          },
+          {
+            "table": "Spell",
+            "rec_id": 16329
           },
           {
             "table": "Spell",
@@ -126165,7 +129499,23 @@
           },
           {
             "table": "Spell",
+            "rec_id": 18125
+          },
+          {
+            "table": "Spell",
             "rec_id": 18135
+          },
+          {
+            "table": "Spell",
+            "rec_id": 18141
+          },
+          {
+            "table": "Spell",
+            "rec_id": 18192
+          },
+          {
+            "table": "Spell",
+            "rec_id": 18194
           },
           {
             "table": "Spell",
@@ -126325,6 +129675,18 @@
           },
           {
             "table": "Spell",
+            "rec_id": 20188
+          },
+          {
+            "table": "Spell",
+            "rec_id": 20285
+          },
+          {
+            "table": "Spell",
+            "rec_id": 20286
+          },
+          {
+            "table": "Spell",
             "rec_id": 20287
           },
           {
@@ -126350,6 +129712,22 @@
           {
             "table": "Spell",
             "rec_id": 20293
+          },
+          {
+            "table": "Spell",
+            "rec_id": 20300
+          },
+          {
+            "table": "Spell",
+            "rec_id": 20301
+          },
+          {
+            "table": "Spell",
+            "rec_id": 20302
+          },
+          {
+            "table": "Spell",
+            "rec_id": 20303
           },
           {
             "table": "Spell",
@@ -126461,6 +129839,10 @@
           },
           {
             "table": "Spell",
+            "rec_id": 21183
+          },
+          {
+            "table": "Spell",
             "rec_id": 21512
           },
           {
@@ -126509,7 +129891,19 @@
           },
           {
             "table": "Spell",
+            "rec_id": 22730
+          },
+          {
+            "table": "Spell",
             "rec_id": 22747
+          },
+          {
+            "table": "Spell",
+            "rec_id": 22789
+          },
+          {
+            "table": "Spell",
+            "rec_id": 22790
           },
           {
             "table": "Spell",
@@ -126538,6 +129932,10 @@
           {
             "table": "Spell",
             "rec_id": 22854
+          },
+          {
+            "table": "Spell",
+            "rec_id": 22920
           },
           {
             "table": "Spell",
@@ -126625,7 +130023,19 @@
           },
           {
             "table": "Spell",
+            "rec_id": 24382
+          },
+          {
+            "table": "Spell",
+            "rec_id": 24383
+          },
+          {
+            "table": "Spell",
             "rec_id": 24407
+          },
+          {
+            "table": "Spell",
+            "rec_id": 24417
           },
           {
             "table": "Spell",
@@ -126701,7 +130111,15 @@
           },
           {
             "table": "Spell",
+            "rec_id": 25661
+          },
+          {
+            "table": "Spell",
             "rec_id": 25780
+          },
+          {
+            "table": "Spell",
+            "rec_id": 25804
           },
           {
             "table": "Spell",
@@ -126934,6 +130352,10 @@
           {
             "table": "Spell",
             "rec_id": 31018
+          },
+          {
+            "table": "Spell",
+            "rec_id": 31906
           },
           {
             "table": "Spell",
@@ -129629,6 +133051,10 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 6998
+          },
+          {
+            "table": "SpellName",
             "rec_id": 7068
           },
           {
@@ -129981,6 +133407,14 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 8512
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 8515
+          },
+          {
+            "table": "SpellName",
             "rec_id": 8516
           },
           {
@@ -130297,11 +133731,47 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 10609
+          },
+          {
+            "table": "SpellName",
             "rec_id": 10610
           },
           {
             "table": "SpellName",
+            "rec_id": 10612
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 10613
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 10614
+          },
+          {
+            "table": "SpellName",
             "rec_id": 10654
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 10667
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 10668
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 10669
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 10692
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 10693
           },
           {
             "table": "SpellName",
@@ -130374,6 +133844,10 @@
           {
             "table": "SpellName",
             "rec_id": 11297
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 11374
           },
           {
             "table": "SpellName",
@@ -130773,6 +134247,10 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 15279
+          },
+          {
+            "table": "SpellName",
             "rec_id": 15464
           },
           {
@@ -130822,6 +134300,30 @@
           {
             "table": "SpellName",
             "rec_id": 16321
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 16322
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 16323
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 16325
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 16326
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 16327
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 16329
           },
           {
             "table": "SpellName",
@@ -130985,7 +134487,23 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 18125
+          },
+          {
+            "table": "SpellName",
             "rec_id": 18135
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 18141
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 18192
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 18194
           },
           {
             "table": "SpellName",
@@ -131145,6 +134663,18 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 20188
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 20285
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 20286
+          },
+          {
+            "table": "SpellName",
             "rec_id": 20287
           },
           {
@@ -131170,6 +134700,22 @@
           {
             "table": "SpellName",
             "rec_id": 20293
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 20300
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 20301
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 20302
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 20303
           },
           {
             "table": "SpellName",
@@ -131281,6 +134827,10 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 21183
+          },
+          {
+            "table": "SpellName",
             "rec_id": 21512
           },
           {
@@ -131329,7 +134879,19 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 22730
+          },
+          {
+            "table": "SpellName",
             "rec_id": 22747
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 22789
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 22790
           },
           {
             "table": "SpellName",
@@ -131358,6 +134920,10 @@
           {
             "table": "SpellName",
             "rec_id": 22854
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 22920
           },
           {
             "table": "SpellName",
@@ -131445,7 +135011,19 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 24382
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 24383
+          },
+          {
+            "table": "SpellName",
             "rec_id": 24407
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 24417
           },
           {
             "table": "SpellName",
@@ -131521,7 +135099,15 @@
           },
           {
             "table": "SpellName",
+            "rec_id": 25661
+          },
+          {
+            "table": "SpellName",
             "rec_id": 25780
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 25804
           },
           {
             "table": "SpellName",
@@ -131754,6 +135340,10 @@
           {
             "table": "SpellName",
             "rec_id": 31018
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 31906
           },
           {
             "table": "SpellName",
@@ -137207,6 +140797,10 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 14557
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 14560
           },
           {
@@ -138367,6 +141961,10 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 217727
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 226826
           },
           {
@@ -138691,6 +142289,10 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 284097
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 284187
           },
           {
@@ -138876,6 +142478,14 @@
           {
             "table": "ItemSparse",
             "rec_id": 287077
+          },
+          {
+            "table": "Spell",
+            "rec_id": 1331408
+          },
+          {
+            "table": "SpellName",
+            "rec_id": 1331408
           }
         ]
       }
@@ -138915,26 +142525,26 @@
       },
       "Item": {
         "ok": true,
-        "reason": "disposition 9A2A4834 validée : 2744 entrée(s) décodée(s), 2744 comparée(s), 100% des valeurs égales au build, 7/7 références résolues",
-        "decoded": 2744,
-        "compared": 2744,
+        "reason": "disposition 9A2A4834 validée : 2766 entrée(s) décodée(s), 2766 comparée(s), 100% des valeurs égales au build, 7/7 références résolues",
+        "decoded": 2766,
+        "compared": 2766,
         "equal_ratio": 1.0,
         "references_ok": true
       },
       "ItemEffect": {
         "ok": true,
-        "reason": "disposition 4CA77678 validée : 56 entrée(s) décodée(s), 56 comparée(s), 100% des valeurs égales au build, 81/81 références résolues",
-        "decoded": 56,
-        "compared": 56,
-        "equal_ratio": 1.0,
+        "reason": "disposition 4CA77678 validée : 57 entrée(s) décodée(s), 57 comparée(s), 100% des valeurs égales au build, 82/82 références résolues",
+        "decoded": 57,
+        "compared": 57,
+        "equal_ratio": 0.9980506822612085,
         "references_ok": true
       },
       "ItemSparse": {
         "ok": true,
-        "reason": "disposition 6FCC3191 validée : 2744 entrée(s) décodée(s), 1523 comparée(s), 100% des valeurs égales au build, 74/74 références résolues",
-        "decoded": 2744,
-        "compared": 1523,
-        "equal_ratio": 0.9997513849135266,
+        "reason": "disposition 6FCC3191 validée : 2766 entrée(s) décodée(s), 1542 comparée(s), 100% des valeurs égales au build, 74/74 références résolues",
+        "decoded": 2766,
+        "compared": 1542,
+        "equal_ratio": 0.9996159319003186,
         "references_ok": true
       },
       "ItemXItemEffect": {
@@ -138961,20 +142571,28 @@
         "equal_ratio": 1.0,
         "references_ok": true
       },
+      "SkillRaceClassInfo": {
+        "ok": true,
+        "reason": "disposition 24277B48 validée : 1 entrée(s) décodée(s), 1 comparée(s), 88% des valeurs égales au build, 1/1 références résolues",
+        "decoded": 1,
+        "compared": 1,
+        "equal_ratio": 0.875,
+        "references_ok": true
+      },
       "Spell": {
         "ok": true,
-        "reason": "disposition E3D134FB validée : 1205 entrée(s) décodée(s) à la taille et à l'identifiant attendus ; textes en frFR non comparés (noms de cette langue absents)",
-        "decoded": 1205,
-        "compared": 1205,
+        "reason": "disposition E3D134FB validée : 1248 entrée(s) décodée(s) à la taille et à l'identifiant attendus ; textes en frFR non comparés (noms de cette langue absents)",
+        "decoded": 1248,
+        "compared": 1247,
         "equal_ratio": null,
         "references_ok": null
       },
       "SpellAuraOptions": {
         "ok": true,
-        "reason": "disposition 95F4D5E1 validée : 70 entrée(s) décodée(s), 70 comparée(s), 100% des valeurs égales au build, 70/70 références résolues",
-        "decoded": 70,
-        "compared": 70,
-        "equal_ratio": 0.9968253968253968,
+        "reason": "disposition 95F4D5E1 validée : 72 entrée(s) décodée(s), 72 comparée(s), 100% des valeurs égales au build, 72/72 références résolues",
+        "decoded": 72,
+        "compared": 72,
+        "equal_ratio": 0.9953703703703703,
         "references_ok": true
       },
       "SpellAuraRestrictions": {
@@ -138987,16 +142605,16 @@
       },
       "SpellCategories": {
         "ok": true,
-        "reason": "disposition 679EF94C validée : 88 entrée(s) décodée(s), 88 comparée(s), 100% des valeurs égales au build, 189/189 références résolues",
-        "decoded": 88,
-        "compared": 88,
-        "equal_ratio": 1.0,
+        "reason": "disposition 679EF94C validée : 134 entrée(s) décodée(s), 134 comparée(s), 97% des valeurs égales au build, 245/245 références résolues",
+        "decoded": 134,
+        "compared": 134,
+        "equal_ratio": 0.9731343283582089,
         "references_ok": true
       },
       "SpellCategory": {
         "ok": true,
-        "reason": "disposition B79B78E1 validée : 4 entrée(s) décodée(s), 4 comparée(s), 100% des valeurs égales au build",
-        "decoded": 4,
+        "reason": "disposition B79B78E1 validée : 5 entrée(s) décodée(s), 4 comparée(s), 100% des valeurs égales au build",
+        "decoded": 5,
         "compared": 4,
         "equal_ratio": 1.0,
         "references_ok": null
@@ -139011,10 +142629,10 @@
       },
       "SpellCooldowns": {
         "ok": true,
-        "reason": "disposition DC945B8C validée : 63 entrée(s) décodée(s), 63 comparée(s), 100% des valeurs égales au build, 63/63 références résolues",
-        "decoded": 63,
-        "compared": 63,
-        "equal_ratio": 0.9973544973544973,
+        "reason": "disposition DC945B8C validée : 69 entrée(s) décodée(s), 66 comparée(s), 98% des valeurs égales au build, 69/69 références résolues",
+        "decoded": 69,
+        "compared": 66,
+        "equal_ratio": 0.9823232323232324,
         "references_ok": true
       },
       "SpellDuration": {
@@ -139027,10 +142645,10 @@
       },
       "SpellEffect": {
         "ok": true,
-        "reason": "disposition 5362E3D4 validée : 969 entrée(s) décodée(s), 969 comparée(s), 100% des valeurs égales au build, 1012/1014 références résolues",
-        "decoded": 969,
-        "compared": 969,
-        "equal_ratio": 0.999828001375989,
+        "reason": "disposition 5362E3D4 validée : 989 entrée(s) décodée(s), 981 comparée(s), 100% des valeurs égales au build, 1032/1034 références résolues",
+        "decoded": 989,
+        "compared": 981,
+        "equal_ratio": 0.99932042133877,
         "references_ok": true
       },
       "SpellInterrupts": {
@@ -139051,18 +142669,18 @@
       },
       "SpellMisc": {
         "ok": true,
-        "reason": "disposition 434B3607 validée : 1806 entrée(s) décodée(s), 1806 comparée(s), 100% des valeurs égales au build, 6512/6512 références résolues",
-        "decoded": 1806,
-        "compared": 1806,
-        "equal_ratio": 1.0,
+        "reason": "disposition 434B3607 validée : 1947 entrée(s) décodée(s), 1946 comparée(s), 100% des valeurs égales au build, 7042/7042 références résolues",
+        "decoded": 1947,
+        "compared": 1946,
+        "equal_ratio": 0.9973683390949578,
         "references_ok": true
       },
       "SpellName": {
         "ok": true,
-        "reason": "disposition 782EE721 validée : 1205 entrée(s) décodée(s), 1205 comparée(s), 99% des valeurs égales au build",
-        "decoded": 1205,
-        "compared": 1205,
-        "equal_ratio": 0.9933609958506224,
+        "reason": "disposition 782EE721 validée : 1248 entrée(s) décodée(s), 1247 comparée(s), 99% des valeurs égales au build",
+        "decoded": 1248,
+        "compared": 1247,
+        "equal_ratio": 0.9935846030473136,
         "references_ok": null
       },
       "SpellPower": {
