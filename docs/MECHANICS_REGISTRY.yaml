@@ -2044,7 +2044,10 @@ mechanics:
     sources:
       - "GearQuest Forever (choix par emplacement, fiches : reqLevel, sourceType, questName, profession, plage de butin), lu en local"
       - "livre des quêtes (niveau, niveau minimal, camp), livre des donjons de DJ1 (plage de niveaux), écart d'une quête rouge de mechanics.json (leveling.quest_band.red_min_diff, registre I7)"
+      - "source de l'objet dans la base des simulateurs (wowsims : quest, soldBy, drop), pour un candidat sans niveau requis hors des choix de GearQuest (2026-11-16)"
     tests:
+      - tests/unit/test_sims_candidate_obtain.py::test_items_without_required_level_are_judged_by_their_source
+      - tests/unit/test_sims_candidate_obtain.py::test_level_60_takes_every_source
       - tests/unit/test_gear_level_access.py::test_quest_of_another_race_is_never_offered
       - tests/unit/test_gear_route_4d.py::test_route_request_includes_the_quests_and_dungeons_of_the_items
       - tests/unit/test_gear_route_4d.py::test_reply_says_which_quests_are_in_the_route
