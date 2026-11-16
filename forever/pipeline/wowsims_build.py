@@ -39,6 +39,24 @@ def patchset(patches_dir: Path) -> dict[str, Any]:
     return {"sha256": digest.hexdigest(), "files": [p.name for p in files]}
 
 
+ITEMS_SUFFIX = ".items.json"  # objets connus d'un binaire, relevés à sa compilation (`<binaire>.items.json`)
+
+
+def database_item_ids(clone: Path) -> list[int] | None:
+    """Objets des deux bases que le binaire de wowsims charge (db.json, leftover_db.json) ; None sans base."""
+    folder = clone / "assets" / "database"
+    files = [folder / name for name in ("db.json", "leftover_db.json") if (folder / name).is_file()]
+    if not files:
+        return None
+    return sorted({int(i["id"]) for f in files for i in json.loads(f.read_text(encoding="utf-8"))["items"]})
+
+
+def _write_items(root: Path, clone: Path, binary: str) -> None:
+    ids = database_item_ids(clone)
+    if ids is not None:
+        (root / f"{binary}{ITEMS_SUFFIX}").write_text(json.dumps(ids), encoding="utf-8")
+
+
 def wowsims_dir(cache_dir: Path) -> Path:
     return cache_dir.joinpath(*FOLDER)
 
@@ -90,6 +108,8 @@ def update_wowsims(
         and previous.get("patches") == patches
         and (root / str(previous.get("binary"))).is_file()
     ):
+        if not (root / f"{previous['binary']}{ITEMS_SUFFIX}").is_file():
+            _write_items(root, clone, str(previous["binary"]))  # même commit : la base du clone est la sienne
         return {**previous, "status": "à jour"}
     committed_at = _out(run, ["git", "log", "-1", "--format=%cI"], clone)
     m = _PROTOBUF.search((clone / "go.mod").read_text(encoding="utf-8"))
@@ -129,11 +149,12 @@ def update_wowsims(
         "built_at": (now or datetime.now(UTC)).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": "compilé",
     }
+    _write_items(root, clone, binary)
     (root / PIN_NAME).write_text(json.dumps(pin, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     # un seul binaire épinglé à la fois : les anciens sont retirés, sauf celui qu'un calcul en cours utilise encore
     # (Windows refuse de le supprimer) ; il part à la mise à jour suivante
-    for old in root.glob("wowsimcli-*.exe"):
-        if old.name != binary:
+    for old in [*root.glob("wowsimcli-*.exe"), *root.glob(f"wowsimcli-*.exe{ITEMS_SUFFIX}")]:
+        if old.name not in (binary, f"{binary}{ITEMS_SUFFIX}"):
             try:
                 old.unlink(missing_ok=True)
             except PermissionError:

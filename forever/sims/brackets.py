@@ -106,7 +106,18 @@ DATABASE = ("assets", "database")  # base d'objets de wowsims (db.json et leftov
 
 
 def known_items(clone: Path) -> set[int] | None:
-    """Objets de la base de wowsims (les deux fichiers que son binaire charge) ; None si le clone n'en a pas."""
+    """Objets de la base de wowsims (les deux fichiers que son binaire charge) ; None si le clone n'en a pas.
+    Ceux du binaire épinglé d'abord (`<binaire>.items.json`, relevés à sa compilation) : après une mise à jour en
+    échec, le clone peut être plus récent que le binaire et connaître des objets que celui-ci n'a pas."""
+    from forever.pipeline.wowsims_build import ITEMS_SUFFIX, PIN_NAME
+
+    try:
+        binary = json.loads((clone.parent / PIN_NAME).read_text(encoding="utf-8")).get("binary")
+        snapshot = clone.parent / f"{binary}{ITEMS_SUFFIX}"
+        if binary and snapshot.is_file():
+            return {int(i) for i in json.loads(snapshot.read_text(encoding="utf-8"))}
+    except (OSError, ValueError, AttributeError):
+        pass
     folder = clone.joinpath(*DATABASE)
     files = [folder / name for name in ("db.json", "leftover_db.json") if (folder / name).is_file()]
     if not files:
