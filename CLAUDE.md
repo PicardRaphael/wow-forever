@@ -25,6 +25,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - SavedVariable initialisée dans le gestionnaire d'`ADDON_LOADED` ; jamais d'alias local au niveau du fichier.
 - `pcall` autour de chaque `RegisterEvent` et de chaque API incertaine (talents, bonus des sorts, valeurs secrètes).
 - Aucune fonction d'action (`CastSpell*`, `UseAction`, `RunMacro*`, `CreateMacro`, `SendChatMessage` automatique) ; ni pixels, ni lecture d'écran, ni entrées simulées, sauf la bande du pont de P06a (décision 194). Macros : texte à importer par le joueur seulement (décision 195).
+- Rappel d'aura (décision 307) : seule l'icône de ForeverRappels s'affiche en combat ; texture de sort, non cliquable, aucune action.
 - Aucun abonnement au journal de combat (`COMBAT_LOG_EVENT*`) : l'analyse des combats se fait toujours hors du jeu, sur `WoWCombatLog-*.txt`.
 - Contrôle : `uv run python scripts/check_addon.py` (et `tests/unit/test_addon_rules.py`).
 
