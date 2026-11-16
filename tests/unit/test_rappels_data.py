@@ -3,6 +3,7 @@ main dans `addon/`. Fixture synthétique (identifiants inventés), aucune règle
 vrai Lua 5.1 (lupa)."""
 
 import pytest
+
 from forever.rappels import GROUPS, build_groups, render_lua
 
 lupa = pytest.importorskip("lupa")
