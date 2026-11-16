@@ -118,3 +118,16 @@ def test_old_binary_still_running_keeps_the_new_pin(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "unlink", real_unlink)
     third = update_wowsims(tmp_path, runner=Tools(tmp_path, commit="c" * 40))
     assert not old.is_file() and third["commit"] == "c" * 40
+
+
+def test_build_keeps_the_item_list_of_its_binary(tmp_path):
+    """Les objets connus du binaire épinglé sont relevés à la compilation (`<binaire>.items.json`) : un clone passé
+    à une version plus récente par une mise à jour en échec ne fait plus croire qu'un objet est connu."""
+    update_wowsims(tmp_path, runner=Tools(tmp_path))
+    folder = tmp_path / "third_party" / "wowsims" / "forever" / "assets" / "database"
+    folder.mkdir(parents=True)
+    (folder / "db.json").write_text(json.dumps({"items": [{"id": 900001}]}), encoding="utf-8")
+    (folder / "leftover_db.json").write_text(json.dumps({"items": [{"id": 900002}]}), encoding="utf-8")
+    pin = update_wowsims(tmp_path, runner=Tools(tmp_path, commit=NEXT))
+    snapshot = tmp_path / "third_party" / "wowsims" / f"{pin['binary']}.items.json"
+    assert json.loads(snapshot.read_text(encoding="utf-8")) == [900001, 900002]
