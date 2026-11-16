@@ -1,6 +1,11 @@
-"""Installe l'addon ForeverLogger du dépôt dans le client (copie de `addon/ForeverLogger/`).
+"""Installe un addon du dépôt dans le client (copie de `addon/<nom>/`, ForeverLogger par défaut).
 
-    uv run python scripts/install_addon.py [--wow-dir <dossier du client>] [--dry-run] [--backups-only]
+    uv run python scripts/install_addon.py [--addon ForeverLogger|ForeverRappels] [--wow-dir <dossier du client>]
+        [--dry-run] [--backups-only]
+
+ForeverRappels (RA1) : `RappelsData.lua` de la copie installée est généré depuis les données de la version installée
+(`forever.rappels`) ; le fichier du dépôt reste vide, sans identifiant de sort. Réinstaller après une mise à jour des
+données.
 
 Destination : `<wow-dir>/Interface/AddOns/ForeverLogger/` (défaut : FOREVER_WOW_DIR, sinon la bêta Forever trouvée
 sous Program Files (x86) ou Program Files). Refuse une destination sans dossier `Interface/AddOns`. Seul le dossier
@@ -24,6 +29,7 @@ from forever.config import default_cache_dir, default_wow_dir
 
 SOURCE = ROOT / "addon" / "ForeverLogger"
 NAME = "ForeverLogger"
+ADDONS = ("ForeverLogger", "ForeverRappels")
 
 
 class InstallError(Exception):
@@ -64,9 +70,27 @@ def _addons_dir(wow_dir: Path) -> Path:
     return addons
 
 
-def install(src: Path, wow_dir: Path, *, dry_run: bool, now: datetime, backup_dir: Path) -> list[str]:
+def rappels_data() -> str:
+    """`RappelsData.lua` de ForeverRappels pour la version de données installée."""
+    from forever.config import default_deps
+    from forever.rappels import data_lua
+    from forever.store import load_version
+
+    return data_lua(load_version(default_deps()))
+
+
+def install(
+    src: Path,
+    wow_dir: Path,
+    *,
+    dry_run: bool,
+    now: datetime,
+    backup_dir: Path,
+    extra: dict[str, str] | None = None,
+) -> list[str]:
     """Copie `src` dans `<wow_dir>/Interface/AddOns/<nom>`, l'ancien contenu et les anciennes sauvegardes déplacés
-    dans `backup_dir` ; renvoie les opérations (préfixées « [simulation] » en `dry_run`)."""
+    dans `backup_dir`, puis écrit les fichiers générés `extra` (nom -> texte) par-dessus la copie ; renvoie les
+    opérations (préfixées « [simulation] » en `dry_run`)."""
     addons = _addons_dir(wow_dir)
     if not (src / f"{src.name}.toc").is_file():
         raise InstallError(f"source invalide : {src / (src.name + '.toc')} absent")
@@ -83,11 +107,16 @@ def install(src: Path, wow_dir: Path, *, dry_run: bool, now: datetime, backup_di
     actions.append(f"{prefix}copie : {src} -> {dest} ({len(files)} fichier(s))")
     if not dry_run:
         shutil.copytree(src, dest)
+    for name, text in sorted((extra or {}).items()):
+        actions.append(f"{prefix}fichier généré : {dest / name}")
+        if not dry_run:
+            (dest / name).write_bytes(text.encode("utf-8"))
     return actions
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Installe l'addon ForeverLogger dans le client.")
+    parser = argparse.ArgumentParser(description="Installe un addon du dépôt dans le client.")
+    parser.add_argument("--addon", choices=ADDONS, default=NAME, help="addon à installer (défaut : ForeverLogger)")
     parser.add_argument("--wow-dir", type=Path, default=default_wow_dir(), help="dossier du client")
     parser.add_argument("--dry-run", action="store_true", help="afficher les opérations sans rien écrire")
     parser.add_argument(
@@ -99,11 +128,13 @@ def main(argv: list[str] | None = None) -> int:
     backup_dir = backups_dir(default_cache_dir())
     try:
         if args.backups_only:
-            actions = relocate_backups(_addons_dir(args.wow_dir), NAME, backup_dir, dry_run=args.dry_run)
+            actions = relocate_backups(_addons_dir(args.wow_dir), args.addon, backup_dir, dry_run=args.dry_run)
             print("\n".join(actions) or "aucune sauvegarde dans le dossier des addons")
             return 0
         now = datetime.now()  # noqa: DTZ005 : horodatage local du nom de sauvegarde
-        actions = install(SOURCE, args.wow_dir, dry_run=args.dry_run, now=now, backup_dir=backup_dir)
+        extra = {"RappelsData.lua": rappels_data()} if args.addon == "ForeverRappels" else None
+        source = ROOT / "addon" / args.addon
+        actions = install(source, args.wow_dir, dry_run=args.dry_run, now=now, backup_dir=backup_dir, extra=extra)
     except InstallError as exc:
         print(f"Erreur : {exc}", file=sys.stderr)
         return 2

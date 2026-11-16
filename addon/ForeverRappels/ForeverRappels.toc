@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: ForeverRappels
+## Notes: Rappels d'aura en jeu (forever-core, RA1) : icône déplaçable, réglages dans EllesmereUI.
+## Version: 0.1.0
+## SavedVariables: ForeverRappelsDB
+## OptionalDeps: EllesmereUI
+RappelsData.lua
+ForeverRappels.lua

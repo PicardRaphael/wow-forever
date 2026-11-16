@@ -18,7 +18,8 @@ sys.path.insert(0, str(ROOT))
 
 from forever import toc
 
-SAVED_VARIABLE = "ForeverLoggerDB"
+SAVED_VARIABLE = "ForeverLoggerDB"  # défaut d'un fichier Lua sans .toc voisin (fixtures des tests)
+_TOC_SAVED = re.compile(r"^##\s*SavedVariables:\s*(\S+?)\s*(?:,|$)", re.MULTILINE)
 FORBIDDEN = frozenset(
     {
         "CastSpell",
@@ -96,7 +97,17 @@ def _line(text: str, pos: int) -> int:
     return text.count("\n", 0, pos) + 1
 
 
-def check_lua(path: Path) -> list[str]:
+def toc_saved_variable(directory: Path) -> str | None:
+    """Première SavedVariable déclarée par le `.toc` du dossier (RA1 : la règle suit chaque addon), None sans `.toc`."""
+    for toc_path in sorted(directory.glob("*.toc")):
+        m = _TOC_SAVED.search(toc_path.read_text(encoding="utf-8"))
+        if m:
+            return m[1]
+    return None
+
+
+def check_lua(path: Path, saved_variable: str | None = None, *, require_init: bool = True) -> list[str]:
+    saved = saved_variable or toc_saved_variable(path.parent) or SAVED_VARIABLE
     text = path.read_text(encoding="utf-8")
     code, strings = _mask(text)
     lines = code.splitlines()
@@ -111,21 +122,19 @@ def check_lua(path: Path) -> list[str]:
             stack.append(word)
         elif word in CLOSERS and stack:
             stack.pop()
-        elif word == SAVED_VARIABLE:
+        elif word == saved:
             uses_db = True
             if not in_function:
                 statement = lines[line - 1]
                 if re.match(r"\s*local\b", statement):
+                    errors.append(f"{name}:{line} : alias local de {saved} au niveau du fichier (table perdue)")
+                elif re.match(rf"\s*{saved}\s*=", statement):
                     errors.append(
-                        f"{name}:{line} : alias local de {SAVED_VARIABLE} au niveau du fichier (table perdue)"
-                    )
-                elif re.match(rf"\s*{SAVED_VARIABLE}\s*=", statement):
-                    errors.append(
-                        f"{name}:{line} : {SAVED_VARIABLE} initialisée hors d'une fonction : l'initialiser dans le "
+                        f"{name}:{line} : {saved} initialisée hors d'une fonction : l'initialiser dans le "
                         "gestionnaire d'ADDON_LOADED"
                     )
                 else:
-                    errors.append(f"{name}:{line} : {SAVED_VARIABLE} utilisée hors d'une fonction")
+                    errors.append(f"{name}:{line} : {saved} utilisée hors d'une fonction")
         elif word in ("RegisterEvent", "RegisterUnitEvent"):
             before = code[code.rfind("\n", 0, m.start()) + 1 : m.start()]
             if not re.search(r"pcall\s*\(\s*[\w.:]*$", before):
@@ -143,8 +152,13 @@ def check_lua(path: Path) -> list[str]:
     for pos, value in strings:
         if value in COMBAT_LOG:
             errors.append(f"{name}:{_line(text, pos)} : abonnement au journal de combat interdit ({value})")
-    if uses_db and not any(value == "ADDON_LOADED" for _, value in strings) and "ADDON_LOADED" not in code:
-        errors.append(f"{name}:1 : {SAVED_VARIABLE} sans initialisation dans ADDON_LOADED")
+    if (
+        require_init
+        and uses_db
+        and not any(value == "ADDON_LOADED" for _, value in strings)
+        and "ADDON_LOADED" not in code
+    ):
+        errors.append(f"{name}:1 : {saved} sans initialisation dans ADDON_LOADED")
     return errors
 
 
@@ -172,9 +186,16 @@ def check_toc(path: Path) -> list[str]:
 
 def check_addon(directory: Path) -> list[str]:
     errors: list[str] = []
+    saved = toc_saved_variable(directory)
+    lua_files = [p for p in sorted(directory.iterdir()) if p.suffix == ".lua"]
+    if saved is not None and lua_files:
+        # Addon en plusieurs fichiers : l'initialisation dans ADDON_LOADED se cherche dans l'addon entier.
+        texts = [p.read_text(encoding="utf-8") for p in lua_files]
+        if any(saved in t for t in texts) and not any("ADDON_LOADED" in t for t in texts):
+            errors.append(f"{directory.name} : {saved} sans initialisation dans ADDON_LOADED")
     for path in sorted(directory.iterdir()):
         if path.suffix == ".lua":
-            errors += check_lua(path)
+            errors += check_lua(path, saved, require_init=saved is None)
         elif path.suffix == ".toc":
             errors += check_toc(path)
     return errors
