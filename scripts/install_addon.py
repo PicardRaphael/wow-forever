@@ -141,7 +141,7 @@ def main(argv: list[str] | None = None) -> int:
     except PermissionError as exc:
         print(
             f"Erreur : droits insuffisants ({exc}). Relancer dans un terminal administrateur : "
-            "uv run python scripts/install_addon.py",
+            f"uv run python scripts/install_addon.py --addon {args.addon}",
             file=sys.stderr,
         )
         return 1

@@ -194,7 +194,9 @@ local function evaluate()
 	if rule then
 		M.texture:SetTexture(iconFor(rule))
 		frame:Show()
-		if not M.wasShown and db.son then pcall(PlaySound, SOUNDKIT and SOUNDKIT.RAID_WARNING, "Master") end
+		if not M.wasShown and db.son and rule.when == "combat" then
+			pcall(PlaySound, SOUNDKIT and SOUNDKIT.RAID_WARNING, "Master")
+		end
 		M.wasShown = true
 		return
 	end
@@ -388,8 +390,8 @@ local handlers = {
 	PLAYER_LOGIN = function() refreshStates() end,
 	PLAYER_ENTERING_WORLD = function() refreshStates() end,
 	PLAYER_REGEN_DISABLED = function()
-		refreshStates()
 		M.combat = true
+		refreshStates()
 	end,
 	PLAYER_REGEN_ENABLED = function()
 		M.combat = false
