@@ -21,6 +21,10 @@ l'aura qui manque (Aspect du faucon : Aspects mortels 5/5 ne joue que sous Fauco
 
 ## Décisions à prendre avant l'exécution (à moi)
 
+**Plan validé le 2026-11-16 (« Oui, on le construit »)** : 1. construire RA1 (HunterSuite non installé) ;
+2. exception aux lignes rouges accordée pour la seule icône de rappel d'aura (décision à écrire dans
+`docs/DECISIONS.md`, `docs/ADDON.md` et `CLAUDE.md` amendés en conséquence) ; 3. icône non cliquable (défaut du plan).
+
 1. **Construire ou installer HunterSuite ?** RA1 apporte : règles réglables (toute classe plus tard), intégration
    au panneau d'EllesmereUI, données tenues par la veille. Sinon : installer HunterSuite et s'arrêter là.
 2. **Lignes rouges (nouvelle décision)** : `docs/ADDON.md` dit « seul ForeverBridge dessine » et « aucun conseil de
