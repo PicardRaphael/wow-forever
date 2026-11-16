@@ -47,3 +47,12 @@ def test_analysis_is_computed_written_and_read_back(make_deps):
     read = read_analysis(deps, "mage/dps/Fire", "Human")
     assert read["brackets"][0]["dps"] == 50.0 and read["provenance"]["certainty"] == "suppose"
     assert read_analysis(deps, "mage/dps/Frost", "Human") is None
+
+
+def test_analysis_key_follows_the_candidate_rule(make_deps):
+    """Une règle des candidats d'équipement changée (2026-11-16 : objets sans niveau requis jugés par leur source)
+    périme les analyses gardées : sa version est dans la clé, la veille les relance."""
+    from forever.sims.brackets import CANDIDATES
+
+    deps = make_deps()
+    assert CANDIDATES in analysis_path(deps, "mage/dps/Fire", "Human").parent.name
