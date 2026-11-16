@@ -130,7 +130,12 @@ def update_wowsims(
         "status": "compilé",
     }
     (root / PIN_NAME).write_text(json.dumps(pin, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    if previous and previous.get("binary") not in (None, binary):
-        old = root / str(previous["binary"])
-        old.unlink(missing_ok=True)  # un seul binaire épinglé à la fois
+    # un seul binaire épinglé à la fois : les anciens sont retirés, sauf celui qu'un calcul en cours utilise encore
+    # (Windows refuse de le supprimer) ; il part à la mise à jour suivante
+    for old in root.glob("wowsimcli-*.exe"):
+        if old.name != binary:
+            try:
+                old.unlink(missing_ok=True)
+            except PermissionError:
+                pass
     return pin
