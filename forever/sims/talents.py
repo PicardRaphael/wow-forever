@@ -32,7 +32,19 @@ MYTHICSIM_TABLES = {
         "src/classes/hunter/prepare.rs",
         ("FOREVER_BEAST_MASTERY", "FOREVER_MARKSMANSHIP", "FOREVER_SURVIVAL"),
     ),
+    "Druid": ("src/classes/druid/prepare.rs", ("FOREVER_BALANCE", "FOREVER_FERAL_COMBAT", "FOREVER_RESTORATION")),
+    "Rogue": ("src/classes/rogue/prepare.rs", ("FOREVER_ASSASSINATION", "FOREVER_COMBAT", "FOREVER_SUBTLETY")),
+    "Warrior": ("src/classes/warrior/prepare/talent_ranks.rs", ("FOREVER_ARMS", "FOREVER_FURY", "PROTECTION")),
+    "Paladin": ("src/classes/paladin/prepare/hotfix_113554.rs", ("HOLY", "PROTECTION", "RETRIBUTION")),
 }
+# Classes que MythicSim lit, sous les règles de Forever aussi, dans l'ordre des numéros de champ du proto de son fork Go
+# (`fill_talents`, un arbre après l'autre selon `TALENT_TREE_SIZES` de ce fichier) : le champ est relié au sort par
+# l'arbre du fork, comme pour les tables.
+MYTHICSIM_PROTO_ORDER = {
+    "Warlock": "src/classes/warlock/prepare.rs",
+    "Priest": "src/classes/priest/prepare.rs",
+}
+_TREE_SIZES = re.compile(r"TALENT_TREE_SIZES:\s*\[usize;\s*3\]\s*=\s*\[(\d+),\s*(\d+),\s*(\d+)\]")
 # Options du champ : `talent_spell_id`, puis d'autres options possibles (`talent_max_rank` depuis le commit 64b21da).
 _FIELD = re.compile(r"^\s*(?:int32|bool)\s+(\w+)\s*=\s*\d+\s*(?:\[([^\]]*)\])?\s*;")
 _OPTION = re.compile(r"\((\w+)\)\s*=\s*(\d+)")
@@ -191,6 +203,8 @@ def mythicsim_layout(
 ) -> EngineLayout:
     """Ordre de MythicSim sous les règles de Forever (table de son code), relié à nos clés par le sort de l'arbre de
     son fork Go, nom du client contrôlé (voir le module) ; `wowsims` : clone de wowsims pour confirmer un renommage."""
+    if class_name in MYTHICSIM_PROTO_ORDER:
+        return _mythicsim_proto_layout(engine, go, class_name, client)
     if class_name not in MYTHICSIM_TABLES:
         raise TalentConversionError(
             f"MythicSim : ordre des talents du {class_name} non lu par forever (tables lues : "
@@ -210,7 +224,12 @@ def mythicsim_layout(
                    for f, s, _ in tree if s}  # fmt: skip
     by_spell = _by_spell(client)
     trees = []
-    for const in consts:
+    for index, const in enumerate(consts):
+        # talent propre à Forever absent de l'arbre du fork Go : relié par le nom du client écrit dans la table, s'il
+        # est unique dans le même arbre du client (jamais quand le fork porte un autre sort à ce champ)
+        names: dict[str, list[Mapping[str, Any]]] = {}
+        for t in client[index] if index < len(client) else []:
+            names.setdefault(str(t["name"]), []).append(t)
         head = f"const {const}: &["
         if head not in text:
             raise TalentConversionError(f"constante {const} absente de {rel} (MythicSim épinglé).")
@@ -220,9 +239,47 @@ def mythicsim_layout(
             sid, fancy = fork.get(_camel(field), (None, ""))
             hit = by_spell.get(sid) if sid else None
             same = hit is not None and (name in (hit["name"], fancy) or renamed.get(_snake(name)) == sid)
-            row.append(Slot(field, name, str(hit["key"]) if hit and same else None, int(ranks)))
+            key = str(hit["key"]) if hit and same else None
+            if key is None and sid is None and len(names.get(name, [])) == 1:
+                key = str(names[name][0]["key"])
+            row.append(Slot(field, name, key, int(ranks)))
         trees.append(tuple(row))
     return EngineLayout("MythicSim", class_name, tuple(trees))
+
+
+def _mythicsim_proto_layout(
+    engine: Path, go: Path, class_name: str, client: Sequence[Sequence[Mapping[str, Any]]]
+) -> EngineLayout:
+    """Ordre de MythicSim pour une classe lue par numéro de champ (`MYTHICSIM_PROTO_ORDER`) : champs du message
+    `<Classe>Talents` du proto du fork Go dans l'ordre, arbres de la taille de `TALENT_TREE_SIZES` du moteur (un écart
+    refuse), champ relié à notre talent par le sort de l'arbre du fork ; sans sort ou sans talent du client : aucune
+    correspondance (refus s'il est pris)."""
+    prepare = engine / MYTHICSIM_PROTO_ORDER[class_name]
+    if not prepare.is_file():
+        raise TalentConversionError(
+            f"code de MythicSim introuvable : {prepare}.", "lancer `uv run forever sims update`"
+        )
+    m = _TREE_SIZES.search(prepare.read_text(encoding="utf-8"))
+    if m is None:
+        raise TalentConversionError(f"TALENT_TREE_SIZES absent de {prepare.name} (MythicSim épinglé).")
+    sizes = [int(n) for n in m.groups()]
+    trees = _proto_trees(go / "proto" / f"{class_name.lower()}.proto", class_name)
+    if [len(t) for t in trees] != sizes:
+        raise TalentConversionError(
+            f"MythicSim : arbres du proto du fork ({[len(t) for t in trees]}) différents de TALENT_TREE_SIZES {sizes} "
+            f"pour le {class_name}."
+        )
+    fork = _fork_tree(go, class_name)
+    by_spell = _by_spell(client)
+    out = []
+    for tree in trees:
+        row = []
+        for field, _sid, _max in tree:
+            sid, fancy = fork.get(_camel(field), (None, ""))
+            hit = by_spell.get(sid) if sid else None
+            row.append(Slot(field, fancy or field, str(hit["key"]) if hit else None))
+        out.append(tuple(row))
+    return EngineLayout("MythicSim", class_name, tuple(out))
 
 
 def parse_talents(text: str) -> dict[str, int]:

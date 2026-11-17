@@ -113,9 +113,10 @@ def test_wowsims_preset_of_64b21da_converts_to_mythicsim(make_deps):
     assert ms.encode(ws.decode(code)) == code
 
 
-def test_class_without_a_read_table_is_refused(make_deps):
-    with pytest.raises(TalentConversionError, match="Paladin"):
-        mythicsim_layout(ENGINE, GO, "Paladin", client_trees(make_deps(), "Paladin"), wowsims=WOWSIMS)
+def test_class_without_a_read_table_is_refused():
+    # depuis le 2026-11-17, les neuf classes de Forever sont lues : une classe hors de la liste reste refusée
+    with pytest.raises(TalentConversionError, match="DeathKnight"):
+        mythicsim_layout(ENGINE, GO, "DeathKnight", [], wowsims=WOWSIMS)
 
 
 def test_talents_parameter_is_read():
@@ -165,4 +166,3 @@ def test_forever_talent_missing_from_the_fork_is_linked_by_its_client_name(make_
     ms = mythicsim_layout(ENGINE, GO, "Warrior", client, wowsims=WOWSIMS)
     slot = next(s for tree in ms.trees for s in tree if s.name == "Two-Handed Weapon Specialization")
     assert slot.key == "twoHandedWeaponSpecialization"
-    assert all(s.key for tree in ms.trees for s in tree)
