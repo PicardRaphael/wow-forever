@@ -14,4 +14,8 @@ Copiés le 2026-11-04 (puis le 2026-11-08 pour SIM2) depuis les clones épinglé
 | `wowsims/proto/hunter.proto` | wowsims/forever (MIT), `proto/hunter.proto`, message `HunterTalents` seulement (copié le 2026-11-17) | `540ad8fca3fd367c5f780972f43d65af858bcef7` |
 | `mythicsim/engine/src/classes/hunter/prepare.rs` | sage3648/mythicsim-forever-engine (MIT), constantes `FOREVER_BEAST_MASTERY` à `FOREVER_SURVIVAL` seulement (copié le 2026-11-17) | `68f4a06af0f40ecf250ad521957a56e956272f92` |
 | `mythicsim/go/ui/sim/talents/trees/hunter.json` | sage3648/mythicsim-forever-engine-go (MIT), fichier entier (copié le 2026-11-17) | `a667dce8492bd9fb94269a9f864289cb74006775` |
+| `mythicsim/go/proto/warlock.proto` | sage3648/mythicsim-forever-engine-go (MIT), message `WarlockTalents` seulement (copié le 2026-11-17) | `a667dce8492bd9fb94269a9f864289cb74006775` |
+| `mythicsim/go/ui/sim/talents/trees/warlock.json`, `warrior.json` | même dépôt, fichiers entiers (copiés le 2026-11-17) | `a667dce8492bd9fb94269a9f864289cb74006775` |
+| `mythicsim/engine/src/classes/warlock/prepare.rs` | sage3648/mythicsim-forever-engine (MIT), ligne `TALENT_TREE_SIZES` seulement (copiée le 2026-11-17) | `68f4a06af0f40ecf250ad521957a56e956272f92` |
+| `mythicsim/engine/src/classes/warrior/prepare/talent_ranks.rs` | même dépôt, constantes `FOREVER_ARMS` à `PROTECTION` seulement (copié le 2026-11-17) | `68f4a06af0f40ecf250ad521957a56e956272f92` |
 Ils servent seulement à tester la conversion des talents par identifiant de sort (`forever/sims/talents.py`).
