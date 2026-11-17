@@ -122,3 +122,15 @@ def test_talents_parameter_is_read():
     assert parse_talents("improvedGhostWolf=2, stormstrike=1") == {"improvedGhostWolf": 2, "stormstrike": 1}
     with pytest.raises(ForeverError, match="clé=rang"):
         parse_talents("improvedGhostWolf")
+
+
+def test_hunter_orders_agree_between_the_two_engines(make_deps):
+    """Chasseur (2026-11-17) : MythicSim lit le Chasseur sous les règles de Forever (`FOREVER_BEAST_MASTERY` à
+    `FOREVER_SURVIVAL`) ; le build de raid Précision trouvé par wowsims se convertit pour MythicSim, talent par
+    talent, par identifiant de sort."""
+    client = client_trees(make_deps(), "Hunter")
+    ws = wowsims_layout(WOWSIMS, "Hunter", client)
+    ms = mythicsim_layout(ENGINE, GO, "Hunter", client, wowsims=WOWSIMS)
+    talents = ws.decode("5-0053552511523051-3")
+    assert talents["deadlyAspects"] == 5 and talents["trueshotAura"] == 1
+    assert ms.decode(ms.encode(talents)) == talents
