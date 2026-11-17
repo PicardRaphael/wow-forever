@@ -2970,6 +2970,18 @@
    "money_difficulty": 3,
    "money_multiplier": 1.0
   },
+  "294": {
+   "type": 2,
+   "level": 24,
+   "min_level": 22,
+   "sort_id": 11,
+   "next_quest": 295,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 1700,
+   "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
   "295": {
    "type": 2,
    "level": 27,
@@ -2980,6 +2992,18 @@
    "xp_multiplier": 1.0,
    "money": 2200,
    "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
+  "296": {
+   "type": 2,
+   "level": 29,
+   "min_level": 22,
+   "sort_id": 11,
+   "next_quest": 0,
+   "xp_difficulty": 6,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "297": {
@@ -6042,6 +6066,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "1017": {
+   "type": 2,
+   "level": 25,
+   "min_level": 20,
+   "sort_id": 331,
+   "next_quest": 0,
+   "xp_difficulty": 6,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "1020": {
    "type": 2,
    "level": 20,
@@ -6174,6 +6210,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "1057": {
+   "type": 2,
+   "level": 27,
+   "min_level": 20,
+   "sort_id": 406,
+   "next_quest": 1059,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "1061": {
    "type": 2,
    "level": 17,
@@ -6210,6 +6258,42 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "1071": {
+   "type": 2,
+   "level": 21,
+   "min_level": 17,
+   "sort_id": 406,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "1072": {
+   "type": 2,
+   "level": 21,
+   "min_level": 17,
+   "sort_id": 406,
+   "next_quest": 1073,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "1075": {
+   "type": 2,
+   "level": 21,
+   "min_level": 17,
+   "sort_id": 406,
+   "next_quest": 1076,
+   "xp_difficulty": 3,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
   "1078": {
    "type": 2,
    "level": 26,
@@ -6217,6 +6301,18 @@
    "sort_id": 406,
    "next_quest": 0,
    "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
+   "money_multiplier": 1.0
+  },
+  "1085": {
+   "type": 2,
+   "level": 21,
+   "min_level": 17,
+   "sort_id": 331,
+   "next_quest": 1071,
+   "xp_difficulty": 1,
    "xp_multiplier": 1.0,
    "money": 0,
    "money_difficulty": 0,
@@ -6964,6 +7060,18 @@
    "xp_multiplier": 1.0,
    "money": 500,
    "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
+  "1582": {
+   "type": 2,
+   "level": 18,
+   "min_level": 8,
+   "sort_id": -182,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "1638": {
@@ -8440,6 +8548,18 @@
    "xp_multiplier": 1.8,
    "money": 2200,
    "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
+  "2927": {
+   "type": 2,
+   "level": 27,
+   "min_level": 20,
+   "sort_id": 133,
+   "next_quest": 0,
+   "xp_difficulty": 1,
+   "xp_multiplier": 1.0,
+   "money": 0,
+   "money_difficulty": 0,
    "money_multiplier": 1.0
   },
   "2928": {
@@ -13686,6 +13806,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "86757": {
+   "type": 2,
+   "level": 30,
+   "min_level": 25,
+   "sort_id": 331,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 2500,
+   "money_difficulty": 5,
+   "money_multiplier": 1.0
+  },
   "86758": {
    "type": 2,
    "level": 16,
@@ -18286,8 +18418,8 @@
  "questcache": {
   "build": 70938,
   "locale": "frFR",
-  "records": 222,
-  "kept_from_base": 1414
+  "records": 277,
+  "kept_from_base": 1423
  },
  "notes": [
   "quest_xp : XP d'une quête par niveau de quête (clé) et par difficulté (colonne), table QuestXP du client",
