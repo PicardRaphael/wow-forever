@@ -28,11 +28,16 @@ from forever.errors import ForeverError, InvalidArgumentError
 MYTHICSIM_TABLES = {
     "Mage": ("src/classes/mage/prepare.rs", ("FOREVER_ARCANE", "FOREVER_FIRE", "FOREVER_FROST")),
     "Shaman": ("src/classes/shaman/prepare/layout.rs", ("ELEMENTAL", "ENHANCEMENT", "RESTORATION")),
+    "Hunter": (
+        "src/classes/hunter/prepare.rs",
+        ("FOREVER_BEAST_MASTERY", "FOREVER_MARKSMANSHIP", "FOREVER_SURVIVAL"),
+    ),
 }
 # Options du champ : `talent_spell_id`, puis d'autres options possibles (`talent_max_rank` depuis le commit 64b21da).
 _FIELD = re.compile(r"^\s*(?:int32|bool)\s+(\w+)\s*=\s*\d+\s*(?:\[([^\]]*)\])?\s*;")
 _OPTION = re.compile(r"\((\w+)\)\s*=\s*(\d+)")
-_TABLE_ROW = re.compile(r'(?:new_)?talent\(\s*"(\w+)",\s*"([^"]+)",\s*(\d+)\s*\)')
+# ligne de table, sur une ligne ou coupée par rustfmt (virgule finale)
+_TABLE_ROW = re.compile(r'(?:new_)?talent\(\s*"(\w+)",\s*"([^"]+)",\s*(\d+)\s*,?\s*\)')
 
 
 class TalentConversionError(ForeverError):
