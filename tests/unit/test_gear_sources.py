@@ -53,6 +53,16 @@ def test_gearquest_picks():
     assert len(picks) == 3 and read_gearquest_picks(ADDONS, "WARRIOR") == []
 
 
+def test_gearquest_picks_packed():
+    """GearQuest Forever 1.2.2 : choix rangés en texte par camp (`<classe>PicksPacked`), emplacement et spé par index."""
+    picks = read_gearquest_picks(ADDONS, "WARLOCK")
+    assert picks == [
+        GearPick(900101, "Head", 18, 22, 1, "destruction", "Alliance", 3.5),
+        GearPick(900102, "SecondaryHand", 18, 22, 2, "affliction", "Alliance", 2.25),
+        GearPick(900103, "Head", 20, 25, 1, "affliction", "Horde", 1.5),
+    ]
+
+
 def test_missing_addons_read_empty(tmp_path):
     assert read_guide_gear(tmp_path) == {}
     assert read_naowh_bis(tmp_path) == ({}, {})
