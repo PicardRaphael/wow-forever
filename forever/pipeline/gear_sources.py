@@ -275,9 +275,13 @@ def read_gearquest_picks(addons: Path, class_token: str) -> list[GearPick]:
     """Choix de leveling de GearQuest Forever pour une classe (`GQ.Data.<classe>Picks`), dans l'ordre du fichier."""
     folder = addons / f"{GEARQUEST_PREFIX}{class_token.upper()}"
     marker = f"GQ.Data.{class_token.lower()}Picks = "
+    packed = f"GQ.Data.{class_token.lower()}PicksPacked = "
     out: list[GearPick] = []
     for path in sorted(folder.glob("*.lua")) if folder.is_dir() else []:
         text = _read(path) or ""
+        if packed in text:
+            out += _packed_picks(_value_after(text, packed))
+            continue
         if marker not in text:
             continue
         rows = _value_after(text, marker)
@@ -287,6 +291,33 @@ def read_gearquest_picks(addons: Path, class_token: str) -> list[GearPick]:
                 item, slot, low, high, rank, spec, faction, score = values
                 out.append(GearPick(item, str(slot), int(low), int(high), int(rank), str(spec), str(faction),
                                     float(score)))  # fmt: skip
+    return out
+
+
+_PACKED_ROW = re.compile(r"^(\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\S+) (\d+)$", re.MULTILINE)
+
+
+def _packed_picks(table: Any) -> list[GearPick]:
+    """Choix rangés en texte de GearQuest Forever 1.2.2 (`<classe>PicksPacked`, lu comme `ReadRows` de son
+    `DataAdapter.lua`) : par camp, une ligne `objet emplacement min max rang spé score extra`, emplacement et spé
+    en index (base 1) de `slots` et `specs` ; camp `_` : aucun."""
+    if not isinstance(table, dict):
+        return []
+
+    def listed(value: Any) -> list[Any]:
+        return [value[k] for k in sorted(value)] if isinstance(value, dict) else list(value or ())
+
+    slots, specs = listed(table.get("slots")), listed(table.get("specs"))
+    out: list[GearPick] = []
+    rows = table.get("rows")
+    for faction, text in sorted(rows.items()) if isinstance(rows, dict) else ():
+        for m in _PACKED_ROW.finditer(str(text).replace("\\n", "\n")):
+            item, slot, low, high, rank, spec, score, _extra = m.groups()
+            if not (0 < int(slot) <= len(slots) and 0 < int(spec) <= len(specs)):
+                continue
+            out.append(GearPick(int(item), str(slots[int(slot) - 1]), int(low), int(high), int(rank),
+                                str(specs[int(spec) - 1]), "" if faction == "_" else str(faction),
+                                float(score)))  # fmt: skip
     return out
 
 
