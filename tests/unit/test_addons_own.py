@@ -104,3 +104,9 @@ def test_update_step_counts_only_unknown_addons(deps):
     step = next(s for s in report["steps"] if s["name"] == "addons")
     assert [u["folder"] for u in step["data"]["untracked"]] == ["SomeDataAddon"]
     assert "1 à inventorier" in step["detail"]
+
+
+def test_forever_rappels_is_an_own_addon_never_to_inventory(addons):
+    write(addons / "ForeverRappels" / "ForeverRappels.toc", "## Version: 0.1.0\n")
+    assert "ForeverRappels" not in [u["folder"] for u in untracked_addons(addons)]
+    assert {g["folder"]: g for g in own_addons(addons)}["ForeverRappels"]["version"] == "0.1.0"

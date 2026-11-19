@@ -113,12 +113,56 @@ def test_wowsims_preset_of_64b21da_converts_to_mythicsim(make_deps):
     assert ms.encode(ws.decode(code)) == code
 
 
-def test_class_without_a_read_table_is_refused(make_deps):
-    with pytest.raises(TalentConversionError, match="Paladin"):
-        mythicsim_layout(ENGINE, GO, "Paladin", client_trees(make_deps(), "Paladin"), wowsims=WOWSIMS)
+def test_class_without_a_read_table_is_refused():
+    # depuis le 2026-11-17, les neuf classes de Forever sont lues : une classe hors de la liste reste refusée
+    with pytest.raises(TalentConversionError, match="DeathKnight"):
+        mythicsim_layout(ENGINE, GO, "DeathKnight", [], wowsims=WOWSIMS)
 
 
 def test_talents_parameter_is_read():
     assert parse_talents("improvedGhostWolf=2, stormstrike=1") == {"improvedGhostWolf": 2, "stormstrike": 1}
     with pytest.raises(ForeverError, match="clé=rang"):
         parse_talents("improvedGhostWolf")
+
+
+def test_hunter_orders_agree_between_the_two_engines(make_deps):
+    """Chasseur (2026-11-17) : MythicSim lit le Chasseur sous les règles de Forever (`FOREVER_BEAST_MASTERY` à
+    `FOREVER_SURVIVAL`) ; le build de raid Précision trouvé par wowsims se convertit pour MythicSim, talent par
+    talent, par identifiant de sort."""
+    client = client_trees(make_deps(), "Hunter")
+    ws = wowsims_layout(WOWSIMS, "Hunter", client)
+    ms = mythicsim_layout(ENGINE, GO, "Hunter", client, wowsims=WOWSIMS)
+    talents = ws.decode("5-0053552511523051-3")
+    assert talents["deadlyAspects"] == 5 and talents["trueshotAura"] == 1
+    assert ms.decode(ms.encode(talents)) == talents
+
+
+def test_warlock_is_read_in_the_proto_order_of_the_fork(make_deps):
+    """Démoniste (2026-11-17) : MythicSim le lit, sous les règles de Forever aussi, par numéro de champ du proto de
+    son fork Go, arbres de la taille de `TALENT_TREE_SIZES` ; chaque champ relié à notre talent par le sort de l'arbre
+    du fork : tous les talents du client ont leur place."""
+    client = client_trees(make_deps(), "Warlock")
+    ms = mythicsim_layout(ENGINE, GO, "Warlock", client)
+    assert [len(t) for t in ms.trees] == [17, 19, 16]
+    every = {t["key"]: 1 for tree in client for t in tree}
+    assert ms.decode(ms.encode(every)) == every
+
+
+def test_proto_order_with_other_tree_sizes_is_refused(make_deps, tmp_path):
+    import shutil
+
+    engine = tmp_path / "engine"
+    shutil.copytree(ENGINE, engine)
+    rs = engine / "src" / "classes" / "warlock" / "prepare.rs"
+    rs.write_text("const TALENT_TREE_SIZES: [usize; 3] = [16, 19, 17];\n", encoding="utf-8")
+    with pytest.raises(TalentConversionError, match="TALENT_TREE_SIZES"):
+        mythicsim_layout(engine, GO, "Warlock", client_trees(make_deps(), "Warlock"))
+
+
+def test_forever_talent_missing_from_the_fork_is_linked_by_its_client_name(make_deps):
+    """Guerrier : un talent propre à Forever que l'arbre du fork Go n'a pas encore (Two-Handed Weapon Specialization)
+    est relié par le nom du client écrit dans la table de MythicSim, unique dans son arbre."""
+    client = client_trees(make_deps(), "Warrior")
+    ms = mythicsim_layout(ENGINE, GO, "Warrior", client, wowsims=WOWSIMS)
+    slot = next(s for tree in ms.trees for s in tree if s.name == "Two-Handed Weapon Specialization")
+    assert slot.key == "twoHandedWeaponSpecialization"

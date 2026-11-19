@@ -509,6 +509,22 @@ C_UnitAuras = {
 		return Stub.player.auras[index]
 	end),
 }
+-- RA1 : aura du joueur par sort (C_UnitAuras.GetPlayerAuraBySpellID) ; Stub.aura_hidden_in_combat imite un client
+-- qui rend nil en combat même quand l'aura est là (lecture non fiable, sonde en jeu du bloc 0). Icône d'un sort
+-- (C_Spell.GetSpellTexture) et son du client (PlaySound, Stub.kits). Valeurs synthétiques, aucune règle de jeu.
+Stub.aura_hidden_in_combat = false
+Stub.kits = {}
+C_UnitAuras.GetPlayerAuraBySpellID = api("C_UnitAuras.GetPlayerAuraBySpellID", function(id)
+	if Stub.aura_hidden_in_combat and Stub.combat then return nil end
+	for _, a in ipairs(Stub.player.auras) do
+		if a.spellId == id then return a end
+	end
+	return nil
+end)
+C_Spell = C_Spell or {}
+C_Spell.GetSpellTexture = api("C_Spell.GetSpellTexture", function(id) return "icon-" .. tostring(id) end)
+SOUNDKIT = SOUNDKIT or { RAID_WARNING = "RAID_WARNING" }
+function PlaySound(kit, channel) table.insert(Stub.kits, kit or "nil") end
 C_Item = C_Item or {}
 C_Item.GetItemCount = api("C_Item.GetItemCount", function(item) return Stub.player.items[item] or 0 end)
 C_Traits.GetConfigIDByTreeID = api("C_Traits.GetConfigIDByTreeID", function(tree) return Stub.player.tree_configs[tree] end)

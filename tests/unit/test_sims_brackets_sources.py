@@ -79,3 +79,13 @@ def test_simulator_error_is_named_without_its_go_trace(make_deps):
     with pytest.raises(WowsimsError) as caught:
         run_sim(deps.cache_dir, request_for(fire, race="RaceHuman", encounter=ENCOUNTER), runner=ErrorSim())
     assert caught.value.message == "wowsims : No item with id: 1769"
+
+
+def test_known_items_follow_the_pinned_binary_not_a_newer_clone(make_deps):
+    """Cas réel du 2026-11-16 : mise à jour en échec, clone passé à la version suivante (objet ajouté), binaire
+    épinglé resté l'ancien ; l'objet n'est pas connu du binaire et doit être écarté."""
+    _, root = _setup(make_deps)
+    _database(root, [2800, 18473], [6614])
+    (root / "pin.json").write_text(json.dumps({"binary": "wowsimcli-ancien.exe"}), encoding="utf-8")
+    (root / "wowsimcli-ancien.exe.items.json").write_text(json.dumps([2800, 6614]), encoding="utf-8")
+    assert known_items(root / "forever") == {2800, 6614}

@@ -328,6 +328,10 @@ OWN_ADDONS: Mapping[str, tuple[tuple[str, ...], str]] = {
         "addon du dépôt (addon/), SavedVariables lues par forever/pipeline/addon_sv.py",
     ),
     "ForeverBridge": (("ForeverBridge",), "pont de P06a, installé par forever bridge install"),
+    "ForeverRappels": (
+        ("ForeverRappels",),
+        "addon du dépôt (addon/, RA1), installé par scripts/install_addon.py --addon ForeverRappels",
+    ),
     "RaphCompletionist": (
         ("RaphCompletionist",),
         "addon de l'utilisateur, dossier de la conversation « addons » prévue en P06b",

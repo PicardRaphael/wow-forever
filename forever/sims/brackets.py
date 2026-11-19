@@ -102,11 +102,26 @@ def equipment_from_picks(picks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     return {"items": items}
 
 
+# version de la règle des candidats d'équipement, dans la clé des analyses gardées (2 : objets sans niveau requis
+# jugés par leur source, 2026-11-16)
+CANDIDATES = "candidats-2"
+
 DATABASE = ("assets", "database")  # base d'objets de wowsims (db.json et leftover_db.json, chargées par son binaire)
 
 
 def known_items(clone: Path) -> set[int] | None:
-    """Objets de la base de wowsims (les deux fichiers que son binaire charge) ; None si le clone n'en a pas."""
+    """Objets de la base de wowsims (les deux fichiers que son binaire charge) ; None si le clone n'en a pas.
+    Ceux du binaire épinglé d'abord (`<binaire>.items.json`, relevés à sa compilation) : après une mise à jour en
+    échec, le clone peut être plus récent que le binaire et connaître des objets que celui-ci n'a pas."""
+    from forever.pipeline.wowsims_build import ITEMS_SUFFIX, PIN_NAME
+
+    try:
+        binary = json.loads((clone.parent / PIN_NAME).read_text(encoding="utf-8")).get("binary")
+        snapshot = clone.parent / f"{binary}{ITEMS_SUFFIX}"
+        if binary and snapshot.is_file():
+            return {int(i) for i in json.loads(snapshot.read_text(encoding="utf-8"))}
+    except (OSError, ValueError, AttributeError):
+        pass
     folder = clone.joinpath(*DATABASE)
     files = [folder / name for name in ("db.json", "leftover_db.json") if (folder / name).is_file()]
     if not files:
@@ -1001,11 +1016,46 @@ def gearquest_equipment(deps: Deps, preset: Preset, race: str, level: int) -> tu
     return {"items": items}, note
 
 
+def obtain_check(row: Mapping[str, Any], item: int, level: int, faction: str | None, access: Any) -> str | None:
+    """Raison d'écarter un objet sans niveau requis au niveau `level`, ou None s'il s'obtient : sa source dans la base
+    des simulateurs jugée par la règle des choix de GearQuest (`forever.gear.obtainable`, registre I21) ; quête,
+    donjon ou marchand ; autre source ou aucune : écarté sous le niveau 60 (niveau d'obtention inconnu)."""
+    from forever.gear import obtainable
+
+    if level >= 60:
+        return None
+    reasons: list[str] = []
+    for source in row.get("sources") or []:
+        kind = next(iter(source), "")
+        detail = source.get(kind) if isinstance(source.get(kind), Mapping) else {}
+        if kind == "quest":
+            fact = {"sourceType": "quest_reward", "questName": detail.get("name") or ""}
+        elif kind == "soldBy":
+            fact = {"sourceType": "vendor"}
+        elif kind == "drop":
+            fact = {"sourceType": "boss_drop"}
+        else:
+            reasons.append(f"source « {kind} » sans niveau connu")
+            continue
+        verdict, reason = obtainable(fact, item, level, faction, access)
+        if verdict == "ok":
+            return None
+        reasons.append(reason)
+    return reasons[0] if reasons else "niveau d'obtention inconnu (aucune source dans la base des simulateurs)"
+
+
 def candidate_pool(
-    db: Mapping[int, Mapping[str, Any]], sources: Sequence[tuple[str, Sequence[int]]], *, level: int, class_id: int
+    db: Mapping[int, Mapping[str, Any]],
+    sources: Sequence[tuple[str, Sequence[int]]],
+    *,
+    level: int,
+    class_id: int,
+    obtain: Callable[[int, Mapping[str, Any]], str | None] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Réserve de candidats : objets de toutes les `sources` (nom, objets), emplacement déduit du type de la base,
-    filtrés par niveau requis et classe permise ; (candidats avec leurs sources, objets écartés avec la raison)."""
+    filtrés par niveau requis et classe permise ; un objet sans niveau requis et hors des choix de GearQuest est
+    jugé par `obtain` (raison de l'écarter, ou None) ; (candidats avec leurs sources, objets écartés avec la
+    raison)."""
     found: dict[int, list[str]] = {}
     for name, items in sources:
         for item in items:
@@ -1026,6 +1076,8 @@ def candidate_pool(
             reason = "réservé à d'autres classes"
         elif slot is None:
             reason = "emplacement inconnu"
+        elif obtain is not None and not row.get("reqLvl") and "GearQuest" not in names:
+            reason = obtain(item, row)
         if reason:
             skipped.append({"item": item, "reason": reason, "sources": names})
         else:
@@ -1066,6 +1118,16 @@ def item_database(cache_dir: Path) -> dict[int, dict[str, Any]]:
     return out
 
 
+def _race_faction(deps: Deps, race: str) -> str | None:
+    """Camp d'une race (`races.json`), en minuscules ; None si la race est inconnue."""
+    from forever.store import load_version
+
+    for row in (load_version(deps).read_json("races.json").get("races") or {}).values():
+        if race in (row.get("name"), row.get("client_file"), row.get("name_fr")):
+            return str(row.get("faction") or "").lower() or None
+    return None
+
+
 def pool_from_sources(
     deps: Deps, class_name: str, gear_spec: str, level: int, race: str
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
@@ -1086,8 +1148,13 @@ def pool_from_sources(
     for (cls, spec), slots in read_companion_bis(addons).items():
         if cls.upper() == token:
             sources.append((f"Forever Companion {spec}", [i for ids in slots.values() for i in ids]))
+    from forever.gear import level_access
+
+    faction = _race_faction(deps, race)
+    access = level_access(deps, [], class_name=class_name, race=race, faction=faction)
     pool, skipped = candidate_pool(item_database(deps.cache_dir), sources, level=level,
-                                   class_id=CLASS_IDS.get(class_name, 0))  # fmt: skip
+                                   class_id=CLASS_IDS.get(class_name, 0),
+                                   obtain=lambda item, row: obtain_check(row, item, level, faction, access))  # fmt: skip
     return pool, skipped, [name for name, _ in sources]
 
 
