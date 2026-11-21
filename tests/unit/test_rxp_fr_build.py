@@ -163,3 +163,20 @@ def test_the_validator_refuses_long_brackets_that_lua_51_rejects(bad):
     english, text, _, _ = _generate(Fake())
     broken = text.replace("Brin Chênevaux|r\r\n    .turnin", f"Brin Chênevaux|r {bad}\r\n    .turnin", 1)
     assert any("[[" in e or "]]" in e for e in validate_file(english, broken, known_names=set()))
+
+
+def test_a_next_to_a_part_of_a_guide_keeps_its_labels():
+    """RestedXP v4.11.37 : `#next Nom@début-fin` désigne une partie d'un guide ; les étiquettes après `@` sont des
+    identifiants, jamais traduits, et le nom avant `@` suit le `#name` traduit."""
+    english, _text, _, _ = _generate(Fake())
+    en2 = english.replace("#next 10-12 Test Marsh", "#next 10-12 Test Marsh@PartOneStart-PartOneEnd", 1)
+    rxp = glossary(ADDONS)
+    mem = Memory()
+    for en, fr in rxp.phrases.items():
+        mem.put(en, fr, "restedxp", date="d")
+    names = NameTable([("restedxp", rxp.names), ("client", client_layer(FIX / "wago"))])
+    out, _ = generate_file(en2, FR.read_bytes().decode("utf-8"), names=names, memory=mem, translator=Fake(), meta={})
+    assert "#next 10-12 Marais d’Essai@PartOneStart-PartOneEnd" in out
+    assert validate_file(en2, out, known_names=set()) == []
+    broken = out.replace("#next 10-12 Marais d’Essai@", "#next 10-12 Nulle part@", 1)
+    assert any("#next" in e for e in validate_file(en2, broken, known_names=set()))
