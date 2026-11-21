@@ -22,7 +22,7 @@ from forever.rxp_fr.install import (
     write_guides,
 )
 from forever.rxp_fr.memory import Memory, memory_path
-from forever.rxp_fr.names import NameTable, client_layer, questie_layer
+from forever.rxp_fr.names import NameTable, client_layer, questie_names
 from forever.rxp_fr.source import (
     EN_DIR,
     FR_DIR,
@@ -132,7 +132,7 @@ def translate_addons(
         [
             ("restedxp", rxp.names),
             ("client", client_layer(csv_dir) if csv_dir is not None else {}),
-            ("questie", questie_layer(addons / "Questie")),
+            ("questie", questie_names(addons / "Questie", mem_file.parent / "noms-questie.json")),
         ]
     )
     found = targets(addons, saved)

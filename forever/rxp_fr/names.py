@@ -8,8 +8,12 @@ figure au rapport. Aucun nom n'est traduit librement."""
 
 from __future__ import annotations
 
+import base64
 import csv
+import json
+import os
 import re
+import zlib
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
@@ -152,3 +156,136 @@ def questie_layer(addon_dir: Path) -> dict[str, dict[Key, str]]:
         else:
             layer[kind] = {**named, **ids}
     return layer
+
+
+# --- QuestieDB (Questie 12.11.1 et suivants) ---------------------------------------------------------------------
+
+QUESTIEDB_TYPES = {"npc": "Npc", "item": "Item", "object": "Object", "quest": "Quest"}
+_TOC_LINE = re.compile(r"^## ([^:\s]+):\s?(.*)$")
+_CHUNKS = re.compile(r"^~(\d+)~$")
+_NAME_KEY = re.compile(r"\[\s*['\"]name['\"]\s*\]\s*=\s*(\d+)")
+
+
+def _inflate(raw: bytes) -> bytes:
+    for wbits in (15, -15, 31):  # zlib, deflate brut, gzip
+        try:
+            return zlib.decompress(raw, wbits)
+        except zlib.error:
+            continue
+    raise ValueError("bloc compressé illisible")
+
+
+def _text(value: object) -> str | None:
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", errors="replace")
+    return value if isinstance(value, str) and value else None
+
+
+def questiedb_layer(addon_dir: Path, *, locale: str = "frFR") -> dict[str, dict[Key, str]]:
+    """Noms de l'addon QuestieDB : base « cuite » dans les métadonnées du `.toc` (`## X-<Type>-IDS` : identifiants
+    triés ; `## X-<Type>-<id>-S` : ligne anglaise ; `## X-l10n-<locale>-<Type>` : colonnes traduites alignées sur
+    les identifiants ; valeur `~N~` : morceaux `-1`…`-N`), base64, zlib, CBOR. Format relevé dans `src/read/baked.lua`
+    et `src/l10n/overlay.lua` de l'addon (lecture seule). Addon absent ou illisible : aucun nom."""
+    from forever.pipeline.cbor import CborError, decode
+
+    tocs = sorted(addon_dir.glob("QuestieDB*.toc"), key=lambda p: ("Forever" not in p.name, p.name))
+    if not tocs:
+        return {}
+    meta: dict[str, str] = {}
+    for line in tocs[0].read_text(encoding="utf-8", errors="replace").splitlines():
+        m = _TOC_LINE.match(line)
+        if m:
+            meta[m[1]] = m[2]
+
+    def stored(key: str) -> str | None:
+        value = meta.get(key)
+        chunks = _CHUNKS.match(value) if value else None
+        if chunks:
+            return "".join(meta.get(f"{key}-{i}", "") for i in range(1, int(chunks[1]) + 1))
+        return value
+
+    layer: dict[str, dict[Key, str]] = {}
+    for kind, entity in QUESTIEDB_TYPES.items():
+        meta_file = addon_dir / "src" / "meta" / f"{kind}Meta.lua"
+        found = (
+            _NAME_KEY.search(meta_file.read_text(encoding="utf-8", errors="replace")) if meta_file.is_file() else None
+        )
+        name_field = int(found[1]) if found else 1
+        try:
+            ids_raw, block_raw = stored(f"X-{entity}-IDS"), stored(f"X-l10n-{locale}-{entity}")
+            if not ids_raw or not block_raw:
+                continue
+            ids = decode(_inflate(base64.b64decode(ids_raw)))
+            block = decode(_inflate(base64.b64decode(block_raw)))
+        except (ValueError, CborError):
+            continue
+        if not isinstance(ids, list) or not isinstance(block, list) or not block or not isinstance(block[0], list):
+            continue
+        by_id: dict[Key, str] = {}
+        pairs: list[tuple[Key, str]] = []
+        for ident, french in zip(ids, block[0], strict=False):
+            fr = _text(french)
+            if not isinstance(ident, int) or fr is None:
+                continue
+            by_id[ident] = fr
+            row_raw = stored(f"X-{entity}-{ident}-S")
+            try:
+                row = decode(base64.b64decode(row_raw)) if row_raw else None
+            except (ValueError, CborError):
+                row = None
+            english = _text(row.get(name_field)) if isinstance(row, dict) else None
+            if english:
+                pairs.append((english, fr))
+        if kind == "quest":
+            layer["quest"] = by_id
+            layer["quest_title"] = unique_map(pairs)
+        else:
+            layer[kind] = {**unique_map(pairs), **by_id}
+    return {k: v for k, v in layer.items() if v}
+
+
+# --- copie des noms de Questie (hors dépôt) ---------------------------------------------------------------------
+
+
+def _save_layer(path: Path, layer: Mapping[str, Mapping[Key, str]]) -> None:
+    doc = {
+        "schema_version": 1,
+        "note": "Dernière lecture des noms de Questie ou QuestieDB (FR1, hors dépôt).",
+        "kinds": {
+            kind: {
+                "ids": {str(k): v for k, v in names.items() if isinstance(k, int)},
+                "names": {k: v for k, v in names.items() if isinstance(k, str)},
+            }
+            for kind, names in layer.items()
+        },
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_bytes(json.dumps(doc, ensure_ascii=False, sort_keys=True).encode("utf-8"))
+    os.replace(tmp, path)
+
+
+def _load_layer(path: Path) -> dict[str, dict[Key, str]]:
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    layer: dict[str, dict[Key, str]] = {}
+    for kind, value in (doc.get("kinds") or {}).items() if isinstance(doc, dict) else []:
+        names: dict[Key, str] = {int(k): v for k, v in (value.get("ids") or {}).items() if k.isdigit()}
+        names.update(value.get("names") or {})
+        layer[kind] = names
+    return layer
+
+
+def questie_names(questie_dir: Path, cache: Path) -> dict[str, dict[Key, str]]:
+    """Noms de Questie : ancienne base de l'addon Questie, sinon addon QuestieDB voisin (Questie 12.11.1 et
+    suivants), sinon la dernière lecture gardée dans `cache` (une réorganisation de Questie ne fait plus revenir
+    l'anglais). Une lecture réussie remplace la copie."""
+    layer = questie_layer(questie_dir)
+    if not any(layer.values()):
+        layer = questiedb_layer(questie_dir.parent / "QuestieDB")
+    if any(layer.values()):
+        _save_layer(cache, layer)
+        return layer
+    return _load_layer(cache)

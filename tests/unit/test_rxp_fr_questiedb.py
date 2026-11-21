@@ -18,7 +18,9 @@ def _head(major: int, n: int) -> bytes:
         return bytes([major << 5 | n])
     if n < 256:
         return bytes([major << 5 | 24, n])
-    return bytes([major << 5 | 25]) + struct.pack(">H", n)
+    if n < 65536:
+        return bytes([major << 5 | 25]) + struct.pack(">H", n)
+    return bytes([major << 5 | 26]) + struct.pack(">I", n)
 
 
 def cbor(value: object) -> bytes:
