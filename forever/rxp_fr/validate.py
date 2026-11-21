@@ -69,6 +69,7 @@ def _groups(bodies: Iterable[str]) -> set[str]:
 
 def _known(ref: str, names: set[str], groups: set[str]) -> bool:
     group, _, name = ref.rpartition("\\")
+    name = name.partition("@")[0]  # « Nom@début-fin » : partie d'un guide, étiquettes non traduites
     return name.strip() in names and (not group or group.strip() in groups)
 
 

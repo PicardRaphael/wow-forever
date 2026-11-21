@@ -164,6 +164,9 @@ class _Generator:
         group, _, name = value.rpartition("\\")
         # « Groupe\Guide » (`#next`, `#include`) : RestedXP range les guides par groupe et nom, les deux traduits
         prefix = self._title(group, collect, guide=False) + "\\" if group else ""
+        # « Nom@début-fin » (RestedXP v4.11.37) : partie d'un guide entre deux étiquettes, identifiants jamais traduits
+        name, at, labels = name.partition("@")
+        trail = at + labels + trail
         if guide:
             found = self.names.find("guide", name)
             if found is not None:
