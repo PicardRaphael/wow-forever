@@ -82,3 +82,19 @@ def test_a_name_with_brackets_or_codes_is_never_used():
     }
     table = NameTable([("client", {"item": {"Vial": "[INUTILISÉ] Fiole"}})])
     assert table.lookup("item", "Vial") is None
+
+
+def test_questie_names_are_kept_when_questie_moves_its_database(tmp_path):
+    """Questie 12.11.1 a sorti sa base dans l'addon QuestieDB : sans elle, les noms de Questie restent ceux de la
+    dernière lecture (copie hors dépôt), au lieu de revenir en anglais."""
+    from forever.rxp_fr.names import questie_names
+
+    cache = tmp_path / "rxp_fr" / "noms-questie.json"
+    first = questie_names(ADDONS / "Questie", cache)
+    assert first["item"]["Marsh Reed"] == "Roseau des marais" and cache.is_file()
+    again = questie_names(tmp_path / "Questie-sans-base", cache)
+    assert again["item"]["Marsh Reed"] == "Roseau des marais"
+    assert again["quest"][90002] == "Des défenses pour Brin"  # identifiants rendus en entiers
+    table = NameTable([("questie", again)])
+    found = table.lookup("npc", 900002)
+    assert found is not None and found.fr == "Sanglier des clairières"
