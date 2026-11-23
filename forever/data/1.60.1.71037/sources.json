@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.71037 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-11-22)",
+      "source": "Client 1.60.1.71037 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-11-23)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.71037 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-11-22)",
+      "source": "Client 1.60.1.71037 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-11-23)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -266,7 +266,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 2 (forever install, 2026-11-22)"
+        "installé en révision 3 (forever install, 2026-11-23)"
       ]
     },
     "races.json": {
@@ -400,7 +400,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 2 (forever install, 2026-11-22)"
+        "installé en révision 3 (forever install, 2026-11-23)"
       ]
     },
     "xp_bonuses.json": {
@@ -428,18 +428,18 @@
       ]
     }
   },
-  "revision": 2,
-  "revised_at": "2026-11-22",
+  "revision": 3,
+  "revised_at": "2026-11-23",
   "hotfixes": {
     "dbcache": {
       "file": "Cache/ADB/frFR/DBCache.bin",
       "locale": "frFR",
       "format": 9,
       "build": 71037,
-      "size": 11019308,
-      "sha256": "7ad718b9565894a9d5bb62c15ad10ce56795eb84123b902129294624637a4ec8",
-      "file_date": "2026-11-22T11:05:12Z",
-      "read_at": "2026-11-22T11:05:16Z"
+      "size": 8721652,
+      "sha256": "98767d232f4dbaf7722d1d5439b823206a89a4bcb50fc61fe18e6571f11b04d4",
+      "file_date": "2026-11-23T08:43:49Z",
+      "read_at": "2026-11-23T08:44:08Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -894,9 +894,10 @@
       114318,
       114320,
       114326,
-      114330
+      114330,
+      114332
     ],
-    "max_push": 114330,
+    "max_push": 114332,
     "seen_at": {
       "112414": null,
       "112623": null,
@@ -1295,7 +1296,8 @@
       "114318": null,
       "114320": null,
       "114326": null,
-      "114330": null
+      "114330": null,
+      "114332": null
     },
     "counts": {
       "ChrRaces": {
@@ -1319,9 +1321,9 @@
         "identical": 1
       },
       "Item": {
-        "VALID": 2993,
+        "VALID": 3018,
         "DELETE": 0,
-        "identical": 2990
+        "identical": 3015
       },
       "ItemEffect": {
         "VALID": 69,
@@ -1329,9 +1331,9 @@
         "identical": 63
       },
       "ItemSparse": {
-        "VALID": 2993,
+        "VALID": 3018,
         "DELETE": 0,
-        "identical": 1641
+        "identical": 1666
       },
       "ItemXItemEffect": {
         "VALID": 42,
@@ -18326,6 +18328,54 @@
       },
       {
         "table": "Item",
+        "rec_id": 4632,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 4633,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 4634,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 4636,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 4637,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 4638,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 4665,
         "status": "VALID",
         "push": 113672,
@@ -18714,6 +18764,30 @@
         "status": "VALID",
         "push": 112839,
         "unique_id": 3268727257,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 5758,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 5759,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 5760,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -21306,6 +21380,14 @@
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 9276,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -24050,6 +24132,14 @@
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 12033,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -28310,6 +28400,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 15699,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 15703,
         "status": "VALID",
         "push": 113672,
@@ -28434,6 +28532,14 @@
         "status": "VALID",
         "push": 113672,
         "unique_id": 2781748618,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 15902,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -29382,6 +29488,38 @@
       },
       {
         "table": "Item",
+        "rec_id": 16882,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 16883,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 16884,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 16885,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 16979,
         "status": "VALID",
         "push": 113672,
@@ -29782,6 +29920,30 @@
       },
       {
         "table": "Item",
+        "rec_id": 17962,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 17963,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 17964,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 18102,
         "status": "VALID",
         "push": 113672,
@@ -30134,6 +30296,30 @@
       },
       {
         "table": "Item",
+        "rec_id": 19296,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 19297,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 19298,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 19319,
         "status": "VALID",
         "push": 113672,
@@ -30178,6 +30364,14 @@
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 19425,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -32506,6 +32700,14 @@
         "status": "VALID",
         "push": 113016,
         "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 241233,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -42830,6 +43032,54 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 4632,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 4633,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 4634,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 4636,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 4637,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 4638,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 4665,
         "status": "VALID",
         "push": 113672,
@@ -43218,6 +43468,30 @@
         "status": "VALID",
         "push": 112839,
         "unique_id": 3268727257,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 5758,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 5759,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 5760,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -45810,6 +46084,14 @@
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 9276,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -48555,6 +48837,14 @@
         "push": 112864,
         "unique_id": 956664938,
         "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 12033,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
       },
       {
         "table": "ItemSparse",
@@ -52814,6 +53104,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 15699,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 15703,
         "status": "VALID",
         "push": 113672,
@@ -52939,6 +53237,14 @@
         "push": 113672,
         "unique_id": 2781748618,
         "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 15902,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
       },
       {
         "table": "ItemSparse",
@@ -53886,6 +54192,38 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 16882,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 16883,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 16884,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 16885,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 16979,
         "status": "VALID",
         "push": 113672,
@@ -54286,6 +54624,30 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 17962,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 17963,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 17964,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 18102,
         "status": "VALID",
         "push": 113672,
@@ -54638,6 +55000,30 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 19296,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 19297,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 19298,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 19319,
         "status": "VALID",
         "push": 113672,
@@ -54682,6 +55068,14 @@
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 19425,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -57010,6 +57404,14 @@
         "status": "VALID",
         "push": 113016,
         "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 241233,
+        "status": "VALID",
+        "push": 114332,
+        "unique_id": 875386052,
         "identical": true
       },
       {
@@ -119148,6 +119550,36 @@
       "invalid": [
         {
           "table": "ItemSparse",
+          "rec_id": 216661,
+          "push": 112709
+        },
+        {
+          "table": "Item",
+          "rec_id": 216661,
+          "push": 112709
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 217296,
+          "push": 112709
+        },
+        {
+          "table": "Item",
+          "rec_id": 217296,
+          "push": 112709
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 217299,
+          "push": 112709
+        },
+        {
+          "table": "Item",
+          "rec_id": 217299,
+          "push": 112709
+        },
+        {
+          "table": "ItemSparse",
           "rec_id": 9196,
           "push": 112720
         },
@@ -119220,6 +119652,236 @@
           "table": "SpellEffect",
           "rec_id": 1365142,
           "push": 112789
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 2665,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 2665,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 7188,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 7188,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 18806,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 18806,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 18824,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 18824,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 19134,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 19134,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 19878,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 19878,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 23188,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 23188,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 217294,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 217294,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 221030,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 221030,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 223326,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 223326,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 227952,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 227952,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 227957,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 227957,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228070,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228070,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228254,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228254,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228272,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228272,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228285,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228285,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228591,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228591,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 228684,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 228684,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 229380,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 229380,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 230248,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 230248,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 230802,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 230802,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 232299,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 232299,
+          "push": 112864
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 233209,
+          "push": 112864
+        },
+        {
+          "table": "Item",
+          "rec_id": 233209,
+          "push": 112864
         },
         {
           "table": "ItemSparse",
@@ -120302,6 +120964,26 @@
           "push": 113351
         },
         {
+          "table": "SpellPower",
+          "rec_id": 315148,
+          "push": 113367
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 315149,
+          "push": 113367
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 315152,
+          "push": 113367
+        },
+        {
+          "table": "SpellPower",
+          "rec_id": 315153,
+          "push": 113367
+        },
+        {
           "table": "ItemSparse",
           "rec_id": 278548,
           "push": 113373
@@ -120440,6 +121122,46 @@
           "table": "Item",
           "rec_id": 289555,
           "push": 113596
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287960,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287960,
+          "push": 113605
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287961,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287961,
+          "push": 113605
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287965,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287965,
+          "push": 113605
+        },
+        {
+          "table": "ItemSparse",
+          "rec_id": 287970,
+          "push": 113605
+        },
+        {
+          "table": "Item",
+          "rec_id": 287970,
+          "push": 113605
         },
         {
           "table": "ItemSparse",
@@ -127803,6 +128525,11 @@
         },
         {
           "table": "SpellPower",
+          "rec_id": 315240,
+          "push": 113941
+        },
+        {
+          "table": "SpellPower",
           "rec_id": 315242,
           "push": 113977
         },
@@ -129050,371 +129777,6 @@
           "table": "Item",
           "rec_id": 280996,
           "push": 114318
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 216661,
-          "push": 112709
-        },
-        {
-          "table": "Item",
-          "rec_id": 216661,
-          "push": 112709
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 217296,
-          "push": 112709
-        },
-        {
-          "table": "Item",
-          "rec_id": 217296,
-          "push": 112709
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 217299,
-          "push": 112709
-        },
-        {
-          "table": "Item",
-          "rec_id": 217299,
-          "push": 112709
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2665,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 2665,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 7188,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 7188,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 18806,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 18806,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 18824,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 18824,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 19134,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 19134,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 19878,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 19878,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 23188,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 23188,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 217294,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 217294,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 221030,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 221030,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 223326,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 223326,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 227952,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 227952,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 227955,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 227955,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 227957,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 227957,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 227961,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 227961,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228070,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228070,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228254,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228254,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228272,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228272,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228285,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228285,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228591,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228591,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 228684,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 228684,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 229380,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 229380,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 230248,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 230248,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 230802,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 230802,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 232299,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 232299,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 233209,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 233209,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 288506,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 288506,
-          "push": 112864
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 288619,
-          "push": 112864
-        },
-        {
-          "table": "Item",
-          "rec_id": 288619,
-          "push": 112864
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315148,
-          "push": 113367
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315149,
-          "push": 113367
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315152,
-          "push": 113367
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315153,
-          "push": 113367
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287960,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287960,
-          "push": 113605
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287961,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287961,
-          "push": 113605
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287965,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287965,
-          "push": 113605
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287970,
-          "push": 113605
-        },
-        {
-          "table": "Item",
-          "rec_id": 287970,
-          "push": 113605
-        },
-        {
-          "table": "SpellPower",
-          "rec_id": 315240,
-          "push": 113941
         }
       ],
       "notpublic": [
@@ -130275,9 +130637,9 @@
         }
       ],
       "dbreply": {
-        "0x021826bb": 53,
-        "ItemSparse": 89217,
-        "Spell": 28
+        "0x021826bb": 4,
+        "ItemSparse": 25356,
+        "Spell": 44
       },
       "item_reply": {
         "0x198e28b5": 5364,
@@ -130301,18 +130663,18 @@
         "0x0b685935": 1,
         "0x0e540efd": 5,
         "0x0e82664c": 14,
-        "0x0f992211": 1326,
+        "0x0f992211": 1276,
         "0x1018add5": 1,
         "0x111d4849": 2,
-        "0x12a212a9": 65,
+        "0x12a212a9": 57,
         "0x12a76efd": 2,
-        "0x13c403a5": 175,
+        "0x13c403a5": 174,
         "0x140a5855": 2,
         "0x14320f31": 85,
         "0x15393898": 1,
         "0x15f55b6d": 1,
         "0x15ff1ecc": 2,
-        "0x198e28b5": 3979,
+        "0x198e28b5": 3995,
         "0x1a6b0c40": 1,
         "0x1cf9216d": 69,
         "0x1d53eb74": 31,
@@ -130341,14 +130703,14 @@
         "0x37d001ef": 1,
         "0x394c3727": 14,
         "0x39606286": 2,
-        "0x3ac83109": 1326,
+        "0x3ac83109": 1276,
         "0x3b57c0a1": 4,
         "0x3b9e4ca2": 14,
         "0x3cc89c00": 3,
         "0x3e988108": 8,
         "0x3f85abb7": 3,
         "0x42261b89": 343,
-        "0x4553e9f7": 360,
+        "0x4553e9f7": 357,
         "0x45952e6e": 2,
         "0x461fdc45": 11,
         "0x4666ed42": 273,
@@ -130361,8 +130723,8 @@
         "0x50d91a78": 2,
         "0x5139503a": 3,
         "0x51a28350": 16,
-        "0x5481af88": 3979,
-        "0x550e7513": 11,
+        "0x5481af88": 3995,
+        "0x550e7513": 10,
         "0x588de300": 16,
         "0x59f2eb50": 3,
         "0x5c4bbb1f": 14,
@@ -130382,7 +130744,7 @@
         "0x6d100dcb": 28,
         "0x6f771411": 12,
         "0x6fe05ae9": 22,
-        "0x7253eb43": 79,
+        "0x7253eb43": 77,
         "0x758e7bcc": 7,
         "0x76c04c97": 2,
         "0x7b03245c": 2,
@@ -130431,7 +130793,7 @@
         "0xb33f3964": 3,
         "0xb3af6eca": 7,
         "0xb4b5e047": 2,
-        "0xb50ca635": 3979,
+        "0xb50ca635": 3995,
         "0xb5307a56": 25,
         "0xb8ba5fb3": 1,
         "0xb8f96456": 3,
@@ -130443,7 +130805,7 @@
         "0xbd84cd62": 5,
         "0xbe1eca27": 2,
         "0xbe6aed26": 2,
-        "0xbf0bc27a": 161,
+        "0xbf0bc27a": 158,
         "0xbfdaf9f1": 14,
         "0xc0a5f8c6": 70,
         "0xc2b150c7": 578,
@@ -130457,11 +130819,11 @@
         "0xc7ed797d": 1,
         "0xc842493a": 15,
         "0xc9bcb028": 12,
-        "0xc9d6b6b3": 381,
+        "0xc9d6b6b3": 380,
         "0xc9e0a749": 2119,
         "0xcc284d0f": 202,
         "0xccff87ed": 1,
-        "0xce88edca": 3979,
+        "0xce88edca": 3995,
         "0xcf156785": 1,
         "0xd055d7b5": 13,
         "0xd2ee2ca7": 3,
@@ -134509,6 +134871,30 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 4632
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 4633
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 4634
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 4636
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 4637
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 4638
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 4665
           },
           {
@@ -134634,6 +135020,18 @@
           {
             "table": "ItemSparse",
             "rec_id": 5757
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 5758
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 5759
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 5760
           },
           {
             "table": "ItemSparse",
@@ -135241,6 +135639,10 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 9276
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 9321
           },
           {
@@ -135578,6 +135980,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 12018
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 12033
           },
           {
             "table": "ItemSparse",
@@ -135961,6 +136367,10 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 15699
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 15703
           },
           {
@@ -136002,6 +136412,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 15857
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 15902
           },
           {
             "table": "ItemSparse",
@@ -136349,6 +136763,22 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 16882
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 16883
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 16884
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 16885
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 16979
           },
           {
@@ -136498,6 +136928,18 @@
           {
             "table": "ItemSparse",
             "rec_id": 17723
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 17962
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 17963
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 17964
           },
           {
             "table": "ItemSparse",
@@ -136661,6 +137103,18 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 19296
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 19297
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 19298
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 19319
           },
           {
@@ -136682,6 +137136,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 19395
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 19425
           },
           {
             "table": "ItemSparse",
@@ -137526,6 +137984,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 235278
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 241233
           },
           {
             "table": "ItemSparse",
@@ -156183,10 +156645,10 @@
       },
       "Item": {
         "ok": true,
-        "reason": "disposition 9A2A4834 validée : 2993 entrée(s) décodée(s), 2992 comparée(s), 100% des valeurs égales au build, 12/12 références résolues",
-        "decoded": 2993,
-        "compared": 2992,
-        "equal_ratio": 0.9999582219251337,
+        "reason": "disposition 9A2A4834 validée : 3018 entrée(s) décodée(s), 3017 comparée(s), 100% des valeurs égales au build, 12/12 références résolues",
+        "decoded": 3018,
+        "compared": 3017,
+        "equal_ratio": 0.9999585681140205,
         "references_ok": true
       },
       "ItemEffect": {
@@ -156199,10 +156661,10 @@
       },
       "ItemSparse": {
         "ok": true,
-        "reason": "disposition 6FCC3191 validée : 2993 entrée(s) décodée(s), 1641 comparée(s), 100% des valeurs égales au build, 76/76 références résolues",
-        "decoded": 2993,
-        "compared": 1641,
-        "equal_ratio": 0.9999645018725263,
+        "reason": "disposition 6FCC3191 validée : 3018 entrée(s) décodée(s), 1666 comparée(s), 100% des valeurs égales au build, 76/76 références résolues",
+        "decoded": 3018,
+        "compared": 1666,
+        "equal_ratio": 0.9998193452138137,
         "references_ok": true
       },
       "ItemXItemEffect": {
